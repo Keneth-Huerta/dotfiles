@@ -1,0 +1,17 @@
+
+show=drun
+width=650
+height=450
+location=center
+lines=12
+columns=1
+prompt=🔍 Buscar: 
+insensitive=true
+allow_markup=true
+stylesheet=/home/valge/.config/wofi/style.css
+allow_images=true
+hide_scroll=true
+filter_rate=100
+sort_order=alphabetical
+matching=fuzzy
+cache_file=/home/valge/.cache/wofi-drun

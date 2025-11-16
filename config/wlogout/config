@@ -1,0 +1,29 @@
+# Configuración de wlogout
+# Archivo: ~/.config/wlogout/config
+
+# Ubicación del archivo de layout
+layout = ~/.config/wlogout/layout
+
+# Ubicación del archivo de estilo CSS
+css = ~/.config/wlogout/style.css
+
+# Configuración de comportamiento
+buttons-per-row = 3
+column-spacing = 30
+row-spacing = 30
+margin-top = 0
+margin-bottom = 0
+margin-left = 0
+margin-right = 0
+
+# Posición de la ventana
+position = center
+
+# Configuración de animaciones
+fade-in = 250
+
+# Configuración de colores de fondo
+background-color = rgba(0, 0, 0, 0.85)
+
+# Configuración de selección por teclado
+selection-label = true

@@ -1,0 +1,156 @@
+/* 
+ * Wlogout Red Modern Theme - Estilo rojo moderno y elegante
+ * Diseño moderno con colores rojos predominantes
+ */
+
+/* Fondo principal con degradado */
+window {
+    font-family: "JetBrains Mono", "Ubuntu", "Roboto", sans-serif;
+    font-size: 14px;
+    color: #ffffff;
+    background: linear-gradient(135deg, #1a0000 0%, #330000 50%, #1a0000 100%);
+}
+
+/* Estilo base de los botones mejorado */
+button {
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    background: linear-gradient(145deg, #2d1b1b, #1a0f0f);
+    border: 2px solid #cc0000;
+    border-radius: 12px;
+    margin: 10px;
+    padding: 15px;
+    min-width: 140px;
+    min-height: 120px;
+    box-shadow: 0 4px 15px rgba(204, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+/* Efecto hover mejorado */
+button:hover {
+    background: linear-gradient(145deg, #cc0000, #ff1a1a);
+    border-color: #ff3333;
+    box-shadow: 0 6px 20px rgba(204, 0, 0, 0.5);
+}
+
+/* Efecto focus */
+button:focus {
+    border-color: #ff0000;
+    box-shadow: 0 0 0 3px rgba(204, 0, 0, 0.3);
+}
+
+/* Botón de bloquear - Rojo oscuro */
+#lock {
+    background: linear-gradient(145deg, #4d1a1a, #2d0f0f);
+    border-color: #990000;
+    background-image: url('/home/valge/.config/wlogout/icons/lock.svg');
+    background-repeat: no-repeat;
+    background-position: center 18px;
+    background-size: 80px 80px;
+}
+
+#lock:hover {
+    background: linear-gradient(145deg, #990000, #cc0000);
+    border-color: #cc0000;
+    background-image: url('/home/valge/.config/wlogout/icons/lock.svg');
+    background-repeat: no-repeat;
+    background-position: center 18px;
+    background-size: 80px 80px;
+}
+
+/* Botón de logout - Rojo carmesí */
+#logout {
+    background: linear-gradient(145deg, #4d1a2a, #2d0f1a);
+    border-color: #cc0033;
+    background-image: url('/home/valge/.config/wlogout/icons/logout.svg');
+    background-repeat: no-repeat;
+    background-position: center 18px;
+    background-size: 80px 80px;
+}
+
+#logout:hover {
+    background: linear-gradient(145deg, #cc0033, #ff0044);
+    border-color: #ff0044;
+    background-image: url('/home/valge/.config/wlogout/icons/logout.svg');
+    background-repeat: no-repeat;
+    background-position: center 18px;
+    background-size: 80px 80px;
+}
+
+/* Botón de suspender - Rojo naranja */
+#suspend {
+    background: linear-gradient(145deg, #4d2a1a, #2d1a0f);
+    border-color: #cc3300;
+    background-image: url('/home/valge/.config/wlogout/icons/suspend.svg');
+    background-repeat: no-repeat;
+    background-position: center 18px;
+    background-size: 80px 80px;
+}
+
+#suspend:hover {
+    background: linear-gradient(145deg, #cc3300, #ff4400);
+    border-color: #ff4400;
+    background-image: url('/home/valge/.config/wlogout/icons/suspend.svg');
+    background-repeat: no-repeat;
+    background-position: center 18px;
+    background-size: 80px 80px;
+}
+
+/* Botón de hibernar - Rojo profundo */
+#hibernate {
+    background: linear-gradient(145deg, #3d1a1a, #2a0f0f);
+    border-color: #990000;
+    background-image: url('/home/valge/.config/wlogout/icons/hibernate.svg');
+    background-repeat: no-repeat;
+    background-position: center 18px;
+    background-size: 80px 80px;
+}
+
+#hibernate:hover {
+    background: linear-gradient(145deg, #990000, #cc0000);
+    border-color: #cc0000;
+    background-image: url('/home/valge/.config/wlogout/icons/hibernate.svg');
+    background-repeat: no-repeat;
+    background-position: center 18px;
+    background-size: 80px 80px;
+}
+
+/* Botón de apagar - Rojo brillante */
+#shutdown {
+    background: linear-gradient(145deg, #4d1a1a, #330f0f);
+    border-color: #ff0000;
+    background-image: url('/home/valge/.config/wlogout/icons/shutdown.svg');
+    background-repeat: no-repeat;
+    background-position: center 18px;
+    background-size: 80px 80px;
+}
+
+#shutdown:hover {
+    background: linear-gradient(145deg, #ff0000, #ff3333);
+    border-color: #ff3333;
+    background-image: url('/home/valge/.config/wlogout/icons/shutdown.svg');
+    background-repeat: no-repeat;
+    background-position: center 18px;
+    background-size: 80px 80px;
+}
+
+/* Botón de reiniciar - Rojo vibrante */
+#reboot {
+    background: linear-gradient(145deg, #4d2020, #301515);
+    border-color: #cc0044;
+    background-image: url('/home/valge/.config/wlogout/icons/reboot.svg');
+    background-repeat: no-repeat;
+    background-position: center 18px;
+    background-size: 80px 80px;
+}
+
+#reboot:hover {
+    background: linear-gradient(145deg, #cc0044, #ff1155);
+    border-color: #ff1155;
+    background-image: url('/home/valge/.config/wlogout/icons/reboot.svg');
+    background-repeat: no-repeat;
+    background-position: center 18px;
+    background-size: 80px 80px;
+}

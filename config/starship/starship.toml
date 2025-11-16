@@ -1,0 +1,102 @@
+# Ejemplo de configuración de Starship
+# Coloca este archivo en: ~/.config/starship.toml
+# O en: ~/dotfiles/config/starship/starship.toml
+
+# Formato general con colores rojos
+format = """
+[┌───────────────────>](bold red)
+[│](bold red)$directory$git_branch$git_status
+[└─>](bold red) """
+
+# Directorio actual
+[directory]
+style = "bold red"
+format = "[$path]($style)[$read_only]($read_only_style) "
+truncation_length = 3
+truncate_to_repo = true
+
+# Git branch
+[git_branch]
+symbol = " "
+style = "bold yellow"
+format = "on [$symbol$branch]($style) "
+
+# Git status
+[git_status]
+style = "bold red"
+conflicted = "🏳"
+ahead = "⇡${count}"
+behind = "⇣${count}"
+diverged = "⇕⇡${ahead_count}⇣${behind_count}"
+up_to_date = "✓"
+untracked = "🤷"
+stashed = "📦"
+modified = "📝"
+staged = '[++\($count\)](green)'
+renamed = "👅"
+deleted = "🗑"
+
+# Character prompt
+[character]
+success_symbol = "[➜](bold green)"
+error_symbol = "[➜](bold red)"
+
+# Lenguajes de programación
+[nodejs]
+symbol = " "
+style = "bold green"
+format = "via [$symbol($version )]($style)"
+
+[python]
+symbol = " "
+style = "bold yellow"
+format = 'via [${symbol}${pyenv_prefix}(${version} )(\($virtualenv\) )]($style)'
+
+[rust]
+symbol = " "
+style = "bold red"
+format = "via [$symbol($version )]($style)"
+
+[golang]
+symbol = " "
+style = "bold cyan"
+format = "via [$symbol($version )]($style)"
+
+[java]
+symbol = " "
+style = "bold red"
+format = "via [$symbol($version )]($style)"
+
+# Docker
+[docker_context]
+symbol = " "
+style = "bold blue"
+format = "via [$symbol$context]($style) "
+
+# Tiempo de ejecución
+[cmd_duration]
+min_time = 500
+style = "bold yellow"
+format = "took [$duration]($style) "
+
+# Hora
+[time]
+disabled = false
+style = "bold red"
+format = '🕙[\[ $time \]]($style) '
+time_format = "%T"
+
+# Usuario
+[username]
+style_user = "bold red"
+style_root = "bold red"
+format = "[$user]($style) "
+disabled = false
+show_always = false
+
+# Hostname
+[hostname]
+ssh_only = true
+style = "bold red"
+format = "on [$hostname]($style) "
+disabled = false

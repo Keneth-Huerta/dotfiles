@@ -1,0 +1,108 @@
+# Backups
+*.bak
+*.backup
+*.old
+*~
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+.*.swp
+
+# OS specific
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor specific
+.vscode/settings.json
+.idea/
+*.code-workspace
+
+# Datos personales sensibles
+config/git/.gitconfig
+secrets/
+*.key
+*.pem
+*.cert
+
+# Tokens y credenciales
+*token*
+*secret*
+*password*
+.env
+.env.*
+
+# Cache
+*.cache
+cache/
+__pycache__/
+.pytest_cache/
+packages/*.cache
+
+# Node modules
+node_modules/
+npm-debug.log*
+
+# Python
+*.pyc
+*.pyo
+venv/
+.venv/
+
+# Configuraciones específicas de máquina
+local-config.sh
+*.local
+
+# Historiales
+.bash_history
+.zsh_history
+.python_history
+.node_repl_history
+
+# SSH keys
+*.pub
+id_rsa
+id_ed25519
+
+# Configuraciones de servicios específicos
+config/gh/
+config/github-copilot/
+config/netbird/
+
+# Bases de datos
+*.db
+*.sqlite
+*.sqlite3
+
+# VS Code/JetBrains heavy data
+config/Code/User/workspaceStorage/
+config/Code/CachedData/
+config/Code/Cache/
+config/Code/logs/
+config/JetBrains/
+
+# Configuraciones de juegos
+config/PCSX2/
+config/Ryujinx/
+config/heroic/
+config/StardewValley/
+config/gamehub/
+config/hydralauncher/
+
+# Plasma/KDE configs (muy específicos)
+config/plasma-*
+config/kwin*
+config/kdeglobals
+
+# Sesiones
+config/session/
+*.session
+
+# Historiales de apps
+config/*history*

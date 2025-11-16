@@ -1,0 +1,62 @@
+# Usar una captura de pantalla como fondo con desenfoque
+screenshots
+
+# Aplicar efectos modernos de desenfoque y viñeta
+effect-blur=7x5
+effect-vignette=0.2:0.5
+
+# Fade in suave al mostrar el bloqueador
+fade-in=0.2
+
+# Mostrar el reloj
+clock
+
+# Mostrar intentos de autenticación fallidos
+show-failed-attempts
+
+# Tema rojo moderno para el indicador
+# Anillo exterior
+ring-color=a30000
+ring-ver-color=ff0000     # Verde al verificar -> rojo brillante
+ring-wrong-color=ff4444   # Rojo claro al fallar
+ring-clear-color=660000   # Rojo oscuro al limpiar
+
+# Interior del círculo
+inside-color=111213aa     # Fondo del círculo (semi-transparente)
+inside-ver-color=111213bb
+inside-wrong-color=330000bb
+inside-clear-color=111213aa
+
+# Colores del texto
+text-color=ffffff
+text-ver-color=ffffff
+text-wrong-color=ffaaaa
+text-clear-color=ffffff
+
+# Línea separadora (invisible para look moderno)
+line-color=00000000
+line-ver-color=00000000
+line-wrong-color=00000000
+line-clear-color=00000000
+
+# Separador invisible
+separator-color=00000000
+
+# Configuración del indicador moderno
+indicator-radius=120
+indicator-thickness=15
+indicator-caps-lock
+
+# Fuente personalizada
+font="Noto Sans CJK JP"
+font-size=16
+
+# Posición centrada del indicador
+indicator-x-position=960
+indicator-y-position=540
+
+# Timeout de pantalla
+screen-timeout=30
+
+# Ocultar el indicador cuando está inactivo
+indicator-idle-visible

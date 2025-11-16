@@ -1,0 +1,115 @@
+/* Red Dominant Style */
+* {
+  font-family: "JetBrains Mono Nerd Font", "Hack Nerd Font", "FiraCode Nerd Font", "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
+  margin: 0;
+  padding: 0;
+}
+
+window#waybar {
+  background: rgba(25, 5, 5, 0.95);
+  border-bottom: 3px solid #ff4757;
+  /* backdrop-filter no es compatible con GTK en Waybar */
+  /* backdrop-filter: blur(10px); */
+  color: #ffcccc;
+}
+
+/* Workspaces */
+#workspaces {
+  background: transparent;
+  margin: 5px;
+  padding: 0px 5px;
+  border-radius: 10px;
+}
+
+#workspaces button {
+  padding: 5px 10px;
+  margin: 3px;
+  border-radius: 8px;
+  background: rgba(255, 71, 87, 0.1);
+  color: #ffaaaa;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+#workspaces button.active {
+  background: #ff4757;
+  color: #ffffff;
+  border: 2px solid #ff3742;
+}
+
+#workspaces button:hover {
+  background: rgba(255, 71, 87, 0.3);
+  color: #ffffff;
+}
+
+/* Window title */
+#window {
+  margin: 5px;
+  padding: 5px 15px;
+  border-radius: 8px;
+  background: rgba(139, 28, 28, 0.6);
+  color: #ffcccc;
+  font-weight: 500;
+}
+
+/* Clock */
+#clock {
+  margin: 5px;
+  padding: 5px 15px;
+  border-radius: 8px;
+  background: rgba(255, 71, 87, 0.2);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* All modules in the right */
+#pulseaudio, #network, #cpu, #memory, #temperature, #battery, #tray {
+  margin: 5px 3px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  background: rgba(183, 28, 28, 0.4);
+  color: #ffcccc;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+#pulseaudio:hover, #network:hover, #cpu:hover, #memory:hover, #temperature:hover, #battery:hover {
+  background: rgba(255, 71, 87, 0.3);
+  /* transform: translateY(-2px); */ /* No compatible con GTK */
+  color: #ffffff;
+}
+
+/* Battery states */
+#battery.critical:not(.charging) {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  animation: blink 0.5s linear infinite alternate;
+}
+
+#battery.warning:not(.charging) {
+  background: rgba(255, 193, 7, 0.3);
+  color: #ffc107;
+}
+
+#battery.good {
+  background: rgba(76, 175, 80, 0.3);
+  color: #4caf50;
+}
+
+/* Temperature warning */
+#temperature.critical {
+  background: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  animation: blink 0.5s linear infinite alternate;
+}
+
+@keyframes blink {
+  to {
+    background: rgba(255, 71, 87, 0.7);
+  }
+}

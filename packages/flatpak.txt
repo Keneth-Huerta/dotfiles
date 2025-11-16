@@ -1,0 +1,6 @@
+com.mattjakeman.ExtensionManager
+com.usebottles.bottles
+com.vysp3r.ProtonPlus
+io.github.peazip.PeaZip
+it.mijorus.gearlever
+org.vinegarhq.Sober

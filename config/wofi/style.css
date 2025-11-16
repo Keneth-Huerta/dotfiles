@@ -1,0 +1,86 @@
+/*
+ * Wofi Clean Red Theme - Versión Mejorada
+ *
+ * Mejoras:
+ * - Mejor espaciado entre elementos
+ * - Separación visual más clara entre aplicaciones
+ * - Bordes suaves y sombras
+ * - Mejor contraste y legibilidad
+ * - Efectos de hover más suaves
+ */
+
+/* Estilo principal de la ventana */
+window {
+    background-color: rgba(30, 30, 30, 0.95);
+    border-radius: 16px;
+    border: 2px solid #ff1744;
+    padding: 8px;
+    font-family: "Ubuntu", sans-serif;
+    font-size: 13px;
+    margin: 0;
+}
+
+/* Campo de entrada de texto */
+#input {
+    background: #222;
+    color: #fff;
+    border-radius: 8px;
+    border: none;
+    margin-bottom: 12px;
+    font-size: 18px;
+    padding: 8px 10px;
+    outline: none;
+    transition: border-color 0.2s ease-in-out;
+}
+
+/* Contenedor de scroll */
+#scroll {
+    margin: 0;
+    padding: 0;
+}
+
+/* Contenedores internos - IMPORTANTE: sin margin para evitar que cubran el borde */
+#outer-box,
+#inner-box {
+    margin: 3px;
+    padding: 0;
+    background: transparent;
+}
+
+/* Estilo de cada entrada/resultado en la lista */
+#entry {
+    background: transparent;
+    border-radius: 12px;
+    margin: 8px;
+    padding: 12px;
+    font-size: 20px;
+    color: #fff;
+    transition: background 0.2s;
+    min-height: 32px;
+}
+
+/* Estado seleccionado */
+#entry:selected {
+    background: #ff1744;
+    color: #fff;
+}
+
+/* Efecto hover para entradas no seleccionadas */
+#entry:not(:selected):hover {
+    background-color: #3a3a3a;
+}
+
+/* Elementos de texto dentro de una entrada */
+#entry #text {
+    margin: 0;
+    padding: 0;
+    line-height: 1.2;
+}
+
+/* Elementos de imagen dentro de una entrada */
+#entry #img {
+    margin-right: 12px;
+    width: 48px;
+    height: 48px;
+    vertical-align: middle;
+}
