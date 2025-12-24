@@ -1,25 +1,25 @@
-# 🔴 Dotfiles - Sistema de Configuración Automática
+# Dotfiles - Sistema de Configuración Automática
 
 Sistema modular de dotfiles para Arch Linux con Hyprland, diseñado para restaurar tu entorno completo en cualquier máquina con un solo comando.
 
-## ✨ Características
+## Características
 
-- 🎨 **Tema moderno** con colores rojos predominantes
-- 🚀 **Instalación modular** - instala solo lo que necesitas
-- 🔧 **Configuración completa** de Hyprland + Waybar
-- 📦 **Gestión de paquetes** - Pacman, AUR y Flatpak
-- 🎯 **Modo rápido** para instalación parcial (ideal para escuela/trabajo)
-- 💾 **Sistema de backup** para tus configuraciones actuales
-- 🔗 **Symlinks automáticos** para fácil sincronización
+ **Tema moderno** con colores rojos predominantes
+ **Instalación modular** - instala solo lo que necesitas
+-  **Configuración completa** de Hyprland + Waybar
+-  **Gestión de paquetes** - Pacman, AUR y Flatpak
+-  **Modo rápido** para instalación parcial (ideal para escuela/trabajo)
+-  **Sistema de backup** para tus configuraciones actuales
+-  **Symlinks automáticos** para fácil sincronización
 
-## 📋 Requisitos
+## Requisitos
 
 - Arch Linux (o derivados como Manjaro, EndeavourOS)
 - Conexión a internet activa
 - Git instalado: `sudo pacman -S git`
 - Usuario con permisos sudo
 
-## 🚀 Instalación Rápida
+## Instalación Rápida
 
 ```bash
 # 1. Clonar el repositorio
@@ -36,7 +36,7 @@ nano config.sh
 ./install.sh
 ```
 
-## 📂 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```
 dotfiles/
@@ -76,9 +76,9 @@ dotfiles/
 └── user-scripts/               # Scripts personalizados del usuario
 ```
 
-## 🎯 Modos de Uso
+## Modos de Uso
 
-### 1️⃣ Instalación Completa
+### Instalación Completa
 **Ideal para:** Nueva instalación de Arch Linux
 
 ```bash
@@ -90,7 +90,7 @@ dotfiles/
 
 ---
 
-### 2️⃣ Instalación Rápida (Modo Portátil)
+### Instalación Rápida (Modo Portátil)
 **Ideal para:** Escuela, trabajo, computadoras temporales
 
 ```bash
@@ -104,7 +104,7 @@ dotfiles/
 
 ---
 
-### 3️⃣ Instalación Modular
+### Instalación Modular
 Instala solo componentes específicos:
 
 - **Opción 2:** Solo paquetes
@@ -115,7 +115,7 @@ Instala solo componentes específicos:
 
 ---
 
-### 4️⃣ Hacer Backup
+### Hacer Backup
 Guarda tu configuración actual **antes** de instalar:
 
 ```bash
@@ -128,7 +128,7 @@ Guarda tu configuración actual **antes** de instalar:
 - Archivos de shell (`.zshrc`, etc.)
 - Lista de paquetes instalados
 
-## 🔧 Configuración Personalizada
+## Configuración Personalizada
 
 Edita `config.sh` antes de instalar con tu información:
 
@@ -152,14 +152,14 @@ CURSOR_THEME="Bibata-Modern-Classic"
 HYPRLAND_BORDER_COLOR="rgb(dc143c)"  # Rojo carmesí
 ```
 
-## 📦 Paquetes Incluidos
+## Paquetes Incluidos
 
-### 🔨 Sistema y Desarrollo
+### Sistema y Desarrollo
 - Base: `base-devel`, `git`, `wget`, `curl`
 - Lenguajes: `nodejs`, `python`, `go`, `rust`
 - Contenedores: `docker`, `docker-compose`
 
-### 🎨 Hyprland y Wayland
+### Hyprland y Wayland
 - Core: `hyprland`, `waybar`, `rofi-wayland`
 - Wallpapers: `swaybg`
 - Lock: `swaylock-effects`, `swayidle`
@@ -167,16 +167,16 @@ HYPRLAND_BORDER_COLOR="rgb(dc143c)"  # Rojo carmesí
 - Notificaciones: `dunst`
 - Screenshots: `grim`, `slurp`
 
-### 💻 Terminal y Shell
+### Terminal y Shell
 - Terminales: `kitty`, `alacritty`
 - Shells: `fish`, `zsh` + plugins
 - Prompts: `starship`, `oh-my-posh`
 - Multiplexor: `tmux`
 
-### ✏️ Editores
+### Editores
 - `neovim`, `vim`, `visual-studio-code-bin`
 
-### 🛠️ Utilidades CLI
+### Utilidades CLI
 - Monitores: `htop`, `btop`
 - Info: `fastfetch`, `neofetch`
 - Búsqueda: `fzf`, `ripgrep`, `fd`
@@ -184,15 +184,15 @@ HYPRLAND_BORDER_COLOR="rgb(dc143c)"  # Rojo carmesí
 - File managers: `ranger`, `nnn`
 - Git: `git`, `git-delta`, `lazygit`
 
-### 🌐 Navegadores
+### Navegadores
 - `firefox`, `chromium`, `brave-bin`
 
-### 🎨 Temas y Fuentes
+### Temas y Fuentes
 - GTK: `catppuccin-gtk-theme-mocha`
 - Iconos: `papirus-icon-theme`
 - Fuentes: `ttf-jetbrains-mono-nerd`, `ttf-font-awesome`
 
-## 🔄 Flujo de Trabajo
+## Flujo de Trabajo
 
 ### Primera vez (Nueva instalación de Arch)
 
@@ -251,7 +251,7 @@ git commit -m "Update configs - $(date +%Y-%m-%d)"
 git push origin main
 ```
 
-## 🎨 Tema y Estilo
+## Tema y Estilo
 
 **Tema moderno con colores rojos predominantes:**
 
@@ -261,7 +261,7 @@ git push origin main
 - Cursor: Bibata Modern Classic
 - Colores Hyprland: Bordes rojos (`#dc143c`)
 
-## 🐛 Solución de Problemas
+## Solución de Problemas
 
 ### No hay internet
 ```bash
@@ -283,21 +283,21 @@ cd ~/dotfiles
 mv ~/.config/hypr.bak ~/.config/hypr
 ```
 
-## 📝 Notas
+## Notas
 
-1. ⚠️ Edita `config.sh` antes del primer uso
-2. 💾 Backups automáticos con extensión `.bak`
-3. 🔗 Las configs se enlazan (symlinks), no se copian
-4. 🔒 Datos sensibles: añádelos a `.gitignore`
+1.  Edita `config.sh` antes del primer uso
+2.  Backups automáticos con extensión `.bak`
+3.  Las configs se enlazan (symlinks), no se copian
+4.  Datos sensibles: añádelos a `.gitignore`
 
-## 👤 Autor
+##  Autor
 
 **Keneth Isaac Huerta Galindo**
-- GitHub: [@kenethissac](https://github.com/kenethissac)
-- Email: hugk070821@gmail.com
+- GitHub: [@Keneth-Huerta](https://github.com/Keneth-Huerta)
+- Email: kenethissac@gmail.com
 
 ---
 
-⭐ **¡Dale una estrella si te gusta este proyecto!**
+**¡Dale una estrella si te gusta este proyecto!**
 
-💡 **Tip:** Puedes forkear y adaptar a tus necesidades.
+**Tip:** Puedes forkear y adaptar a tus necesidades.
