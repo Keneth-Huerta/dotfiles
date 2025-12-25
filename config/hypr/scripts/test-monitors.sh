@@ -4,7 +4,7 @@
 # Comprehensive testing of the monitor management system
 
 LOG_FILE="/tmp/monitor-test.log"
-MONITOR_MANAGER="/home/valge/.config/hypr/scripts/monitor-manager.sh"
+MONITOR_MANAGER="$HOME/.config/hypr/scripts/monitor-manager.sh"
 
 # Colors for output
 RED='\033[0;31m'

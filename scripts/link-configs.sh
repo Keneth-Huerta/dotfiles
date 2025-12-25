@@ -60,14 +60,7 @@ link_kitty() {
     fi
 }
 
-# Función para enlazar configuraciones de Fish
-link_fish() {
-    echo -e "${BLUE}Enlazando configuraciones de Fish...${NC}"
-    
-    if [ -d "$DOTFILES_DIR/config/fish" ]; then
-        create_symlink "$DOTFILES_DIR/config/fish" "$HOME/.config/fish"
-    fi
-}
+
 
 # Función para enlazar configuraciones de Zsh
 link_zsh() {
@@ -195,7 +188,6 @@ link_all() {
     link_hyprland
     link_waybar
     link_kitty
-    link_fish
     link_zsh
     link_neovim
     link_rofi
@@ -221,20 +213,19 @@ main() {
     echo "2)  Hyprland"
     echo "3)  Waybar"
     echo "4)  Kitty"
-    echo "5)  Fish"
-    echo "6)  Zsh"
-    echo "7)  Neovim"
-    echo "8)  Rofi"
-    echo "9)  Dunst"
-    echo "10) Starship"
-    echo "11) Git"
-    echo "12) Tmux"
-    echo "13) Btop"
-    echo "14) Fastfetch"
-    echo "15) Wlogout"
-    echo "16) Swaylock"
-    echo "17) MPV"
-    echo "18) Ranger"
+    echo "5)  Zsh"
+    echo "6)  Neovim"
+    echo "7)  Rofi"
+    echo "8)  Dunst"
+    echo "9) Starship"
+    echo "10) Git"
+    echo "11) Tmux"
+    echo "12) Btop"
+    echo "13) Fastfetch"
+    echo "14) Wlogout"
+    echo "15) Swaylock"
+    echo "16) MPV"
+    echo "17) Ranger"
     echo "0)  Volver"
     echo ""
     read -p "Selecciona una opción: " option
@@ -244,20 +235,19 @@ main() {
         2) link_hyprland ;;
         3) link_waybar ;;
         4) link_kitty ;;
-        5) link_fish ;;
-        6) link_zsh ;;
-        7) link_neovim ;;
-        8) link_rofi ;;
-        9) link_dunst ;;
-        10) link_starship ;;
-        11) link_git ;;
-        12) link_tmux ;;
-        13) link_btop ;;
-        14) link_fastfetch ;;
-        15) link_wlogout ;;
-        16) link_swaylock ;;
-        17) link_mpv ;;
-        18) link_ranger ;;
+        5) link_zsh ;;
+        6) link_neovim ;;
+        7) link_rofi ;;
+        8) link_dunst ;;
+        9) link_starship ;;
+        10) link_git ;;
+        11) link_tmux ;;
+        12) link_btop ;;
+        13) link_fastfetch ;;
+        14) link_wlogout ;;
+        15) link_swaylock ;;
+        16) link_mpv ;;
+        17) link_ranger ;;
         0) return ;;
         *) echo -e "${RED}Opción inválida${NC}" ;;
     esac

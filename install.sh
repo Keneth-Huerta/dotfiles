@@ -6,7 +6,8 @@
 # Uso: ./install.sh [--full|--gui|--cli|--dev|--configs-only|--custom]
 # ============================================================================
 
-set -e  # Salir si hay errores
+# No usar set -e aquí para permitir mejor manejo de errores
+# set -e  
 
 # ============================================================================
 # VARIABLES GLOBALES
@@ -18,14 +19,7 @@ LOG_FILE="$HOME/.dotfiles-install.log"
 CONFIG_DIR="$SCRIPT_DIR/config"
 SCRIPTS_DIR="$SCRIPT_DIR/scripts"
 PACKAGES_DIR="$SCRIPT_DIR/packages"
-
-#!/usr/bin/env bash
-
-# Script de instalación de dotfiles
-# Autor: Keneth Isaac Huerta Galindo
-# Descripción: Instalador modular para Arch Linux con menú interactivo
-
-set -e
+PROFILES_DIR="$SCRIPT_DIR/scripts/profiles"
 
 # Colores para output
 RED='\033[0;31m'
@@ -38,6 +32,188 @@ NC='\033[0m' # No Color
 
 # Directorio de dotfiles
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Modo dry-run
+DRY_RUN=false
+
+# Perfil seleccionado
+SELECTED_PROFILE=""
+
+# Control de sudo
+SUDO_CACHED=false
+SUDO_TIMESTAMP=0
+
+# ============================================================================
+# FUNCIONES DE MANEJO DE PERMISOS
+# ============================================================================
+
+# Verificar si el usuario tiene permisos sudo
+check_sudo_access() {
+    if ! sudo -n true 2>/dev/null; then
+        # Usuario no tiene sudo cacheado, verificar si puede usarlo
+        if ! groups | grep -q '\(wheel\|sudo\)'; then
+            log_error "Tu usuario no está en el grupo 'wheel' o 'sudo'"
+            log_error "Necesitas permisos de administrador para instalar paquetes"
+            echo ""
+            echo -e "${YELLOW}Solución:${NC}"
+            echo "  1. Agrega tu usuario al grupo wheel:"
+            echo "     su -c 'usermod -aG wheel $USER'"
+            echo "  2. Asegúrate que wheel tiene permisos en /etc/sudoers:"
+            echo "     su -c 'visudo'  # Descomenta: %wheel ALL=(ALL:ALL) ALL"
+            echo "  3. Cierra sesión y vuelve a entrar"
+            return 1
+        fi
+    fi
+    return 0
+}
+
+# Cachear contraseña sudo al inicio
+cache_sudo() {
+    if [[ "$SUDO_CACHED" == true ]]; then
+        # Verificar si el caché sigue válido (por defecto 5 minutos)
+        local current_time=$(date +%s)
+        local elapsed=$((current_time - SUDO_TIMESTAMP))
+        
+        # Si han pasado más de 4 minutos, renovar
+        if [[ $elapsed -gt 240 ]]; then
+            if sudo -v 2>/dev/null; then
+                SUDO_TIMESTAMP=$(date +%s)
+                return 0
+            else
+                SUDO_CACHED=false
+                return 1
+            fi
+        fi
+        return 0
+    fi
+    
+    log_info "Este script necesita permisos de administrador para instalar paquetes"
+    echo -e "${YELLOW}Por favor, ingresa tu contraseña sudo:${NC}"
+    
+    if sudo -v; then
+        SUDO_CACHED=true
+        SUDO_TIMESTAMP=$(date +%s)
+        
+        # Mantener sudo activo en segundo plano
+        (
+            while true; do
+                sleep 240  # Cada 4 minutos
+                sudo -n true 2>/dev/null || exit
+            done
+        ) &
+        SUDO_KEEPALIVE_PID=$!
+        
+        log_success "Credenciales sudo verificadas y cacheadas"
+        return 0
+    else
+        log_error "No se pudieron verificar las credenciales sudo"
+        return 1
+    fi
+}
+
+# Ejecutar comando con sudo de forma segura
+run_sudo() {
+    local cmd="$*"
+    
+    if [[ "$DRY_RUN" == true ]]; then
+        echo -e "${YELLOW}[DRY-RUN]${NC} sudo $cmd"
+        return 0
+    fi
+    
+    # Verificar que tenemos sudo cacheado
+    if [[ "$SUDO_CACHED" != true ]]; then
+        if ! cache_sudo; then
+            log_error "No se pudo obtener permisos sudo"
+            return 1
+        fi
+    fi
+    
+    # Ejecutar comando
+    if sudo $cmd; then
+        return 0
+    else
+        local exit_code=$?
+        log_error "Comando con sudo falló (código: $exit_code): $cmd"
+        return $exit_code
+    fi
+}
+
+# Limpiar proceso de keepalive al salir
+cleanup_sudo() {
+    if [[ -n "${SUDO_KEEPALIVE_PID:-}" ]]; then
+        kill "$SUDO_KEEPALIVE_PID" 2>/dev/null || true
+    fi
+}
+
+# Trap para limpiar al salir
+trap cleanup_sudo EXIT INT TERM
+
+# Funciones de utilidad
+log_info() {
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    echo -e "${BLUE}[INFO]${NC} $1" | tee -a "$LOG_FILE"
+    echo "[$timestamp] [INFO] $1" >> "$LOG_FILE"
+}
+
+log_success() {
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    echo -e "${GREEN}[OK]${NC} $1" | tee -a "$LOG_FILE"
+    echo "[$timestamp] [SUCCESS] $1" >> "$LOG_FILE"
+}
+
+log_warn() {
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    echo -e "${YELLOW}[WARN]${NC} $1" | tee -a "$LOG_FILE"
+    echo "[$timestamp] [WARN] $1" >> "$LOG_FILE"
+}
+
+log_error() {
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    echo -e "${RED}[ERROR]${NC} $1" | tee -a "$LOG_FILE"
+    echo "[$timestamp] [ERROR] $1" >> "$LOG_FILE"
+}
+
+log_debug() {
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    if [ "${DEBUG:-false}" = true ]; then
+        echo -e "${MAGENTA}[DEBUG]${NC} $1"
+        echo "[$timestamp] [DEBUG] $1" >> "$LOG_FILE"
+    else
+        echo "[$timestamp] [DEBUG] $1" >> "$LOG_FILE"
+    fi
+}
+
+command_exists() {
+    command -v "$1" &> /dev/null
+}
+
+# Ejecutar comando (respeta DRY_RUN)
+run_command() {
+    local cmd="$*"
+    if [ "$DRY_RUN" = true ]; then
+        echo -e "${CYAN}[DRY-RUN]${NC} $cmd"
+        return 0
+    else
+        log_info "Ejecutando: $cmd"
+        eval "$cmd"
+    fi
+}
+
+# Instalar paquete (respeta DRY_RUN)
+install_package() {
+    local pkg="$1"
+    if [ "$DRY_RUN" = true ]; then
+        echo -e "${CYAN}[DRY-RUN]${NC} Instalaría: $pkg"
+        return 0
+    else
+        if ! pacman -Q "$pkg" &> /dev/null; then
+            log_info "Instalando $pkg..."
+            run_sudo pacman -S --noconfirm "$pkg"
+        else
+            log_info "$pkg ya está instalado"
+        fi
+    fi
+}
 
 # Cargar configuración si existe
 if [ -f "$DOTFILES_DIR/config.sh" ]; then
@@ -76,23 +252,201 @@ check_system() {
     echo -e "${GREEN}✓ Sistema Arch Linux detectado${NC}"
 }
 
+# ============================================================================
+# SISTEMA DE PERFILES
+# ============================================================================
+
+list_profiles() {
+    echo -e "${CYAN}╔════════════════════════════════════════════════════╗${NC}"
+    echo -e "${CYAN}║     PERFILES DISPONIBLES${NC}"
+    echo -e "${CYAN}╚════════════════════════════════════════════════════╝${NC}"
+    echo ""
+    
+    local i=1
+    for profile in "$PROFILES_DIR"/*.profile; do
+        if [ -f "$profile" ]; then
+            source "$profile"
+            echo -e "${GREEN}$i.${NC} ${YELLOW}$PROFILE_NAME${NC}"
+            echo -e "   $PROFILE_DESC"
+            echo ""
+            ((i++))
+        fi
+    done
+}
+
+load_profile() {
+    local profile_name="$1"
+    local profile_file="$PROFILES_DIR/${profile_name}.profile"
+    
+    if [ ! -f "$profile_file" ]; then
+        log_error "Perfil no encontrado: $profile_name"
+        return 1
+    fi
+    
+    log_info "Cargando perfil: $profile_name"
+    source "$profile_file"
+    SELECTED_PROFILE="$profile_name"
+    
+    log_success "Perfil cargado: $PROFILE_NAME"
+    echo -e "${BLUE}Descripción:${NC} $PROFILE_DESC"
+    return 0
+}
+
+select_profile_interactive() {
+    list_profiles
+    
+    echo -e "${YELLOW}Selecciona un perfil (número) o presiona Enter para instalación personalizada:${NC}"
+    read -r profile_choice
+    
+    if [ -z "$profile_choice" ]; then
+        log_info "Instalación personalizada seleccionada"
+        return 0
+    fi
+    
+    # Convertir número a nombre de perfil
+    local profiles=("minimal" "desktop" "gaming" "developer" "pentesting" "full")
+    local index=$((profile_choice - 1))
+    
+    if [ $index -ge 0 ] && [ $index -lt ${#profiles[@]} ]; then
+        load_profile "${profiles[$index]}"
+    else
+        log_error "Opción inválida"
+        return 1
+    fi
+}
+
+# ============================================================================
+# SISTEMA DE HOOKS
+# ============================================================================
+
+run_hook() {
+    local hook_name="$1"
+    local hook_path="$DOTFILES_DIR/hooks/$hook_name.sh"
+    
+    if [ -f "$hook_path" ] && [ -x "$hook_path" ]; then
+        log_info "Ejecutando hook: $hook_name"
+        bash "$hook_path"
+        
+        if [ $? -eq 0 ]; then
+            log_success "Hook $hook_name completado"
+        else
+            log_warn "Hook $hook_name falló (código: $?)"
+        fi
+    fi
+}
+
 # Verificar conexión a internet
 check_internet() {
-    echo -e "${YELLOW}Verificando conexión a internet...${NC}"
-    if ping -c 1 archlinux.org &> /dev/null; then
-        echo -e "${GREEN}✓ Conexión a internet disponible${NC}"
+    log_info "Verificando conexión a internet..."
+    
+    local test_hosts=("archlinux.org" "google.com" "1.1.1.1")
+    
+    for host in "${test_hosts[@]}"; do
+        if ping -c 1 -W 2 "$host" &> /dev/null; then
+            log_success "Conexión a internet disponible"
+            return 0
+        fi
+    done
+    
+    log_error "No hay conexión a internet"
+    log_warn "Configura la red antes de continuar"
+    log_info "Puedes usar: nmtui, nmcli o wifi-menu para configurar la red"
+    return 1
+}
+
+# ============================================================================
+# VERIFICACIÓN DE ESPACIO EN DISCO
+# ============================================================================
+
+check_disk_space() {
+    local required_gb=${1:-20}  # Default: 20GB requeridos
+    
+    log_info "Verificando espacio en disco..."
+    
+    local available_gb=$(df -BG / | tail -1 | awk '{print $4}' | sed 's/G//')
+    
+    echo -e "${BLUE}Espacio disponible:${NC} ${available_gb}GB"
+    echo -e "${BLUE}Espacio requerido:${NC} ${required_gb}GB"
+    
+    if [ $available_gb -lt $required_gb ]; then
+        log_error "Espacio insuficiente en disco"
+        log_warn "Se requieren al menos ${required_gb}GB, pero solo hay ${available_gb}GB disponibles"
+        
+        read -p "¿Deseas continuar de todos modos? (s/N): " -n 1 -r
+        echo
+        [[ $REPLY =~ ^[Ss]$ ]] && return 0 || return 1
     else
-        echo -e "${RED}Error: No hay conexión a internet${NC}"
-        echo -e "${YELLOW}Configura la red antes de continuar${NC}"
-        exit 1
+        log_success "Espacio en disco suficiente"
+        return 0
     fi
+}
+
+# ============================================================================
+# DETECCIÓN DE CONFLICTOS
+# ============================================================================
+
+check_conflicts() {
+    log_info "Detectando posibles conflictos..."
+    
+    local conflicts_found=false
+    
+    # Conflicto: Display Managers
+    local dm_count=0
+    local installed_dms=()
+    
+    if systemctl is-enabled gdm &> /dev/null; then
+        installed_dms+=("GDM")
+        ((dm_count++))
+    fi
+    
+    if systemctl is-enabled sddm &> /dev/null; then
+        installed_dms+=("SDDM")
+        ((dm_count++))
+    fi
+    
+    if systemctl is-enabled lightdm &> /dev/null; then
+        installed_dms+=("LightDM")
+        ((dm_count++))
+    fi
+    
+    if [ $dm_count -gt 1 ]; then
+        conflicts_found=true
+        log_warn "Múltiples display managers detectados: ${installed_dms[*]}"
+        log_info "Esto puede causar conflictos al iniciar el sistema"
+    fi
+    
+    # Conflicto: Shells en .bashrc/.zshrc
+    if [ -f "$HOME/.bashrc" ] && grep -q "zsh" "$HOME/.bashrc"; then
+        log_warn "Referencia a zsh encontrada en .bashrc"
+    fi
+    
+    if [ "$conflicts_found" = false ]; then
+        log_success "No se detectaron conflictos"
+    fi
+    
+    return 0
 }
 
 # Actualizar sistema
 update_system() {
-    echo -e "${YELLOW}Actualizando el sistema...${NC}"
-    sudo pacman -Syu --noconfirm
-    echo -e "${GREEN}✓ Sistema actualizado${NC}"
+    log_info "Actualizando el sistema..."
+    
+    # Cachear sudo
+    if ! cache_sudo; then
+        log_error "No se pudo obtener permisos sudo"
+        return 1
+    fi
+    
+    if run_sudo pacman -Syu --noconfirm 2>&1 | tee -a "$LOG_FILE"; then
+        log_success "Sistema actualizado"
+        return 0
+    else
+        log_error "Error al actualizar el sistema"
+        log_warn "Puedes continuar, pero se recomienda resolver este problema primero"
+        read -p "¿Deseas continuar de todos modos? (s/N): " -n 1 -r
+        echo
+        [[ $REPLY =~ ^[Ss]$ ]] && return 0 || return 1
+    fi
 }
 
 # Menú principal
@@ -109,7 +463,18 @@ show_menu() {
     echo -e "${MAGENTA}6)${NC} Hacer backup de configuraciones actuales"
     echo -e "${MAGENTA}7)${NC} Exportar lista de paquetes instalados"
     echo -e "${MAGENTA}8)${NC} Actualizar sistema"
-    echo -e "${MAGENTA}9)${NC} Configuración rápida (solo vim, zsh, fish, starship)"
+    echo -e "${MAGENTA}9)${NC} Configuración rápida (solo vim, zsh, starship)"
+    echo ""
+    echo -e "${CYAN}Gestión:${NC}"
+    echo -e "${MAGENTA}11)${NC} Gestionar repositorios"
+    echo -e "${MAGENTA}12)${NC} Gestionar claves SSH"
+    echo -e "${MAGENTA}13)${NC} Restaurar backup"
+    echo -e "${MAGENTA}17)${NC} Auto-detectar repositorios existentes"
+    echo ""
+    echo -e "${CYAN}Diagnóstico:${NC}"
+    echo -e "${MAGENTA}14)${NC} Detección de hardware"
+    echo -e "${MAGENTA}15)${NC} Verificar salud del sistema"
+    echo -e "${MAGENTA}16)${NC} Verificar instalación"
     echo ""
     echo -e "${CYAN}Avanzado:${NC}"
     echo -e "${MAGENTA}10)${NC} Inicializar dotfiles (copiar configs actuales al repo)"
@@ -122,11 +487,16 @@ show_menu() {
 quick_install() {
     echo -e "${YELLOW}Instalación rápida de herramientas esenciales...${NC}"
     
+    # Cachear sudo
+    if ! cache_sudo; then
+        log_error "No se pudo obtener permisos sudo"
+        return 1
+    fi
+    
     # Herramientas básicas
-    sudo pacman -S --needed --noconfirm \
+    run_sudo pacman -S --needed --noconfirm \
         vim neovim \
         zsh zsh-completions zsh-autosuggestions zsh-syntax-highlighting \
-        fish \
         starship \
         fzf ripgrep fd bat exa \
         git \
@@ -138,11 +508,7 @@ quick_install() {
         cp "$DOTFILES_DIR/config/zsh/.zshrc" "$HOME/.zshrc"
     fi
     
-    # Configurar fish
-    if [ -d "$DOTFILES_DIR/config/fish" ]; then
-        mkdir -p "$HOME/.config/fish"
-        cp -r "$DOTFILES_DIR/config/fish/"* "$HOME/.config/fish/"
-    fi
+
     
     # Configurar vim/neovim
     if [ -d "$DOTFILES_DIR/config/nvim" ]; then
@@ -156,7 +522,7 @@ quick_install() {
         cp "$DOTFILES_DIR/config/starship/starship.toml" "$HOME/.config/starship.toml"
     fi
     
-    # Cambiar shell a fish o zsh
+    # Cambiar shell a zsh
     if [ -n "$DEFAULT_SHELL" ]; then
         chsh -s $(which $DEFAULT_SHELL)
         echo -e "${GREEN}✓ Shell cambiada a $DEFAULT_SHELL${NC}"
@@ -168,25 +534,65 @@ quick_install() {
 # Instalación completa
 full_install() {
     echo -e "${YELLOW}Iniciando instalación completa...${NC}"
+    echo ""
+    
+    # Pre-install hook
+    run_hook "pre-install"
+    
+    # Verificaciones iniciales
+    check_disk_space 25
+    check_conflicts
+    
+    # Detección de hardware (si está disponible)
+    if [ -f "$DOTFILES_DIR/scripts/detect-hardware.sh" ]; then
+        source "$DOTFILES_DIR/scripts/detect-hardware.sh"
+        detect_hardware
+        echo ""
+        read -p "$(echo -e ${YELLOW}Presiona ENTER para continuar...${NC})"
+    fi
     
     update_system
     
     # Ejecutar scripts de instalación
+    log_info "Iniciando instalación de paquetes..."
     bash "$DOTFILES_DIR/scripts/install-packages.sh" || true
+    
+    log_info "Iniciando instalación de GUI..."
     bash "$DOTFILES_DIR/scripts/install-gui.sh" || true
+    
+    log_info "Iniciando instalación de herramientas CLI..."
     bash "$DOTFILES_DIR/scripts/install-cli-tools.sh" || true
+    
+    # Pre-config hook
+    run_hook "pre-config"
+    
+    log_info "Creando symlinks de configuración..."
     bash "$DOTFILES_DIR/scripts/link-configs.sh" || true
     
+    # Post-config hook
+    run_hook "post-config"
+    
+    # Verificación post-instalación
+    echo ""
+    log_info "Verificando instalación..."
+    bash "$DOTFILES_DIR/scripts/post-install-verify.sh" "$DOTFILES_DIR/packages/pacman-explicit.txt"
+    
+    # Post-install hook
+    run_hook "post-install"
+    
+    echo ""
     echo -e "${GREEN}╔════════════════════════════════════════╗${NC}"
     echo -e "${GREEN}║   ¡INSTALACIÓN COMPLETADA!             ║${NC}"
     echo -e "${GREEN}╚════════════════════════════════════════╝${NC}"
     echo ""
+    echo -e "${CYAN}Logs guardados en:${NC} $LOG_FILE"
     echo -e "${YELLOW}Se recomienda reiniciar el sistema${NC}"
     echo ""
     read -p "¿Deseas reiniciar ahora? (s/n): " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Ss]$ ]]; then
-        sudo reboot
+        log_info "Reiniciando sistema..."
+        run_sudo reboot
     fi
 }
 
@@ -230,6 +636,29 @@ main() {
                 ;;
             10)
                 bash "$DOTFILES_DIR/scripts/init-dotfiles.sh"
+                ;;
+            11)
+                bash "$DOTFILES_DIR/scripts/repo-manager.sh"
+                ;;
+            12)
+                bash "$DOTFILES_DIR/scripts/ssh-manager.sh"
+                ;;
+            13)
+                bash "$DOTFILES_DIR/scripts/restore-backup.sh"
+                ;;
+            14)
+                source "$DOTFILES_DIR/scripts/detect-hardware.sh"
+                detect_hardware
+                read -p "Presiona ENTER para continuar..."
+                ;;
+            15)
+                bash "$DOTFILES_DIR/scripts/health-check.sh"
+                ;;
+            16)
+                bash "$DOTFILES_DIR/scripts/post-install-verify.sh"
+                ;;
+            17)
+                bash "$DOTFILES_DIR/scripts/auto-detect-repos.sh"
                 ;;
             0)
                 echo -e "${GREEN}¡Hasta luego!${NC}"
@@ -280,8 +709,20 @@ header() {
 
 check_root() {
     if [[ $EUID -eq 0 ]]; then
-        log_error "No ejecutes este script como root. Usa tu usuario normal."
-        log_error "El script pedirá sudo cuando sea necesario."
+        log_error "⚠️  NO EJECUTES ESTE SCRIPT COMO ROOT"
+        log_error "Usa tu usuario normal. El script pedirá sudo cuando sea necesario."
+        echo ""
+        echo -e "${YELLOW}Ejemplo correcto:${NC}"
+        echo "  ./install.sh"
+        echo ""
+        echo -e "${RED}Incorrecto:${NC}"
+        echo "  sudo ./install.sh  ← ¡NO HAGAS ESTO!"
+        exit 1
+    fi
+    
+    # Verificar acceso sudo
+    if ! check_sudo_access; then
+        log_error "No tienes permisos sudo configurados"
         exit 1
     fi
 }
@@ -315,7 +756,17 @@ check_dependencies() {
     
     if [[ ${#missing[@]} -gt 0 ]]; then
         log_warn "Instalando dependencias faltantes: ${missing[*]}"
-        sudo pacman -S --noconfirm --needed "${missing[@]}"
+        
+        # Cachear sudo antes de instalar
+        if ! cache_sudo; then
+            log_error "No se pudo obtener permisos sudo para instalar dependencias"
+            return 1
+        fi
+        
+        if ! run_sudo pacman -S --noconfirm --needed "${missing[@]}"; then
+            log_error "No se pudieron instalar las dependencias"
+            return 1
+        fi
     fi
     log "✓ Dependencias OK"
 }
@@ -325,7 +776,7 @@ create_backup() {
     mkdir -p "$BACKUP_DIR"
     
     # Backup de configs importantes
-    local configs=(".config/hypr" ".config/waybar" ".config/kitty" ".config/nvim" ".config/fish")
+    local configs=(".config/hypr" ".config/waybar" ".config/kitty" ".config/nvim")
     
     for config in "${configs[@]}"; do
         if [[ -e "$HOME/$config" ]]; then

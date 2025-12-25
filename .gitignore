@@ -31,6 +31,16 @@ secrets/
 *.pem
 *.cert
 
+# SSH Keys (CRÍTICO - NUNCA subir claves privadas)
+ssh-backup/*
+!ssh-backup/*.pub
+!ssh-backup/config
+!ssh-backup/README.md
+
+# Backups locales
+.config-backup-*
+.config-backups/
+
 # Tokens y credenciales
 *token*
 *secret*
@@ -106,3 +116,18 @@ config/session/
 
 # Historiales de apps
 config/*history*
+
+
+# Archivos de configuración de AI/IDE
+.github/instructions/
+.github/copilot/
+.cursor/
+.ai/
+
+# Información potencialmente sensible en scripts
+**/test-*.sh
+**/*-test.sh
+
+# Configuraciones personales que podrían tener rutas absolutas
+config/**/*.local
+config/**/local-*

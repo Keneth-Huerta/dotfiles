@@ -22,11 +22,25 @@ echo -e "${BLUE}║   EXPORTANDO PAQUETES INSTALADOS       ║${NC}"
 echo -e "${BLUE}╚════════════════════════════════════════╝${NC}"
 echo ""
 
-# 1. Exportar paquetes pacman explícitamente instalados
+# 1. Exportar paquetes pacman explícitamente instalados (con filtrado)
 echo -e "${YELLOW}Exportando paquetes pacman (explícitos)...${NC}"
-pacman -Qqe > "$PACKAGES_DIR/pacman-explicit.txt"
-COUNT=$(wc -l < "$PACKAGES_DIR/pacman-explicit.txt")
-echo -e "${GREEN}✓ $COUNT paquetes explícitos exportados${NC}"
+
+# Lista de paquetes a excluir (solo GNOME, KDE, terminales/gestores de archivos extras)
+# NO se filtran herramientas de pentesting ni blackarch
+EXCLUDE_PATTERN="^(gnome-|plasma-|kde-cli-tools|konsole|xterm|dolphin|thunar|qemu-base|virt-manager)$"
+
+# Exportar sin filtro primero (backup)
+pacman -Qqe > "$PACKAGES_DIR/pacman-explicit-full.txt"
+
+# Exportar con filtro (archivo principal)
+pacman -Qqe | grep -vE "$EXCLUDE_PATTERN" > "$PACKAGES_DIR/pacman-explicit.txt"
+
+COUNT_FULL=$(wc -l < "$PACKAGES_DIR/pacman-explicit-full.txt")
+COUNT_FILTERED=$(wc -l < "$PACKAGES_DIR/pacman-explicit.txt")
+COUNT_EXCLUDED=$((COUNT_FULL - COUNT_FILTERED))
+
+echo -e "${GREEN}✓ $COUNT_FILTERED paquetes exportados${NC}"
+echo -e "${BLUE}  ($COUNT_EXCLUDED paquetes filtrados automáticamente)${NC}"
 
 # 2. Exportar todos los paquetes nativos
 echo -e "${YELLOW}Exportando paquetes pacman (nativos)...${NC}"
@@ -97,12 +111,28 @@ cat > "$PACKAGES_DIR/RESUMEN.md" << EOF
 | Tipo | Cantidad | Archivo |
 |------|----------|---------|
 | Pacman (explícitos) | $(wc -l < "$PACKAGES_DIR/pacman-explicit.txt") | pacman-explicit.txt |
+| Pacman (explícitos - completo con backup) | $(wc -l < "$PACKAGES_DIR/pacman-explicit-full.txt") | pacman-explicit-full.txt |
 | Pacman (nativos) | $(wc -l < "$PACKAGES_DIR/pacman-native.txt") | pacman-native.txt |
 | AUR | $(wc -l < "$PACKAGES_DIR/aur.txt") | aur.txt |
 | Flatpak | $(wc -l < "$PACKAGES_DIR/flatpak.txt") | flatpak.txt |
 | Snap | $(wc -l < "$PACKAGES_DIR/snap.txt") | snap.txt |
 | npm (global) | $(wc -l < "$PACKAGES_DIR/npm-global.txt") | npm-global.txt |
 | pip (global) | $(wc -l < "$PACKAGES_DIR/pip-global.txt") | pip-global.txt |
+
+## ℹ️ Filtrado Automático
+
+**Paquetes excluidos automáticamente:** $COUNT_EXCLUDED
+
+Los siguientes tipos de paquetes se filtran automáticamente al exportar:
+- ❌ GNOME (gnome-*)
+- ❌ KDE/Plasma (plasma-*, kde-cli-tools, konsole, dolphin)
+- ❌ Terminales extras (xterm)
+- ❌ Gestores de archivos extras (dolphin, thunar)
+- ❌ Virtualización extra (qemu-base, virt-manager)
+- ✅ Herramientas de pentesting (se MANTIENEN)
+- ✅ BlackArch keyring (se MANTIENE)
+
+**Nota:** El archivo \`pacman-explicit-full.txt\` contiene TODOS los paquetes sin filtrar.
 
 ## Cómo restaurar
 
@@ -111,9 +141,11 @@ cat > "$PACKAGES_DIR/RESUMEN.md" << EOF
 sudo pacman -S --needed \$(cat pacman-explicit.txt)
 \`\`\`
 
-### AUR (con yay)
+### AUR (con yay o paru)
 \`\`\`bash
 yay -S --needed \$(cat aur.txt)
+# o
+paru -S --needed \$(cat aur.txt)
 \`\`\`
 
 ### Flatpak

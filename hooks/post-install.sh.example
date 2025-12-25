@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+# ============================================================================
+# POST-INSTALL HOOK - Ejemplo
+# ============================================================================
+# Este script se ejecuta DESPUÉS de completar la instalación
+# Úsalo para configuraciones finales, limpieza, notificaciones, etc.
+
+echo "Ejecutando post-install hook..."
+
+# Ejemplo: Limpiar cache de pacman
+# sudo pacman -Sc --noconfirm
+
+# Ejemplo: Configurar servicios adicionales
+# systemctl --user enable some-service
+
+# Ejemplo: Mostrar mensaje personalizado
+# echo "¡Instalación completada! Recuerda reiniciar el sistema."
+
+echo "Post-install hook completado"

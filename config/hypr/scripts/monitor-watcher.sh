@@ -4,7 +4,7 @@
 # Continuously monitors for display changes and auto-configures
 
 LOG_FILE="/tmp/monitor-watcher.log"
-MONITOR_MANAGER="/home/valge/.config/hypr/scripts/monitor-manager.sh"
+MONITOR_MANAGER="$HOME/.config/hypr/scripts/monitor-manager.sh"
 PIDFILE="/tmp/monitor-watcher.pid"
 CHECK_INTERVAL=3  # Check every 3 seconds
 

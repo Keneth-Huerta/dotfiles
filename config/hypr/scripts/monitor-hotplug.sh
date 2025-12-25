@@ -4,7 +4,7 @@
 # Automatically configures monitors when they are connected/disconnected
 
 LOG_FILE="/tmp/monitor-hotplug.log"
-MONITOR_MANAGER="/home/valge/.config/hypr/scripts/monitor-manager.sh"
+MONITOR_MANAGER="$HOME/.config/hypr/scripts/monitor-manager.sh"
 
 # Function to log messages
 log_message() {

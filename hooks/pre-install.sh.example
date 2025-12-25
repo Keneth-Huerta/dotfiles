@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+# ============================================================================
+# PRE-INSTALL HOOK - Ejemplo
+# ============================================================================
+# Este script se ejecuta ANTES de iniciar la instalación
+# Úsalo para verificaciones previas, configuración inicial, etc.
+
+echo "Ejecutando pre-install hook..."
+
+# Ejemplo: Verificar espacio en disco
+# available_space=$(df -BG / | tail -1 | awk '{print $4}' | sed 's/G//')
+# if [ $available_space -lt 20 ]; then
+#     echo "Advertencia: Menos de 20GB disponibles"
+# fi
+
+# Ejemplo: Configurar variables de entorno
+# export MY_CUSTOM_VAR="value"
+
+echo "Pre-install hook completado"

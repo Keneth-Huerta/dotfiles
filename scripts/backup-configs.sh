@@ -1,13 +1,24 @@
 #!/usr/bin/env bash
 
+# ============================================================================
+# BACKUP DE CONFIGURACIONES - Con Timestamps y Organización
+# ============================================================================
+
 # Colores
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+CYAN='\033[0;36m'
 NC='\033[0m'
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+BACKUP_ROOT="$HOME/.config-backups"
+TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+BACKUP_DIR="$BACKUP_ROOT/backup-$TIMESTAMP"
+
+# Crear directorio de backups
+mkdir -p "$BACKUP_DIR"
 
 # Función para copiar configuración con verificación
 copy_config() {
@@ -34,19 +45,19 @@ copy_config() {
 # Función para hacer backup de Hyprland
 backup_hyprland() {
     echo -e "${BLUE}Haciendo backup de Hyprland...${NC}"
-    copy_config "$HOME/.config/hypr" "$DOTFILES_DIR/config/hypr"
+    copy_config "$HOME/.config/hypr" "$BACKUP_DIR/hypr"
 }
 
 # Función para hacer backup de Waybar
 backup_waybar() {
     echo -e "${BLUE}Haciendo backup de Waybar...${NC}"
-    copy_config "$HOME/.config/waybar" "$DOTFILES_DIR/config/waybar"
+    copy_config "$HOME/.config/waybar" "$BACKUP_DIR/waybar"
 }
 
 # Función para hacer backup de Kitty
 backup_kitty() {
     echo -e "${BLUE}Haciendo backup de Kitty...${NC}"
-    copy_config "$HOME/.config/kitty" "$DOTFILES_DIR/config/kitty"
+    copy_config "$HOME/.config/kitty" "$BACKUP_DIR/kitty"
 }
 
 # Función para hacer backup de Fish
@@ -245,7 +256,28 @@ main() {
         *) echo -e "${RED}Opción inválida${NC}" ;;
     esac
     
-    echo -e "${GREEN}¡Backup completado!${NC}"
+    # Mostrar resumen del backup
+    if [ -d "$BACKUP_DIR" ]; then
+        echo ""
+        echo -e "${CYAN}════════════════════════════════════════${NC}"
+        echo -e "${GREEN}✓ Backup completado${NC}"
+        echo -e "${BLUE}Ubicación:${NC} $BACKUP_DIR"
+        
+        # Calcular tamaño
+        local size=$(du -sh "$BACKUP_DIR" 2>/dev/null | cut -f1)
+        echo -e "${BLUE}Tamaño:${NC} $size"
+        
+        # Contar archivos
+        local files=$(find "$BACKUP_DIR" -type f | wc -l)
+        echo -e "${BLUE}Archivos:${NC} $files"
+        
+        echo -e "${CYAN}════════════════════════════════════════${NC}"
+        echo ""
+        echo -e "${YELLOW}Para restaurar este backup usa:${NC}"
+        echo -e "  ./scripts/restore-backup.sh $TIMESTAMP"
+        echo ""
+    fi
+    
     echo -e "${YELLOW}No olvides hacer commit de los cambios:${NC}"
     echo -e "  cd $DOTFILES_DIR"
     echo -e "  git add ."

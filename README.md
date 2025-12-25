@@ -1,121 +1,568 @@
-# Dotfiles - Sistema de Configuración Automática
+# 🚀 Dotfiles v2.0 - Sistema de Configuración Avanzada
 
-Sistema modular de dotfiles para Arch Linux con Hyprland, diseñado para restaurar tu entorno completo en cualquier máquina con un solo comando.
+Sistema modular y profesional de dotfiles para Arch Linux con Hyprland. Restaura tu entorno completo en cualquier máquina con un solo comando.
 
-## Características
+## ✨ Características Principales
 
- **Tema moderno** con colores rojos predominantes
- **Instalación modular** - instala solo lo que necesitas
--  **Configuración completa** de Hyprland + Waybar
--  **Gestión de paquetes** - Pacman, AUR y Flatpak
--  **Modo rápido** para instalación parcial (ideal para escuela/trabajo)
--  **Sistema de backup** para tus configuraciones actuales
--  **Symlinks automáticos** para fácil sincronización
+### 🎯 Nuevo en v2.0
+- 🎯 **6 Perfiles predefinidos** (minimal, desktop, gaming, developer, pentesting, full)
+- 🔍 **Detección automática de hardware** (GPU, CPU, WiFi, Bluetooth)
+- 🧪 **Modo Dry-Run** - previsualiza sin ejecutar
+- 💾 **Sistema de backups mejorado** con timestamps
+- ✅ **Verificación post-instalación** automática
+- 🪝 **Sistema de hooks** (pre/post install/config)
+- ⚠️ **Detección de conflictos** (display managers, etc.)
+- 💽 **Verificación de espacio** en disco
+- 🏥 **Health Check** completo del sistema
+- 📦 **Gestión de repositorios Git** (clonar, actualizar todos)
+- 🔐 **Gestión de claves SSH** (backup seguro, restauración)
+- 📂 **Auto-ubicación** del repositorio (`~/Documents/repos/dotfiles`)
+- 🔍 **Auto-detección de repositorios** existentes
+- 🔒 **Soporte para repositorios privados** (SSH/HTTPS)
+- 🛡️ **Manejo robusto de permisos sudo** (pide contraseña una sola vez)
 
-## Requisitos
+### 🎨 Interfaz
+- **Tema moderno** con colores rojos predominantes
+- **Instalación modular** - instala solo lo que necesitas
+- **Menú interactivo** con 16 opciones
+- **Logs detallados** con timestamps y niveles
 
-- Arch Linux (o derivados como Manjaro, EndeavourOS)
+### 🛠️ Configuración
+- **Hyprland + Waybar** completamente configurados
+- **Gestión de paquetes** - Pacman, AUR (yay/paru), Flatpak
+- **Modo rápido** para instalación parcial
+- **Symlinks automáticos** para sincronización
+
+## 📋 Requisitos
+
+- Arch Linux (o derivados: Manjaro, EndeavourOS, etc.)
 - Conexión a internet activa
 - Git instalado: `sudo pacman -S git`
-- Usuario con permisos sudo
+- **Usuario normal con permisos sudo** (NO ejecutar como root)
+- Espacio en disco: 5-20GB (según perfil)
 
-## Instalación Rápida
+**⚠️ IMPORTANTE:** 
+- **NO ejecutes** `sudo ./install.sh`
+- El script pedirá sudo **automáticamente** cuando sea necesario
+- Solo pedirá tu contraseña **una vez** al inicio
+- Ver [docs/PERMISOS_SUDO.md](docs/PERMISOS_SUDO.md) para detalles
+
+## 🚀 Instalación Rápida
+
+### Primera vez:
 
 ```bash
 # 1. Clonar el repositorio
-git clone https://github.com/tu-usuario/dotfiles.git ~/dotfiles
-cd ~/dotfiles
+git clone https://github.com/tu-usuario/dotfiles.git
+cd dotfiles
 
-# 2. Hacer ejecutable el instalador
-chmod +x install.sh
+# 2. Inicializar (mueve a ubicación correcta)
+./scripts/init-dotfiles.sh
 
-# 3. (Opcional) Editar configuración personal
-nano config.sh
+# 3. Ejecutar desde nueva ubicación
+cd ~/Documents/repos/dotfiles
 
-# 4. Ejecutar el instalador
-./install.sh
+# 4. Detectar hardware (opcional pero recomendado)
+./install.sh  # Opción 14
+
+# 5. Instalar con perfil
+./install.sh  # Opción 1 → Selecciona tu perfil
 ```
 
-## Estructura del Proyecto
+### Instalación en nueva computadora (si ya tienes el repo configurado):
+
+```bash
+# 1. Clonar
+git clone https://github.com/tu-usuario/dotfiles.git ~/Documents/repos/dotfiles
+cd ~/Documents/repos/dotfiles
+
+# 2. Instalar
+./install.sh  # Opción 1 → Tu perfil guardado
+
+# 3. Restaurar SSH
+./scripts/ssh-manager.sh  # Opción 5
+
+# 4. Clonar repos
+./scripts/repo-manager.sh  # Opción 2
+
+# ¡Listo! 🎉
+```
+
+## 📁 Estructura del Proyecto
 
 ```
 dotfiles/
-├── install.sh                  # Script principal con menú interactivo
-├── config.sh                   # Configuración personalizable
-├── README.md                   # Este archivo
-├── .gitignore                  # Archivos ignorados por git
+├── install.sh                     # Script principal (17 opciones)
+├── config.sh                      # Configuración personalizable
+├── verify.sh                      # Verificación del sistema
+├── README.md                      # Este archivo
+├── .gitignore                     # Protección de datos sensibles
 │
-├── config/                     # Configuraciones de aplicaciones
-│   ├── hypr/                  # Hyprland (compositor Wayland)
-│   ├── waybar/                # Barra de estado
-│   ├── kitty/                 # Terminal emulator
-│   ├── fish/                  # Fish shell
-│   ├── zsh/                   # Zsh shell (.zshrc, .zshenv)
-│   ├── nvim/                  # Neovim configuración
-│   ├── rofi/                  # Application launcher
-│   ├── dunst/                 # Gestor de notificaciones
-│   ├── starship/              # Prompt personalizado
-│   ├── git/                   # Configuración Git
-│   ├── tmux/                  # Terminal multiplexor
-│   ├── btop/                  # Monitor de sistema
-│   ├── fastfetch/             # Info del sistema
-│   └── cava/                  # Visualizador de audio
+├── docs/                          # 📚 Documentación
+│   ├── FEATURES.md               # Características completas v2.0
+│   ├── PERMISOS_SUDO.md          # Manejo de permisos sudo
+│   └── REPOSITORIOS_PRIVADOS.md  # Guía de repos privados
 │
-├── scripts/                    # Scripts de instalación modulares
-│   ├── install-packages.sh    # Instalación de paquetes
-│   ├── install-gui.sh         # Entorno gráfico (Hyprland + SDDM)
-│   ├── install-cli-tools.sh   # Herramientas CLI
-│   ├── link-configs.sh        # Enlazar configuraciones con symlinks
-│   └── backup-configs.sh      # Backup de configuraciones actuales
+├── config/                        # Configuraciones de aplicaciones
+│   ├── hypr/                     # Hyprland (compositor Wayland)
+│   ├── waybar/                   # Barra de estado
+│   ├── kitty/                    # Terminal
+│   ├── zsh/                      # Shell
+│   ├── fish/                     # Fish shell
+│   ├── git/                      # Configuración Git
+│   ├── starship/                 # Prompt
+│   ├── swaylock/                 # Lockscreen
+│   ├── wlogout/                  # Menú de logout
+│   └── wofi/                     # Launcher
 │
-├── packages/                   # Listas de paquetes instalados
-│   ├── pacman-explicit.txt    # Paquetes oficiales
-│   ├── aur.txt                # Paquetes de AUR
-│   └── flatpak.txt            # Aplicaciones Flatpak
+├── scripts/                       # Scripts de utilidad
+│   ├── install-packages.sh       # Instalador de paquetes
+│   ├── install-gui.sh            # Instalador GUI (Hyprland, GDM)
+│   ├── install-cli-tools.sh      # Herramientas CLI
+│   ├── link-configs.sh           # Crear symlinks
+│   ├── backup-configs.sh         # Backup con timestamps
+│   ├── restore-backup.sh         # Restaurar backups
+│   ├── health-check.sh           # Verificar salud del sistema
+│   ├── detect-hardware.sh        # Detección de hardware
+│   ├── repo-manager.sh           # Gestión de repositorios
+│   ├── ssh-manager.sh            # Gestión de SSH
+│   ├── auto-detect-repos.sh      # Auto-detectar repos existentes
+│   ├── post-install-verify.sh    # Verificación post-instalación
+│   ├── export-packages.sh        # Exportar paquetes
+│   ├── init-dotfiles.sh          # Inicializar y mover repo
+│   └── profiles/                 # Perfiles predefinidos
+│       ├── minimal.profile       # Perfil mínimo (~5GB)
+│       ├── desktop.profile       # Uso diario (~10GB)
+│       ├── gaming.profile        # Gaming (~15GB)
+│       ├── developer.profile     # Desarrollo (~18GB)
+│       ├── pentesting.profile    # Seguridad (~16GB)
+│       └── full.profile          # Todo (~20GB)
 │
-└── user-scripts/               # Scripts personalizados del usuario
+├── packages/                      # Listas de paquetes
+│   ├── pacman-explicit.txt       # Paquetes pacman
+│   ├── aur.txt                   # Paquetes AUR
+│   ├── flatpak.txt               # Paquetes Flatpak
+│   ├── npm-global.txt            # Paquetes npm
+│   ├── pip-global.txt            # Paquetes pip
+│   └── snap.txt                  # Paquetes snap
+│
+├── hooks/                         # Hooks pre/post
+│   ├── README.md                 # Documentación de hooks
+│   ├── pre-install.sh.example    # Ejemplo pre-instalación
+│   └── post-install.sh.example   # Ejemplo post-instalación
+│
+├── ssh-backup/                    # Backup SSH
+│   └── README.md                 # Guía de seguridad SSH
+│
+├── user-scripts/                  # Scripts personalizados del usuario
+│   └── README.md                 # Documentación
+│
+├── repos.list                     # Lista de repositorios Git
+└── repos.list.example             # Ejemplo de configuración
+```
+│       └── full.profile          # Todo incluido
+│
+├── hooks/                         # 🆕 Sistema de hooks
+│   ├── README.md                 # Documentación de hooks
+│   ├── pre-install.sh.example    # Ejemplo pre-instalación
+│   └── post-install.sh.example   # Ejemplo post-instalación
+│
+├── packages/                      # Listas de paquetes
+│   ├── pacman-explicit.txt       # Paquetes principales (limpio)
+│   ├── aur.txt                   # Paquetes AUR
+│   ├── flatpak.txt               # Aplicaciones Flatpak
+│   └── ...                       # Otros gestores
+│
+├── ssh-backup/                    # 🆕 Backup de claves SSH
+│   ├── README.md                 # ⚠️ Información de seguridad
+│   └── *.pub                     # Solo claves públicas
+│
+├── repos.list.example             # 🆕 Template para tus repos
+└── repos.list                     # 🆕 Tu lista de repositorios (se crea al usar)
 ```
 
-## Modos de Uso
+## 🎯 Perfiles Disponibles
 
-### Instalación Completa
-**Ideal para:** Nueva instalación de Arch Linux
+| Perfil | Descripción | Paquetes | Espacio | Uso |
+|--------|-------------|----------|---------|-----|
+| **Minimal** | Base + Hyprland | ~50 | ~5GB | VMs, recursos limitados |
+| **Desktop** | Uso diario + multimedia | ~100 | ~10GB | Laptop personal, escuela |
+| **Gaming** | Steam + Lutris + Wine | ~130 | ~15GB | PC gaming |
+| **Developer** | IDEs + Docker + Tools | ~150 | ~18GB | Desarrollo software |
+| **Pentesting** | BlackArch + Security | ~140 | ~16GB | Seguridad, hacking ético |
+| **Full** | TODO incluido | ~200 | ~20GB | Workstation completa |
 
+Elige tu perfil durante la instalación (Opción 1 del menú).
+
+## 📖 Menú Principal
+
+```
+╔════════════════════════════════════════╗
+║         MENÚ PRINCIPAL                 ║
+╚════════════════════════════════════════╝
+
+Instalación:
+  1) Instalación completa (con selección de perfil)
+  2) Solo instalar paquetes
+  3) Solo instalar GUI (Hyprland + GDM)
+  4) Solo CLI tools
+  5) Solo enlazar configuraciones
+
+Backup y Exportación:
+  6) Backup de configuraciones actuales
+  7) Exportar lista de paquetes instalados
+  
+Mantenimiento:
+  8) Actualizar sistema
+  9) Configuración rápida (vim, zsh, starship)
+
+Gestión: 🆕
+  11) Gestionar repositorios
+  12) Gestionar claves SSH
+  13) Restaurar backup
+
+Diagnóstico: 🆕
+  14) Detección de hardware
+  15) Verificar salud del sistema
+  16) Verificar instalación
+
+Avanzado:
+  10) Inicializar dotfiles
+
+  0) Salir
+```
+
+## 🚀 Casos de Uso
+
+### 📚 Laptop de Escuela/Trabajo
 ```bash
 ./install.sh
-# Seleccionar opción 1: "Instalación completa"
+# Opción 1 → Perfil Desktop
+# Opción 9 → Configuración rápida (si solo quieres lo básico)
 ```
 
-**Incluye:** Sistema completo con GUI, todas las apps y configuraciones
+**Incluye**: Navegador, multimedia, office, terminal configurado
 
 ---
 
-### Instalación Rápida (Modo Portátil)
-**Ideal para:** Escuela, trabajo, computadoras temporales
-
+### 🎮 PC Gaming
 ```bash
 ./install.sh
-# Seleccionar opción 8: "Configuración rápida"
+# Opción 1 → Perfil Gaming
 ```
 
-**Instala solo:** vim, neovim, zsh, fish, starship, fzf, ripgrep, git, htop, tmux
-
-**Tiempo:** 5-10 minutos
+**Incluye**: Steam, Lutris, Wine, GameMode, MangoHUD, Discord
 
 ---
 
-### Instalación Modular
-Instala solo componentes específicos:
+### 💻 Workstation de Desarrollo
+```bash
+./install.sh
+# Opción 1 → Perfil Developer
 
-- **Opción 2:** Solo paquetes
-- **Opción 3:** Solo entorno gráfico (Hyprland)
-- **Opción 4:** Solo herramientas CLI
-- **Opción 5:** Solo enlazar configuraciones
-- **Opción 6:** Solo hacer backup
+# Después de instalar:
+
+# 1. Configurar SSH (para repos privados)
+./scripts/ssh-manager.sh   # Crear clave y agregar a GitHub/GitLab
+
+# 2. Detectar repos existentes (si tienes algunos)
+./scripts/auto-detect-repos.sh
+
+# 3. Clonar todos tus proyectos
+./scripts/repo-manager.sh  # Opción 2
+
+# 4. Verificar SSH
+./scripts/repo-manager.sh  # Opción 6
+```
+
+**Incluye**: IDEs, Docker, VirtualBox, herramientas de dev
+
+**💡 Tip**: Lee [docs/REPOSITORIOS_PRIVADOS.md](docs/REPOSITORIOS_PRIVADOS.md) para detalles sobre repos privados
 
 ---
 
-### Hacer Backup
+### 🔒 Pentesting/Seguridad
+```bash
+./install.sh
+# Opción 1 → Perfil Pentesting
+```
+
+**Incluye**: BlackArch, Wireshark, Metasploit, herramientas de seguridad
+
+---
+
+### 🔄 Transferir Entre Computadoras
+
+**PC Origen:**
+```bash
+cd ~/Documents/repos/dotfiles
+
+# Hacer backups
+./scripts/backup-configs.sh      # Configs
+./scripts/ssh-manager.sh         # SSH (Opción 4)
+./scripts/export-packages.sh     # Paquetes
+
+# Commit y push
+git add .
+git commit -m "Backup completo"
+git push
+```
+
+**PC Destino:**
+```bash
+# Clonar y configurar
+git clone https://github.com/tu-usuario/dotfiles ~/Documents/repos/dotfiles
+cd ~/Documents/repos/dotfiles
+
+# Instalar
+./install.sh  # Opción 1 → Mismo perfil
+
+# Restaurar
+./scripts/ssh-manager.sh   # Opción 5
+./scripts/repo-manager.sh  # Opción 2
+
+# ¡Idéntico al PC origen! 🎉
+```
+
+## 🛠️ Herramientas Incluidas
+
+### Gestión de Sistema
+- **pacman** - Gestor de paquetes oficial
+- **yay/paru** - AUR helpers
+- **GDM** - Display Manager (login screen)
+
+### Entorno Gráfico
+- **Hyprland** - Compositor Wayland moderno
+- **Waybar** - Barra de estado personalizable
+- **Dunst** - Notificaciones
+- **Wofi** - Launcher de aplicaciones
+- **Swaylock** - Bloqueador de pantalla
+
+### Terminal
+- **Kitty** - Emulador de terminal GPU-accelerated
+- **Zsh** - Shell avanzado
+- **Starship** - Prompt personalizable
+- **Oh My Zsh** - Framework para Zsh
+
+### Desarrollo
+- **VS Code, IntelliJ, Android Studio** - IDEs
+- **Docker, VirtualBox** - Virtualización
+- **Git, GitHub CLI** - Control de versiones
+- **Node.js, Python, Rust, Go, Java** - Lenguajes
+
+### Utilidades
+- **btop** - Monitor del sistema
+- **fastfetch** - Info del sistema
+- **fzf, ripgrep, fd, bat** - CLI tools
+- **Nautilus, Ranger** - Gestores de archivos
+
+## 🎓 Tips y Trucos
+
+### Vista Previa (Dry-Run)
+```bash
+# Ver qué se instalará SIN ejecutar
+DRY_RUN=true ./install.sh
+```
+
+### Verificar Salud del Sistema
+```bash
+./install.sh  # Opción 15
+# O directamente:
+./scripts/health-check.sh
+```
+
+### Crear Hooks Personalizados
+```bash
+# Copiar ejemplo
+cp hooks/post-install.sh.example hooks/post-install.sh
+
+# Editar
+nano hooks/post-install.sh
+
+# Hacer ejecutable
+chmod +x hooks/post-install.sh
+
+# Se ejecutará automáticamente después de instalar
+```
+
+### Gestionar tus Repos
+```bash
+# Editar lista
+nano repos.list
+
+# Agregar repos:
+# https://github.com/usuario/proyecto1
+# git@github.com:usuario/privado.git
+
+# Clonar todos
+./scripts/repo-manager.sh  # Opción 2
+
+# Actualizar todos
+./scripts/repo-manager.sh  # Opción 3
+```
+
+## 🔒 Seguridad
+
+### Claves SSH
+- ✅ Solo se respaldan claves **públicas** (`.pub`)
+- ❌ Las claves **privadas** NUNCA se suben al repo
+- 🛡️ `.gitignore` previene accidentes
+- 📚 [Más info](ssh-backup/README.md)
+
+### Información Sensible
+El `.gitignore` protege:
+- Claves privadas SSH
+- Tokens y credenciales
+- Información personal en configs
+- Logs con datos sensibles
+
+## 📚 Documentación Adicional
+
+### Guías Completas
+- **[docs/FEATURES.md](docs/FEATURES.md)** - 📖 Documentación completa de todas las características
+- **[docs/PERMISOS_SUDO.md](docs/PERMISOS_SUDO.md)** - 🛡️ Sistema de permisos y sudo
+- **[docs/REPOSITORIOS_PRIVADOS.md](docs/REPOSITORIOS_PRIVADOS.md)** - 🔒 Manejo de repositorios privados
+
+### Otros Recursos
+- **[hooks/README.md](hooks/README.md)** - 🪝 Sistema de hooks pre/post
+- **[ssh-backup/README.md](ssh-backup/README.md)** - 🔐 Guía de seguridad SSH
+- **[user-scripts/README.md](user-scripts/README.md)** - 📝 Scripts personalizados
+- **[packages/README.md](packages/README.md)** - 📦 Gestión de paquetes
+
+## 🐛 Solución de Problemas
+
+### Error: Display Manager conflicts
+```bash
+# Ver cuáles están habilitados
+systemctl list-unit-files | grep -E "(gdm|sddm|lightdm)"
+
+# Deshabilitar el no deseado
+sudo systemctl disable sddm
+sudo systemctl enable gdm
+```
+
+### Verificar Instalación Fallida
+```bash
+./install.sh  # Opción 16
+# O:
+./scripts/post-install-verify.sh
+```
+
+### Restaurar desde Backup
+```bash
+./install.sh  # Opción 13
+# O:
+./scripts/restore-backup.sh
+```
+
+### Health Check con Problemas
+```bash
+# Ejecutar verificación completa
+./scripts/health-check.sh
+
+# Ver detalles de servicios
+systemctl status NetworkManager
+systemctl status gdm
+systemctl status docker
+```
+
+## 🔧 Personalización
+
+### Editar Perfil
+```bash
+# Ver perfil actual
+cat scripts/profiles/developer.profile
+
+# Crear perfil personalizado
+cp scripts/profiles/full.profile scripts/profiles/custom.profile
+nano scripts/profiles/custom.profile
+```
+
+### Agregar tus Scripts
+```bash
+# Agregar en user-scripts/
+cp mi-script.sh user-scripts/
+chmod +x user-scripts/mi-script.sh
+```
+
+## 🤝 Contribuir
+
+1. Fork el proyecto
+2. Crea tu rama: `git checkout -b feature/nueva-caracteristica`
+3. Commit: `git commit -m 'Add nueva característica'`
+4. Push: `git push origin feature/nueva-caracteristica`
+5. Abre un Pull Request
+
+## 📝 Changelog
+
+### v2.0.0 - Diciembre 2024
+**Sistema de Configuración Avanzada**
+
+#### Características Principales (13):
+- 🎯 **Sistema de 6 perfiles** (minimal, desktop, gaming, developer, pentesting, full)
+- 🔍 **Detección automática de hardware** (GPU, CPU, WiFi, Bluetooth)
+- 🧪 **Modo dry-run** - Previsualiza sin ejecutar
+- 💾 **Backups mejorados** con timestamps y metadatos
+- ✅ **Verificación post-instalación** con retry automático
+- 🪝 **Sistema de hooks** (pre/post install/config)
+- ⚠️ **Detección de conflictos** (display managers, shells, etc.)
+- 💽 **Verificación de espacio** en disco
+- 📝 **Logs mejorados** con timestamps y niveles
+- 🏥 **Health check** completo del sistema (9 categorías)
+
+#### Gestión de Repositorios:
+- 📦 **Gestión de repositorios Git** (clonar/actualizar/estado todos)
+- 🔍 **Auto-detección** de repositorios existentes
+- 🔒 **Soporte para repositorios privados** (SSH/HTTPS)
+- 🔄 **Conversión automática** HTTPS → SSH
+
+#### Seguridad y Permisos:
+- 🛡️ **Manejo robusto de permisos sudo** (pide contraseña una sola vez)
+- 🔐 **Gestión de claves SSH** con backup seguro y verificación
+- 🔒 **Verificación de configuración SSH** (GitHub/GitLab)
+
+#### Otros:
+- 📂 **Auto-ubicación** del repositorio
+- 📚 **Documentación completa** (800+ líneas)
+- 🧹 **Estructura organizada** (carpeta docs/)
+
+#### Archivos:
+- 15+ scripts de utilidad
+- 6 perfiles predefinidos
+- Documentación en español
+- Sistema modular y extensible
+
+### v1.0.0 - 2024
+- Primera versión
+- Instalación básica de Hyprland
+- Scripts modulares
+- Sistema de backups básico
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia MIT. Ver archivo `LICENSE` para más detalles.
+
+## 🙏 Agradecimientos
+
+- Comunidad de Arch Linux
+- Hyprland Developers
+- Todos los contribuidores
+
+---
+
+**¿Preguntas o sugerencias?** Abre un issue en el repositorio.
+
+**¡Feliz configuración! 🎉**
+
+---
+
+<div align="center">
+
+**Made with ❤️ for Arch Linux**
+
+[⬆️ Volver arriba](#-dotfiles-v20---sistema-de-configuración-avanzada)
+
+</div>
 Guarda tu configuración actual **antes** de instalar:
 
 ```bash

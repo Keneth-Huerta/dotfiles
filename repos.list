@@ -1,0 +1,27 @@
+# ============================================================================
+# LISTA DE REPOSITORIOS GIT - Auto-generado
+# ============================================================================
+# Este archivo fue generado automáticamente por auto-detect-repos.sh
+#
+# Formato:
+#   URL_DEL_REPO [DIRECTORIO_DESTINO]
+#
+# Si no especificas directorio, se clonará en ~/Documents/repos/nombre-repo
+#
+# Nota: Los directorios personalizados se mantienen de tus repos existentes
+# ============================================================================
+
+https://github.com/Keneth-Huerta/Cubo-Enfocado.git
+https://github.com/Keneth-Huerta/tutorias.git
+https://github.com/bytebot-ai/bytebot.git
+https://aur.archlinux.org/snapd.git
+https://github.com/Keneth-Huerta/Minenfocado.git
+https://github.com/Keneth-Huerta/Huellitas.git
+https://github.com/Keneth-Huerta/1CM4.git
+https://github.com/synacktraa/ani-skip.git
+https://github.com/Keneth-Huerta/Keneth-Huerta.git
+https://github.com/casualsnek/waydroid_script
+https://github.com/Keneth-Huerta/dotfiles.git
+https://aur.archlinux.org/yay.git
+https://aur.archlinux.org/paru.git
+https://github.com/Keneth-Huerta/GamificacionDeportiva.git

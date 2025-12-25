@@ -1,0 +1,23 @@
+# ============================================================================
+# LISTA DE REPOSITORIOS GIT
+# ============================================================================
+# Gestiona todos tus repositorios desde aquí
+#
+# Formato:
+#   URL_DEL_REPO [DIRECTORIO_DESTINO]
+#
+# Si no especificas directorio, se usa: ~/Documents/repos/nombre-repo
+#
+# ============================================================================
+
+# Ejemplos:
+# https://github.com/usuario/proyecto1
+# https://github.com/usuario/proyecto2 ~/custom/path
+# git@github.com:usuario/privado.git
+# https://gitlab.com/usuario/otro-proyecto
+
+# ============================================================================
+# TUS REPOSITORIOS
+# ============================================================================
+# Agrega tus repos aquí, uno por línea:
+
