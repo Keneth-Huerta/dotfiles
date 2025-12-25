@@ -2,15 +2,15 @@
 # Edita este archivo antes de ejecutar el instalador
 
 # Información del usuario
-USER_NAME="kenethissac"
-USER_EMAIL="hugk070821@gmail.com"
+USER_NAME="Keneth Huerta"
+USER_EMAIL="kenethissac@gmail.com"
 
-# Configuración de Git
-GIT_NAME="Keneth Isaac Huerta Galindo"
-GIT_EMAIL="hugk070821@gmail.com"
+# Configuración de Git (debe coincidir con tu cuenta de GitHub)
+GIT_NAME="Keneth-Huerta"
+GIT_EMAIL="kenethissac@gmail.com"
 
 # Shell predeterminada (fish, zsh, bash)
-DEFAULT_SHELL="fish"
+DEFAULT_SHELL="zsh"
 
 # Editor predeterminado
 DEFAULT_EDITOR="nvim"
