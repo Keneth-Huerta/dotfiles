@@ -1,8 +1,7 @@
 # ============================================================================
 # HOOKS SYSTEM - Pre/Post Installation Hooks
 # ============================================================================
-# 
-# Los hooks permiten ejecutar scripts personalizados en diferentes momentos
+# # Los hooks permiten ejecutar scripts personalizados en diferentes momentos
 # del proceso de instalación:
 #
 # pre-install.sh   - Antes de iniciar la instalación
@@ -12,7 +11,6 @@
 #
 # Todos los hooks son opcionales. Si existen, se ejecutarán automáticamente.
 # ============================================================================
-
 # Coloca aquí tus scripts personalizados
 # Ejemplo:
 #

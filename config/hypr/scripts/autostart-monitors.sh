@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# 🚀 Auto-start script for monitor configuration
+#  Auto-start script for monitor configuration
 # This script runs when Hyprland starts to auto-configure monitors
 
 LOG_FILE="/tmp/hyprland-autostart.log"
@@ -14,18 +14,18 @@ log_message() {
 # Wait for Hyprland to be fully loaded
 sleep 3
 
-log_message "🚀 Hyprland auto-start: Configuring monitors..."
+log_message " Hyprland auto-start: Configuring monitors..."
 
 # Check if monitor manager exists and is executable
 if [[ -x "$MONITOR_MANAGER" ]]; then
     # Auto-configure monitors
     "$MONITOR_MANAGER" auto >> "$LOG_FILE" 2>&1
-    log_message "✅ Monitor auto-configuration completed"
+    log_message " Monitor auto-configuration completed"
 else
-    log_message "❌ Monitor manager not found: $MONITOR_MANAGER"
+    log_message " Monitor manager not found: $MONITOR_MANAGER"
 fi
 
 # Optional: Start additional services here
-# log_message "🎵 Starting additional services..."
+# log_message " Starting additional services..."
 
-log_message "🏁 Auto-start script completed"
+log_message " Auto-start script completed"

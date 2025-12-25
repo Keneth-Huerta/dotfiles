@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# 🧪 Monitor Manager Test Suite
+#  Monitor Manager Test Suite
 # Comprehensive testing of the monitor management system
 
 LOG_FILE="/tmp/monitor-test.log"
@@ -26,19 +26,19 @@ run_test() {
     local command="$2"
     local expected_exit_code="${3:-0}"
     
-    echo -e "${CYAN}🧪 Testing: $test_name${NC}"
+    echo -e "${CYAN} Testing: $test_name${NC}"
     
     if eval "$command" >/dev/null 2>&1; then
         local exit_code=$?
         if [[ $exit_code -eq $expected_exit_code ]]; then
-            echo -e "${GREEN}✅ PASS: $test_name${NC}"
+            echo -e "${GREEN} PASS: $test_name${NC}"
             return 0
         else
-            echo -e "${RED}❌ FAIL: $test_name (exit code: $exit_code, expected: $expected_exit_code)${NC}"
+            echo -e "${RED} FAIL: $test_name (exit code: $exit_code, expected: $expected_exit_code)${NC}"
             return 1
         fi
     else
-        echo -e "${RED}❌ FAIL: $test_name (command failed)${NC}"
+        echo -e "${RED} FAIL: $test_name (command failed)${NC}"
         return 1
     fi
 }
@@ -50,27 +50,27 @@ show_results() {
     local failed=$((total - passed))
     
     echo ""
-    echo -e "${CYAN}📊 Test Results${NC}"
+    echo -e "${CYAN} Test Results${NC}"
     echo -e "${YELLOW}===============${NC}"
-    echo -e "${GREEN}✅ Passed: $passed${NC}"
-    echo -e "${RED}❌ Failed: $failed${NC}"
-    echo -e "${BLUE}📝 Total:  $total${NC}"
+    echo -e "${GREEN} Passed: $passed${NC}"
+    echo -e "${RED} Failed: $failed${NC}"
+    echo -e "${BLUE} Total:  $total${NC}"
     
     if [[ $failed -eq 0 ]]; then
-        echo -e "${GREEN}🎉 All tests passed!${NC}"
+        echo -e "${GREEN} All tests passed!${NC}"
         return 0
     else
-        echo -e "${YELLOW}⚠️ Some tests failed. Check the log: $LOG_FILE${NC}"
+        echo -e "${YELLOW} Some tests failed. Check the log: $LOG_FILE${NC}"
         return 1
     fi
 }
 
 # Start testing
-echo -e "${PURPLE}🚀 Starting Monitor Manager Test Suite${NC}"
+echo -e "${PURPLE} Starting Monitor Manager Test Suite${NC}"
 echo -e "${YELLOW}========================================${NC}"
 echo ""
 
-log_message "🧪 Starting monitor manager tests"
+log_message " Starting monitor manager tests"
 
 passed_tests=0
 total_tests=0
@@ -131,7 +131,7 @@ if [[ $monitor_count -gt 1 ]]; then
         ((passed_tests++))
     fi
 else
-    echo -e "${YELLOW}⏭️ Skipping toggle test (single monitor detected)${NC}"
+    echo -e "${YELLOW}⏭ Skipping toggle test (single monitor detected)${NC}"
 fi
 
 # Test 10: Autostart script exists
@@ -140,14 +140,14 @@ if run_test "Autostart script exists" "[[ -x '$HOME/.config/hypr/scripts/autosta
     ((passed_tests++))
 fi
 
-log_message "🏁 Testing completed: $passed_tests/$total_tests tests passed"
+log_message " Testing completed: $passed_tests/$total_tests tests passed"
 
 # Show results
 show_results $passed_tests $total_tests
 
 # Additional information
 echo ""
-echo -e "${CYAN}📋 System Information${NC}"
+echo -e "${CYAN} System Information${NC}"
 echo -e "${YELLOW}=====================${NC}"
 echo -e "${BLUE}Connected monitors:${NC} $(hyprctl monitors | grep -c "^Monitor")"
 echo -e "${BLUE}Active workspace:${NC} $(hyprctl activewindow | grep "workspace:" | awk '{print $2}')"
@@ -155,7 +155,7 @@ echo -e "${BLUE}Monitor config file:${NC} $HOME/.config/hypr/monitors.conf"
 echo -e "${BLUE}Test log file:${NC} $LOG_FILE"
 
 echo ""
-echo -e "${PURPLE}🎯 Quick Commands${NC}"
+echo -e "${PURPLE} Quick Commands${NC}"
 echo -e "${YELLOW}=================${NC}"
 echo -e "${GREEN}Status:${NC} $MONITOR_MANAGER status"
 echo -e "${GREEN}Auto-config:${NC} $MONITOR_MANAGER auto"

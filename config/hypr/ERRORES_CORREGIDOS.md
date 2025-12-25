@@ -1,12 +1,12 @@
-# 🔴 Correcciones de Errores de Configuración - Hyprland 🔴
+# Correcciones de Errores de Configuración - Hyprland 
 
-## 📋 Resumen de Errores Corregidos
+## Resumen de Errores Corregidos
 
 Se detectaron **7 errores de configuración** en `advanced.conf` causados por uso de opciones inválidas o deprecadas de Hyprland.
 
 ---
 
-## ❌ Errores Encontrados
+## Errores Encontrados
 
 ### 1. **Bloque `render` no existe**
 ```
@@ -16,7 +16,7 @@ Error: config option <misc:render_ahead_of_time> does not exist
 
 **Causa**: Hyprland no tiene un bloque de configuración `render {}`. Las opciones de render se configuran mediante variables de entorno.
 
-**Solución**: ✅ Eliminado bloque `render {}` completo
+**Solución**:  Eliminado bloque `render {}` completo
 
 ---
 
@@ -27,7 +27,7 @@ Error: config option <debug:disable_logs> does not exist
 
 **Causa**: Hyprland no tiene un bloque `debug {}` en la configuración. El debug se activa con variables de entorno.
 
-**Solución**: ✅ Eliminado bloque `debug {}`, agregado comentario sobre cómo activar debug:
+**Solución**:  Eliminado bloque `debug {}`, agregado comentario sobre cómo activar debug:
 ```bash
 # Para activar debug: HYPRLAND_TRACE=1 AQ_TRACE=1 Hyprland
 ```
@@ -43,7 +43,7 @@ Error: config option <misc:no_cursor_warps> does not exist
 
 **Causa**: Hyprland no tiene un bloque `cursor {}`. Las opciones de cursor se configuran en `misc` o mediante env vars.
 
-**Solución**: ✅ Eliminado bloque `cursor {}` completo
+**Solución**:  Eliminado bloque `cursor {}` completo
 
 ---
 
@@ -60,11 +60,11 @@ Error: config option <misc:layers_hog_keyboard_focus> does not exist
 
 **Causa**: Opciones que no existen en Hyprland o fueron deprecadas.
 
-**Solución**: ✅ Eliminadas todas las opciones inválidas del bloque `misc`
+**Solución**:  Eliminadas todas las opciones inválidas del bloque `misc`
 
 ---
 
-## ✅ Configuración Corregida
+## Configuración Corregida
 
 ### Opciones `misc` Válidas (Confirmadas por documentación oficial)
 
@@ -103,11 +103,11 @@ misc {
 
 ---
 
-## 📖 Opciones Eliminadas (con alternativas)
+## Opciones Eliminadas (con alternativas)
 
 ### Render/Debug Options
-❌ **Eliminado**: Bloques `render {}` y `debug {}`  
-✅ **Alternativa**: Variables de entorno
+ **Eliminado**: Bloques `render {}` y `debug {}`  
+ **Alternativa**: Variables de entorno
 
 ```bash
 # Habilitar explicit sync (recomendado para Nvidia)
@@ -121,8 +121,8 @@ env = AQ_DRM_DEVICES,/dev/dri/card0:/dev/dri/card1
 ```
 
 ### Cursor Options
-❌ **Eliminado**: Bloque `cursor {}`  
-✅ **Alternativa**: Variables de entorno y opciones misc
+ **Eliminado**: Bloque `cursor {}`  
+ **Alternativa**: Variables de entorno y opciones misc
 
 ```bash
 # Tema y tamaño de cursor
@@ -135,34 +135,34 @@ bind = $mod, equal, exec, hyprctl -q keyword cursor:zoom_factor $(hyprctl getopt
 ```
 
 ### Opciones Misc Inválidas
-❌ `no_direct_scanout` - No existe  
-❌ `mouse_move_focuses_monitor` - No existe  
-❌ `render_ahead_of_time` - No existe  
-❌ `render_ahead_safezone` - No existe  
-❌ `disable_autoreload` - No existe  
-❌ `background_color` - No existe  
-❌ `no_cursor_warps` - No existe  
-❌ `hide_cursor_on_touch` - No existe  
-❌ `layers_hog_keyboard_focus` - No existe  
+ `no_direct_scanout` - No existe  
+ `mouse_move_focuses_monitor` - No existe  
+ `render_ahead_of_time` - No existe  
+ `render_ahead_safezone` - No existe  
+ `disable_autoreload` - No existe  
+ `background_color` - No existe  
+ `no_cursor_warps` - No existe  
+ `hide_cursor_on_touch` - No existe  
+ `layers_hog_keyboard_focus` - No existe  
 
 ---
 
-## 🎯 Resultado Final
+## Resultado Final
 
 ### Antes
-- ❌ 7+ errores de configuración
-- ❌ Hyprland mostraba warnings en el log
-- ❌ Configuración no estándar
+- 7+ errores de configuración
+- Hyprland mostraba warnings en el log
+- Configuración no estándar
 
 ### Después
-- ✅ 0 errores de configuración
-- ✅ `hyprctl reload` exitoso
-- ✅ Solo opciones válidas y documentadas
-- ✅ Comentarios sobre alternativas
+- 0 errores de configuración
+- `hyprctl reload` exitoso
+- Solo opciones válidas y documentadas
+- Comentarios sobre alternativas
 
 ---
 
-## 🔍 Cómo Verificar Opciones Válidas
+## Cómo Verificar Opciones Válidas
 
 ### Método 1: Documentación Oficial
 ```bash
@@ -191,7 +191,7 @@ grep -r "registerOption" hyprland/src/config/
 
 ---
 
-## 🚀 Recomendaciones
+## Recomendaciones
 
 ### Para Rendimiento
 ```hyprlang
@@ -222,9 +222,9 @@ env = NVD_BACKEND,direct
 
 ---
 
-## 📝 Archivos Modificados
+## Archivos Modificados
 
-✅ `/home/valge/.config/hypr/advanced.conf`
+ `/home/valge/.config/hypr/advanced.conf`
 - Eliminados bloques inválidos: `debug`, `render`, `cursor`
 - Eliminadas 13 opciones inválidas de `misc`
 - Mantenidas 13 opciones válidas de `misc`
@@ -232,20 +232,20 @@ env = NVD_BACKEND,direct
 
 ---
 
-## ✅ Validación Final
+## Validación Final
 
 ```bash
 # Recargar configuración
 hyprctl reload
-# Resultado: ok ✅
+# Resultado: ok 
 
 # Sin errores en logs
 journalctl -u hyprland -n 50
-# Sin mensajes de error ✅
+# Sin mensajes de error 
 ```
 
 ---
 
-**Estado**: ✅ **Configuración 100% válida y libre de errores**  
+**Estado**:  **Configuración 100% válida y libre de errores**  
 **Fecha**: 2025-11-15  
 **Versión Hyprland**: Compatible con última versión estable

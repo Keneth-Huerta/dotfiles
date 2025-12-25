@@ -10,7 +10,7 @@ TYPE=${2:-region}  # Tipo por defecto: region
 mkdir -p ~/Pictures/Screenshots
 
 # Notificar inicio
-notify-send "📸 Screenshot con Delay" "Captura en ${DELAY} segundos. Prepara tu desplegable..." --urgency=normal
+notify-send " Screenshot con Delay" "Captura en ${DELAY} segundos. Prepara tu desplegable..." --urgency=normal
 
 # Esperar el delay
 sleep $DELAY
@@ -44,8 +44,8 @@ if [ -f "/tmp/delayed_screenshot.png" ]; then
     wl-copy < /tmp/delayed_screenshot.png
     
     # Notificar éxito
-    notify-send "📸 Screenshot" "Captura guardada y copiada al clipboard" --urgency=low
+    notify-send " Screenshot" "Captura guardada y copiada al clipboard" --urgency=low
 else
     # Notificar error
-    notify-send "❌ Screenshot Error" "No se pudo tomar la captura" --urgency=critical
+    notify-send " Screenshot Error" "No se pudo tomar la captura" --urgency=critical
 fi

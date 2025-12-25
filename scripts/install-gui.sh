@@ -131,7 +131,7 @@ install_sddm() {
         echo -e "${GREEN}✓ Ya tienes un Display Manager instalado: ${dm_name}${NC}"
         echo ""
         echo -e "${BLUE}[INFO]${NC} ${dm_name} funciona perfectamente con Hyprland."
-        echo -e "${BLUE}[INFO]${NC} Para usar Hyprland, selecciónalo en la pantalla de login (ícono ⚙️)."
+        echo -e "${BLUE}[INFO]${NC} Para usar Hyprland, selecciónalo en la pantalla de login (ícono de configuración)."
         echo ""
         read -p "¿Realmente deseas reemplazarlo con SDDM? (s/N): " -n 1 -r
         echo
@@ -310,7 +310,7 @@ main() {
             echo -e "${GREEN}✓ Instalación completada${NC}"
             echo -e "${BLUE}Para iniciar Hyprland desde tu Display Manager actual:${NC}"
             echo "  1. Cierra sesión (logout)"
-            echo "  2. En la pantalla de login, click en el ícono ⚙️"
+            echo "  2. En la pantalla de login, click en el ícono de configuración"
             echo "  3. Selecciona 'Hyprland'"
             echo "  4. Ingresa tu contraseña"
             ;;

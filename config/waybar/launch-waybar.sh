@@ -40,7 +40,7 @@ if pgrep -x waybar >/dev/null; then
 fi
 
 # Launch Waybar
-log_message "🚀 Launching Waybar..."
+log_message "Launching Waybar..."
 waybar --config "$CONFIG_FILE" --style "$STYLE_FILE" >> "$LOG_FILE" 2>&1 &
 
 # Verify launch

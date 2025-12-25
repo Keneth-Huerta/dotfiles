@@ -21,12 +21,12 @@ cleanup() {
 trap cleanup EXIT
 
 # Paso 1: Tomar captura completa de la pantalla actual
-notify-send "📸 Freeze Screenshot" "Congelando pantalla..." --urgency=normal
+notify-send " Freeze Screenshot" "Congelando pantalla..." --urgency=normal
 grim "$TEMP_DIR/frozen_screen.png"
 
 # Verificar que la captura se creó correctamente
 if [ ! -f "$TEMP_DIR/frozen_screen.png" ]; then
-    notify-send "❌ Error" "No se pudo congelar la pantalla" --urgency=critical
+    notify-send " Error" "No se pudo congelar la pantalla" --urgency=critical
     exit 1
 fi
 
@@ -40,7 +40,7 @@ elif command -v feh &> /dev/null; then
     feh -F -Z "$TEMP_DIR/frozen_screen.png" &
     VIEWER_PID=$!
 else
-    notify-send "❌ Error" "Necesitas instalar 'imv' o 'feh' para usar esta función" --urgency=critical
+    notify-send " Error" "Necesitas instalar 'imv' o 'feh' para usar esta función" --urgency=critical
     exit 1
 fi
 
@@ -48,7 +48,7 @@ fi
 sleep 0.5
 
 # Paso 3: Notificar al usuario que puede seleccionar
-notify-send "📸 Pantalla Congelada" "Presiona ENTER para seleccionar región, ESC para cancelar" --urgency=normal
+notify-send " Pantalla Congelada" "Presiona ENTER para seleccionar región, ESC para cancelar" --urgency=normal
 
 # Paso 4: Esperar input del usuario
 echo "Pantalla congelada. Presiona ENTER para continuar con la selección..."
@@ -68,7 +68,7 @@ if [ -n "$SELECTION" ]; then
     # Copiar al clipboard
     wl-copy < "$OUTPUT_FILE"
     
-    notify-send "📸 Screenshot" "Captura de región congelada guardada y copiada" --urgency=low
+    notify-send " Screenshot" "Captura de región congelada guardada y copiada" --urgency=low
 else
-    notify-send "📸 Screenshot" "Captura cancelada" --urgency=low
+    notify-send " Screenshot" "Captura cancelada" --urgency=low
 fi

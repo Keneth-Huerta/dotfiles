@@ -101,7 +101,7 @@ fi
 # 8. Crear resumen
 echo -e "${YELLOW}Creando resumen...${NC}"
 cat > "$PACKAGES_DIR/RESUMEN.md" << EOF
-# 📦 Resumen de Paquetes Instalados
+# Resumen de Paquetes Instalados
 
 **Fecha de exportación:** $(date +"%Y-%m-%d %H:%M:%S")
 **Sistema:** $(uname -n) - $(uname -r)

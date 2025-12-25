@@ -798,7 +798,7 @@ show_menu() {
     cat << "EOF"
 ╔══════════════════════════════════════════════════════════════╗
 ║                                                              ║
-║          🚀 INSTALADOR DE DOTFILES - ARCH LINUX 🚀          ║
+║          INSTALADOR DE DOTFILES - ARCH LINUX          ║
 ║                                                              ║
 ╚══════════════════════════════════════════════════════════════╝
 EOF
@@ -807,12 +807,12 @@ EOF
     echo -e "${BOLD}Selecciona el tipo de instalación:${NC}"
     echo ""
     echo -e "  ${GREEN}1)${NC} 🖥️  Instalación Completa ${CYAN}(Entorno + Apps + Configs)${NC}"
-    echo -e "  ${GREEN}2)${NC} 💻 Solo Entorno Gráfico ${CYAN}(Hyprland + Waybar + GUI)${NC}"
+    echo -e "  ${GREEN}2)${NC} Solo Entorno Gráfico ${CYAN}(Hyprland + Waybar + GUI)${NC}"
     echo -e "  ${GREEN}3)${NC} ⌨️  Solo Herramientas CLI ${CYAN}(Nvim + Fish + Tools)${NC}"
-    echo -e "  ${GREEN}4)${NC} 👨‍💻 Herramientas de Desarrollo ${CYAN}(Docker + IDEs + Languages)${NC}"
+    echo -e "  ${GREEN}4)${NC} Herramientas de Desarrollo ${CYAN}(Docker + IDEs + Languages)${NC}"
     echo -e "  ${GREEN}5)${NC} 📝 Solo Aplicar Configuraciones ${CYAN}(Sin instalar paquetes)${NC}"
-    echo -e "  ${GREEN}6)${NC} 🎨 Instalación Personalizada ${CYAN}(Escoger componentes)${NC}"
-    echo -e "  ${GREEN}7)${NC} 🔍 Mostrar lo que se instalará ${CYAN}(Dry run)${NC}"
+    echo -e "  ${GREEN}6)${NC} Instalación Personalizada ${CYAN}(Escoger componentes)${NC}"
+    echo -e "  ${GREEN}7)${NC} Mostrar lo que se instalará ${CYAN}(Dry run)${NC}"
     echo -e "  ${GREEN}8)${NC} ❌ Salir"
     echo ""
     echo -ne "${BOLD}Opción [1-8]: ${NC}"
@@ -972,7 +972,7 @@ show_finish_message() {
 
 ╔══════════════════════════════════════════════════════════════╗
 ║                                                              ║
-║              ✨ INSTALACIÓN COMPLETADA ✨                    ║
+║              INSTALACIÓN COMPLETADA                    ║
 ║                                                              ║
 ╚══════════════════════════════════════════════════════════════╝
 
