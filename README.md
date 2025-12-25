@@ -1,5 +1,60 @@
 # Dotfiles v2.0 - Sistema de Configuración Avanzada
-Sistema modular y profesional de dotfiles para Arch Linux con Hyprland. Restaura tu entorno completo en cualquier máquina con un solo comando.
+
+<div align="center">
+
+**Sistema modular y profesional de dotfiles para Arch Linux con Hyprland**  
+Restaura tu entorno completo en cualquier máquina con un solo comando.
+
+[![Made for Arch](https://img.shields.io/badge/Arch-Linux-1793D1?logo=arch-linux&logoColor=white)](https://archlinux.org/)
+[![Hyprland](https://img.shields.io/badge/Hyprland-Compositor-00D9FF)](https://hyprland.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+</div>
+
+---
+
+## Índice
+
+<details>
+<summary>Click para expandir el índice completo</summary>
+
+### Inicio Rápido
+- [Requisitos](#requisitos)
+- [Instalación Rápida](#instalación-rápida)
+- [Primeros Pasos](#primeros-pasos)
+
+### Documentación
+- [Características](#características-principales)
+- [Perfiles Disponibles](#perfiles-disponibles)
+- [Estructura del Proyecto](#estructura-del-proyecto)
+- [Menú Principal](#menú-principal)
+
+### Casos de Uso
+- [Laptop Escuela/Trabajo](#laptop-de-escuelatrabajo)
+- [PC Gaming](#pc-gaming)
+- [Workstation Desarrollo](#workstation-de-desarrollo)
+- [Pentesting/Seguridad](#pentestingseguridad)
+- [Transferir entre PCs](#transferir-entre-computadoras)
+
+### Configuración
+- [Personalización](#personalización)
+- [Tips y Trucos](#tips-y-trucos)
+- [Seguridad](#seguridad)
+
+### Mantenimiento
+- [Solución de Problemas](#solución-de-problemas)
+- [Herramientas Incluidas](#herramientas-incluidas)
+- [Documentación Adicional](#documentación-adicional)
+
+### Otros
+- [Contribuir](#contribuir)
+- [Changelog](#changelog)
+- [Licencia](#licencia)
+
+</details>
+
+---
+
 ## Características Principales
 ### Nuevo en v2.0
 - **6 Perfiles predefinidos** (minimal, desktop, gaming, developer, pentesting, full)
@@ -28,16 +83,21 @@ Sistema modular y profesional de dotfiles para Arch Linux con Hyprland. Restaura
 - **Modo rápido** para instalación parcial
 - **Symlinks automáticos** para sincronización
 ## Requisitos
+
 - Arch Linux (o derivados: Manjaro, EndeavourOS, etc.)
 - Conexión a internet activa
 - Git instalado: `sudo pacman -S git`
 - **Usuario normal con permisos sudo** (NO ejecutar como root)
 - Espacio en disco: 5-20GB (según perfil)
-** IMPORTANTE:** 
-- **NO ejecutes** `sudo ./install.sh`
-- El script pedirá sudo **automáticamente** cuando sea necesario
-- Solo pedirá tu contraseña **una vez** al inicio
-- Ver [docs/PERMISOS_SUDO.md](docs/PERMISOS_SUDO.md) para detalles
+
+> [!IMPORTANT]  
+> **NO ejecutes** `sudo ./install.sh`  
+> El script pedirá sudo **automáticamente** cuando sea necesario.  
+> Solo pedirá tu contraseña **una vez** al inicio.  
+> Ver [docs/PERMISOS_SUDO.md](docs/PERMISOS_SUDO.md) para detalles.
+
+---
+
 ## Instalación Rápida
 ### Primera vez:
 ```bash
@@ -67,37 +127,34 @@ cd ~/Documents/repos/dotfiles
 # Listo
 ```
 ## Estructura del Proyecto
+
 ```
 dotfiles/
- install.sh                     # Script principal (17 opciones)
- config.sh                      # Configuración personalizable
- verify.sh                      # Verificación del sistema
- README.md                      # Este archivo
- .gitignore                     # Protección de datos sensibles
- docs/                          #  Documentación
-    FEATURES.md               # Características completas v2.0
-    PERMISOS_SUDO.md          # Manejo de permisos sudo
-    REPOSITORIOS_PRIVADOS.md  # Guía de repos privados
- config/                        # Configuraciones de aplicaciones
-    hypr/                     # Hyprland (compositor Wayland)
-    waybar/                   # Barra de estado
-    kitty/                    # Terminal
-    zsh/                      # Shell
-    fish/                     # Fish shell
-    git/                      # Configuración Git
-    starship/                 # Prompt
-    swaylock/                 # Lockscreen
-    wlogout/                  # Menú de logout
-    wofi/                     # Launcher
- scripts/                       # Scripts de utilidad
-    install-packages.sh       # Instalador de paquetes
-    install-gui.sh            # Instalador GUI (Hyprland, GDM)
-    install-cli-tools.sh      # Herramientas CLI
-    link-configs.sh           # Crear symlinks
-    backup-configs.sh         # Backup con timestamps
-    restore-backup.sh         # Restaurar backups
-    health-check.sh           # Verificar salud del sistema
-    detect-hardware.sh        # Detección de hardware
+├── install.sh                  # Script principal (17 opciones)
+├── config.sh                   # Configuración personalizable
+├── verify.sh                   # Verificación del sistema
+├── README.md                   # Este archivo
+│
+├── docs/                       # Documentación
+│   ├── FEATURES.md             # Características completas v2.0
+│   ├── PERMISOS_SUDO.md        # Manejo de permisos sudo
+│   └── REPOSITORIOS_PRIVADOS.md # Guía de repos privados
+│
+├── config/                     # Configuraciones de aplicaciones
+│   ├── hypr/                   # Hyprland (compositor Wayland)
+│   ├── waybar/                 # Barra de estado
+│   ├── kitty/                  # Terminal
+│   ├── zsh/, fish/             # Shells
+│   ├── git/, starship/         # Git y prompt
+│   └── swaylock/, wlogout/, wofi/
+│
+├── scripts/                    # Scripts de utilidad
+│   ├── install-packages.sh     # Instalador de paquetes
+│   ├── install-gui.sh          # GUI (Hyprland, GDM)
+│   ├── link-configs.sh         # Crear symlinks
+│   ├── backup-configs.sh       # Backups con timestamps
+│   ├── health-check.sh         # Health check del sistema
+│   ├── detect-hardware.sh      # Detección de hardware
     repo-manager.sh           # Gestión de repositorios
     ssh-manager.sh            # Gestión de SSH
     auto-detect-repos.sh      # Auto-detectar repos existentes
@@ -156,33 +213,44 @@ dotfiles/
 | **Full** | TODO incluido | ~200 | ~20GB | Workstation completa |
 Elige tu perfil durante la instalación (Opción 1 del menú).
 ## Menú Principal
+
 ```
-         MENÚ PRINCIPAL                 
+╔════════════════════════════════════╗
+║      MENÚ PRINCIPAL - v2.0         ║
+╚════════════════════════════════════╝
+
 Instalación:
-  1) Instalación completa (con selección de perfil)
-  2) Solo instalar paquetes
-  3) Solo instalar GUI (Hyprland + GDM)
+  1) Instalación completa (con perfil)
+  2) Solo paquetes
+  3) Solo GUI (Hyprland + GDM)
   4) Solo CLI tools
-  5) Solo enlazar configuraciones
+  5) Solo enlazar configs
+
 Backup y Exportación:
-  6) Backup de configuraciones actuales
-  7) Exportar lista de paquetes instalados
-  
+  6) Backup de configuraciones
+  7) Exportar paquetes
+
 Mantenimiento:
   8) Actualizar sistema
-  9) Configuración rápida (vim, zsh, starship)
-Gestión: 
+  9) Config rápida (vim, zsh)
+
+Gestión:
   11) Gestionar repositorios
   12) Gestionar claves SSH
   13) Restaurar backup
-Diagnóstico: 
-  14) Detección de hardware
-  15) Verificar salud del sistema
+
+Diagnóstico:
+  14) Detección hardware
+  15) Health check sistema
   16) Verificar instalación
+
 Avanzado:
   10) Inicializar dotfiles
-  0) Salir
+  0)  Salir
 ```
+
+---
+
 ## Casos de Uso
 ### Laptop de Escuela/Trabajo
 ```bash
@@ -248,7 +316,10 @@ cd ~/Documents/repos/dotfiles
 ./scripts/repo-manager.sh  # Opción 2
 # Idéntico al PC origen
 ```
+---
+
 ## Herramientas Incluidas
+
 ### Gestión de Sistema
 - **pacman** - Gestor de paquetes oficial
 - **yay/paru** - AUR helpers
@@ -259,6 +330,7 @@ cd ~/Documents/repos/dotfiles
 - **Dunst** - Notificaciones
 - **Wofi** - Launcher de aplicaciones
 - **Swaylock** - Bloqueador de pantalla
+
 ### Terminal
 - **Kitty** - Emulador de terminal GPU-accelerated
 - **Zsh** - Shell avanzado
@@ -269,11 +341,15 @@ cd ~/Documents/repos/dotfiles
 - **Docker, VirtualBox** - Virtualización
 - **Git, GitHub CLI** - Control de versiones
 - **Node.js, Python, Rust, Go, Java** - Lenguajes
+
 ### Utilidades
 - **btop** - Monitor del sistema
 - **fastfetch** - Info del sistema
 - **fzf, ripgrep, fd, bat** - CLI tools
 - **Nautilus, Ranger** - Gestores de archivos
+
+---
+
 ## Tips y Trucos
 ### Vista Previa (Dry-Run)
 ```bash
@@ -308,6 +384,9 @@ nano repos.list
 # Actualizar todos
 ./scripts/repo-manager.sh  # Opción 3
 ```
+
+---
+
 ## Seguridad
 ### Claves SSH
 - Solo se respaldan claves **públicas** (`.pub`)
@@ -320,6 +399,9 @@ El `.gitignore` protege:
 - Tokens y credenciales
 - Información personal en configs
 - Logs con datos sensibles
+
+---
+
 ## Documentación Adicional
 ### Guías Completas
 - **[docs/FEATURES.md](docs/FEATURES.md)** -  Documentación completa de todas las características
@@ -330,6 +412,9 @@ El `.gitignore` protege:
 - **[ssh-backup/README.md](ssh-backup/README.md)** -  Guía de seguridad SSH
 - **[user-scripts/README.md](user-scripts/README.md)** -  Scripts personalizados
 - **[packages/README.md](packages/README.md)** -  Gestión de paquetes
+
+---
+
 ## Solución de Problemas
 ### Error: Display Manager conflicts
 ```bash
@@ -360,6 +445,9 @@ systemctl status NetworkManager
 systemctl status gdm
 systemctl status docker
 ```
+
+---
+
 ## Personalización
 ### Editar Perfil
 ```bash
@@ -375,12 +463,18 @@ nano scripts/profiles/custom.profile
 cp mi-script.sh user-scripts/
 chmod +x user-scripts/mi-script.sh
 ```
+
+---
+
 ## Contribuir
 1. Fork el proyecto
 2. Crea tu rama: `git checkout -b feature/nueva-caracteristica`
 3. Commit: `git commit -m 'Add nueva característica'`
 4. Push: `git push origin feature/nueva-caracteristica`
 5. Abre un Pull Request
+
+---
+
 ## Changelog
 ### v2.0.0 - Diciembre 2024
 **Sistema de Configuración Avanzada**
@@ -418,6 +512,9 @@ chmod +x user-scripts/mi-script.sh
 - Instalación básica de Hyprland
 - Scripts modulares
 - Sistema de backups básico
+
+---
+
 ## Licencia
 Este proyecto está bajo la Licencia MIT. Ver archivo `LICENSE` para más detalles.
 ## Agradecimientos
@@ -428,142 +525,25 @@ Este proyecto está bajo la Licencia MIT. Ver archivo `LICENSE` para más detall
 **¿Preguntas o sugerencias?** Abre un issue en el repositorio.
 **Feliz configuración**
 ---
+
 <div align="center">
-**Made with  for Arch Linux**
-[ Volver arriba](#-dotfiles-v20---sistema-de-configuración-avanzada)
-</div>
-Guarda tu configuración actual **antes** de instalar:
-```bash
-./install.sh
-# Seleccionar opción 6: "Hacer backup"
-```
-**Guarda:**
-- Todas las configs de `~/.config/`
-- Archivos de shell (`.zshrc`, etc.)
-- Lista de paquetes instalados
-## Configuración Personalizada
-Edita `config.sh` antes de instalar con tu información:
-```bash
-# Información personal
-USER_NAME="kenethissac"
-USER_EMAIL="hugk070821@gmail.com"
-# Shell predeterminada (fish, zsh, bash)
-DEFAULT_SHELL="fish"
-# Editor predeterminado
-DEFAULT_EDITOR="nvim"
-# Temas (colores rojos predominantes)
-GTK_THEME="Catppuccin-Mocha-Standard-Red-Dark"
-ICON_THEME="Papirus-Dark"
-CURSOR_THEME="Bibata-Modern-Classic"
-# Opciones de Hyprland
-HYPRLAND_BORDER_COLOR="rgb(dc143c)"  # Rojo carmesí
-```
-## Paquetes Incluidos
-### Sistema y Desarrollo
-- Base: `base-devel`, `git`, `wget`, `curl`
-- Lenguajes: `nodejs`, `python`, `go`, `rust`
-- Contenedores: `docker`, `docker-compose`
-### Hyprland y Wayland
-- Core: `hyprland`, `waybar`, `rofi-wayland`
-- Wallpapers: `swaybg`
-- Lock: `swaylock-effects`, `swayidle`
-- Clipboard: `wl-clipboard`, `cliphist`
-- Notificaciones: `dunst`
-- Screenshots: `grim`, `slurp`
-### Terminal y Shell
-- Terminales: `kitty`, `alacritty`
-- Shells: `fish`, `zsh` + plugins
-- Prompts: `starship`, `oh-my-posh`
-- Multiplexor: `tmux`
-### Editores
-- `neovim`, `vim`, `visual-studio-code-bin`
-### Utilidades CLI
-- Monitores: `htop`, `btop`
-- Info: `fastfetch`, `neofetch`
-- Búsqueda: `fzf`, `ripgrep`, `fd`
-- Visualización: `bat`, `exa`, `tree`
-- File managers: `ranger`, `nnn`
-- Git: `git`, `git-delta`, `lazygit`
-### Navegadores
-- `firefox`, `chromium`, `brave-bin`
-### Temas y Fuentes
-- GTK: `catppuccin-gtk-theme-mocha`
-- Iconos: `papirus-icon-theme`
-- Fuentes: `ttf-jetbrains-mono-nerd`, `ttf-font-awesome`
-## Flujo de Trabajo
-### Primera vez (Nueva instalación de Arch)
-```bash
-# 1. Instalar Arch Linux base
-# 2. Conectar a internet
-sudo systemctl start NetworkManager
-nmtui
-# 3. Instalar git
-sudo pacman -S git
-# 4. Clonar dotfiles
-git clone https://github.com/tu-usuario/dotfiles.git ~/dotfiles
-cd ~/dotfiles
-# 5. Editar configuración
-nano config.sh
-# 6. Instalación completa
-./install.sh
-# Opción 1
-# 7. Reiniciar
-sudo reboot
-```
-### Actualizar configuraciones
-```bash
-cd ~/dotfiles
-# 1. Hacer backup primero
-./install.sh  # Opción 6
-# 2. Pull cambios
-git pull
-# 3. Re-enlazar
-./install.sh  # Opción 5
-```
-### Sincronizar a GitHub
-```bash
-cd ~/dotfiles
-# 1. Backup
-./install.sh  # Opción 6
-# 2. Commit
-git add .
-git commit -m "Update configs - $(date +%Y-%m-%d)"
-# 3. Push
-git push origin main
-```
-## Tema y Estilo
-**Tema moderno con colores rojos predominantes:**
-- Tema GTK: Catppuccin Mocha Red Dark
-- Iconos: Papirus Dark (rojos)
-- Fuente: JetBrains Mono Nerd Font
-- Cursor: Bibata Modern Classic
-- Colores Hyprland: Bordes rojos (`#dc143c`)
-## Solución de Problemas
-### No hay internet
-```bash
-sudo systemctl start NetworkManager
-nmtui
-```
-### yay no está instalado
-El script lo instala automáticamente.
-### Configuraciones no se aplican
-```bash
-cd ~/dotfiles
-./scripts/link-configs.sh
-```
-### Restaurar backup
-```bash
-mv ~/.config/hypr.bak ~/.config/hypr
-```
-## Notas
-1.  Edita `config.sh` antes del primer uso
-2.  Backups automáticos con extensión `.bak`
-3.  Las configs se enlazan (symlinks), no se copian
-4.  Datos sensibles: añádelos a `.gitignore`
-## Autor
-**Keneth Isaac Huerta Galindo**
-- GitHub: [@Keneth-Huerta](https://github.com/Keneth-Huerta)
-- Email: kenethissac@gmail.com
+
+### **Made with ❤️ for Arch Linux**
+
+**¿Preguntas o sugerencias?** Abre un issue en el repositorio
+
+**Feliz configuración**
+
+#### Autor
+**Keneth Isaac Huerta Galindo**  
+[![GitHub](https://img.shields.io/badge/GitHub-@Keneth--Huerta-181717?logo=github)](https://github.com/Keneth-Huerta)  
+[![Email](https://img.shields.io/badge/Email-kenethissac@gmail.com-EA4335?logo=gmail&logoColor=white)](mailto:kenethissac@gmail.com)
+
 ---
-**Dale una estrella si te gusta este proyecto**
-**Tip:** Puedes forkear y adaptar a tus necesidades.
+
+**Dale una estrella si te gusta este proyecto**  
+**Puedes forkear y adaptar a tus necesidades**
+
+[Volver arriba](#dotfiles-v20---sistema-de-configuración-avanzada)
+
+</div>
