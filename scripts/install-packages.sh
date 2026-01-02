@@ -1,13 +1,24 @@
 #!/usr/bin/env bash
+# ============================================================================
+# PACKAGE INSTALLER - Compatible con múltiples distribuciones
+# ============================================================================
+# Instala paquetes desde archivos de texto
+# Soporta: Arch, Ubuntu/Debian, Fedora y más
+# ============================================================================
 
 set -e  # Salir en caso de error
 
-# Colores
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m'
+# Obtener directorio del script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PACKAGES_DIR="$SCRIPT_DIR/../packages"
+
+# Cargar utilidades de distribución
+if [ -f "$SCRIPT_DIR/distro-utils.sh" ]; then
+    source "$SCRIPT_DIR/distro-utils.sh"
+else
+    echo "Error: No se encontró distro-utils.sh"
+    exit 1
+fi
 
 # Control de sudo
 SUDO_CACHED=false
@@ -53,8 +64,13 @@ command_exists() {
     command -v "$1" &> /dev/null
 }
 
-# Función para habilitar el repositorio multilib (32-bit)
+# Función para habilitar el repositorio multilib (32-bit) - Solo Arch
 enable_multilib() {
+    if [ "$PKG_MANAGER" != "pacman" ]; then
+        log_warn "multilib solo está disponible en Arch Linux"
+        return 0
+    fi
+    
     echo -e "${YELLOW}Verificando repositorio multilib...${NC}"
     
     # Verificar si ya está habilitado
@@ -75,8 +91,13 @@ enable_multilib() {
     echo -e "${GREEN}✓ Ahora puedes instalar paquetes de 32-bit (steam, wine32, etc.)${NC}"
 }
 
-# Función para configurar el repositorio de BlackArch
+# Función para configurar el repositorio de BlackArch - Solo Arch
 setup_blackarch_repo() {
+    if [ "$PKG_MANAGER" != "pacman" ]; then
+        log_warn "BlackArch solo está disponible en Arch Linux"
+        return 0
+    fi
+    
     echo -e "${YELLOW}Configurando repositorio de BlackArch...${NC}"
     
     # Verificar si ya está configurado
@@ -117,16 +138,12 @@ setup_blackarch_repo() {
 install_official_packages() {
     echo -e "${YELLOW}Instalando paquetes oficiales...${NC}"
     
-    local packages=(
+    local common_packages=(
         # Sistema base
-        base-devel git wget curl
-        
-        # Hyprland y Wayland
-        hyprland waybar rofi-wayland swaybg swaylock-effects
-        swayidle wl-clipboard cliphist dunst
+        git wget curl
         
         # Terminal y shell
-        kitty zsh starship fzf
+        kitty zsh fzf
         
         # Editores
         neovim
@@ -135,28 +152,46 @@ install_official_packages() {
         nodejs npm python python-pip go rust
         docker docker-compose
         
-        # Fuentes
-        ttf-jetbrains-mono-nerd ttf-fira-code nerd-fonts-complete
-        ttf-font-awesome otf-font-awesome
-        
         # Multimedia
-        mpv ffmpeg gstreamer
+        mpv ffmpeg
         
         # Utilidades
-        htop btop fastfetch ripgrep fd bat exa
+        htop btop ripgrep fd bat
         ranger nnn ncdu trash-cli
         
         # Navegadores
-        firefox chromium
+        firefox
+        
+        # Gestor de archivos comprimidos
+        unzip p7zip
+        
+        # Network
+        networkmanager
+        
+        # Screenshots (solo en distros con Wayland)
+        # grim slurp
+    )
+    
+    local arch_specific=(
+        # Build tools
+        base-devel
+        
+        # Hyprland y Wayland (principalmente en Arch)
+        hyprland waybar rofi-wayland swaybg swaylock-effects
+        swayidle wl-clipboard cliphist dunst
+        
+        # Prompts
+        starship
+        
+        # Fuentes
+        ttf-jetbrains-mono-nerd ttf-fira-code
+        ttf-font-awesome otf-font-awesome
+        
+        # File tools
+        exa
         
         # File manager
         thunar
-        
-        # Gestor de archivos comprimidos
-        unzip unrar p7zip
-        
-        # Network
-        networkmanager nm-connection-editor
         
         # Audio
         pipewire pipewire-pulse pipewire-alsa pipewire-jack
@@ -172,32 +207,71 @@ install_official_packages() {
         zathura zathura-pdf-mupdf
     )
     
-    run_sudo pacman -S --needed --noconfirm "${packages[@]}"
+    local ubuntu_specific=(
+        # Build tools
+        build-essential
+        
+        # Prompts
+        starship
+        
+        # Network
+        network-manager
+        
+        # Audio
+        pipewire pipewire-audio-client-libraries
+        pavucontrol
+        
+        # Bluetooth
+        bluez blueman
+        
+        # File manager
+        thunar
+        
+        # Compression
+        unrar
+    )
+    
+    # Instalar paquetes comunes
+    log_info "Instalando paquetes comunes..."
+    pkg_install "${common_packages[@]}"
+    
+    # Instalar paquetes específicos de la distribución
+    case "$PKG_MANAGER" in
+        pacman)
+            log_info "Instalando paquetes específicos de Arch..."
+            pkg_install "${arch_specific[@]}"
+            ;;
+        apt)
+            log_info "Instalando paquetes específicos de Ubuntu/Debian..."
+            pkg_install "${ubuntu_specific[@]}"
+            ;;
+        dnf)
+            log_info "Instalando paquetes para Fedora..."
+            # Fedora tiene su propia selección de paquetes
+            pkg_install "${common_packages[@]}"
+            ;;
+    esac
+    
+    log_success "Paquetes oficiales instalados"
 }
 
-# Función para instalar yay (AUR helper)
+# Función para instalar yay (AUR helper) - Solo Arch
 install_yay() {
+    if [ "$PKG_MANAGER" != "pacman" ]; then
+        log_warn "yay (AUR helper) solo está disponible en Arch Linux"
+        return 0
+    fi
+    
     if command_exists yay; then
         echo -e "${GREEN}yay ya está instalado${NC}"
         return 0
     fi
     
     log_info "Instalando yay (AUR helper)..."
+    install_yay  # Función de distro-utils.sh
     
-    # Verificar que git está instalado
-    if ! command_exists git; then
-        echo -e "${YELLOW}[WARN]${NC} Git no está instalado. Instalando git primero..."
-        run_sudo pacman -S --needed --noconfirm git || handle_error "No se pudo instalar git"
-    fi
-    
-    # Verificar que base-devel está instalado
-    if ! pacman -Qg base-devel &> /dev/null; then
-        log_info "Instalando base-devel..."
-        run_sudo pacman -S --needed --noconfirm base-devel || handle_error "No se pudo instalar base-devel"
-    fi
-    
-    local tmpdir=$(mktemp -d)
-    cd "$tmpdir"
+    log_success "yay instalado correctamente"
+}
     
     if git clone https://aur.archlinux.org/yay.git; then
         cd yay

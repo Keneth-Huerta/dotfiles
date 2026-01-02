@@ -1,17 +1,39 @@
-# Dotfiles v2.0 - Sistema de Configuración Avanzada
+# Dotfiles v2.1 - Sistema de Configuración Multiplataforma
 
 <div align="center">
 
-**Sistema modular y profesional de dotfiles para Arch Linux con Hyprland**  
+**Sistema modular para múltiples distribuciones Linux con Hyprland**  
 Restaura tu entorno completo en cualquier máquina con un solo comando.
 
-[![Made for Arch](https://img.shields.io/badge/Arch-Linux-1793D1?logo=arch-linux&logoColor=white)](https://archlinux.org/)
+[![Arch Linux](https://img.shields.io/badge/Arch-Linux-1793D1?logo=arch-linux&logoColor=white)](https://archlinux.org/)
+[![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?logo=ubuntu&logoColor=white)](https://ubuntu.com/)
+[![Fedora](https://img.shields.io/badge/Fedora-51A2DA?logo=fedora&logoColor=white)](https://getfedora.org/)
 [![Hyprland](https://img.shields.io/badge/Hyprland-Compositor-00D9FF)](https://hyprland.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 </div>
 
 ---
+
+## 🎉 ¡NUEVO! Soporte Multi-Distribución
+
+**Ahora funciona en múltiples distribuciones:**
+- ✅ Arch Linux (y derivados: Manjaro, EndeavourOS, Garuda)
+- ✅ Ubuntu / Debian (y derivados: Pop!_OS, Linux Mint, Elementary)
+- ✅ Fedora / RHEL (y derivados: CentOS, Rocky, AlmaLinux)
+- ✅ openSUSE
+- ✅ Void Linux
+
+**Instalación selectiva:** Ya no necesitas instalar todo. Instala solo lo que necesitas:
+```bash
+# Solo las herramientas esenciales
+./scripts/install-cli-tools.sh --packages kitty zsh neovim git starship
+
+# O usa el modo interactivo
+./scripts/install-cli-tools.sh
+```
+
+Ver [CHANGELOG-MULTI-DISTRO.md](CHANGELOG-MULTI-DISTRO.md) para más detalles.
 
 ## Índice
 
