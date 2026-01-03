@@ -24,16 +24,22 @@ Restaura tu entorno completo en cualquier máquina con un solo comando.
 - ✅ openSUSE
 - ✅ Void Linux
 
+**El script principal (`install.sh`) ahora:**
+- ✅ Detecta automáticamente tu distribución
+- ✅ Muestra advertencia si no es Arch pero permite continuar
+- ✅ Instala lo que puede en tu distro
+- ✅ Registra errores pero no se detiene
+
 **Instalación selectiva:** Ya no necesitas instalar todo. Instala solo lo que necesitas:
 ```bash
-# Solo las herramientas esenciales
-./scripts/install-cli-tools.sh --packages kitty zsh neovim git starship
+# Script principal (optimizado para Arch, funciona en otras)
+./install.sh
 
-# O usa el modo interactivo
-./scripts/install-cli-tools.sh
+# O solo herramientas CLI (recomendado para no-Arch)
+./scripts/install-cli-tools.sh --packages kitty zsh neovim git starship
 ```
 
-Ver [CHANGELOG-MULTI-DISTRO.md](CHANGELOG-MULTI-DISTRO.md) para más detalles.
+Ver [CHANGELOG-MULTI-DISTRO.md](CHANGELOG-MULTI-DISTRO.md) y [RESUMEN-FINAL.md](RESUMEN-FINAL.md) para más detalles.
 
 ## Índice
 

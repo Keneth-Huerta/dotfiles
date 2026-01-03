@@ -2,7 +2,7 @@
 # ============================================================================
 # DOTFILES INSTALLER - Script Principal
 # ============================================================================
-# Sistema de instalación modular para restaurar entorno completo en Arch Linux
+# Sistema de instalación modular para múltiples distribuciones Linux
 # Uso: ./install.sh [--full|--gui|--cli|--dev|--configs-only|--custom]
 # ============================================================================
 
@@ -21,14 +21,13 @@ SCRIPTS_DIR="$SCRIPT_DIR/scripts"
 PACKAGES_DIR="$SCRIPT_DIR/packages"
 PROFILES_DIR="$SCRIPT_DIR/scripts/profiles"
 
-# Colores para output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-MAGENTA='\033[0;35m'
-CYAN='\033[0;36m'
-NC='\033[0m' # No Color
+# Cargar utilidades de distribución
+if [ -f "$SCRIPTS_DIR/distro-utils.sh" ]; then
+    source "$SCRIPTS_DIR/distro-utils.sh"
+else
+    echo "Error: No se encontró distro-utils.sh"
+    exit 1
+fi
 
 # Directorio de dotfiles
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -235,21 +234,45 @@ show_banner() {
 ║   ╚═════╝  ╚═════╝    ╚═╝   ╚═╝     ╚═╝╚══════╝╚══════╝╚══════╝
 ║                                                              ║
 ║              Sistema de Instalación Automática               ║
-║                      Arch Linux Edition                      ║
+║                  Multi-Distribution Edition                  ║
 ║                                                              ║
 ╚══════════════════════════════════════════════════════════════╝
 EOF
     echo -e "${NC}"
 }
 
-# Verificar que estamos en Arch Linux
+# Verificar sistema (ahora multi-distro)
 check_system() {
-    if [ ! -f /etc/arch-release ]; then
-        echo -e "${RED}Error: Este script está diseñado para Arch Linux${NC}"
-        exit 1
+    log_info "Sistema detectado: $DISTRO_NAME ($DISTRO_ID)"
+    log_info "Gestor de paquetes: $PKG_MANAGER"
+    
+    if [ "$PKG_MANAGER" != "pacman" ]; then
+        echo -e "${YELLOW}╔════════════════════════════════════════════════════════════════╗${NC}"
+        echo -e "${YELLOW}║  ADVERTENCIA: No estás en Arch Linux                           ║${NC}"
+        echo -e "${YELLOW}╚════════════════════════════════════════════════════════════════╝${NC}"
+        echo ""
+        echo -e "${YELLOW}Este script está optimizado para Arch Linux con Hyprland.${NC}"
+        echo -e "${YELLOW}Algunas características pueden no estar disponibles:${NC}"
+        echo -e "  - Instalación de Hyprland (compositor Wayland)"
+        echo -e "  - Paquetes de AUR"
+        echo -e "  - Configuraciones específicas de Arch"
+        echo ""
+        echo -e "${BLUE}Las herramientas CLI se instalarán normalmente.${NC}"
+        echo -e "${BLUE}Las configuraciones se vincularán pero puede requerir ajustes.${NC}"
+        echo ""
+        echo -e "${YELLOW}¿Deseas continuar? (s/n)${NC}"
+        read -r response
+        if [[ ! "$response" =~ ^([sS][iI]|[sS])$ ]]; then
+            echo -e "${RED}Instalación cancelada${NC}"
+            echo ""
+            echo -e "${BLUE}Para instalar solo herramientas CLI, usa:${NC}"
+            echo -e "  ./scripts/install-cli-tools.sh"
+            exit 0
+        fi
+        echo ""
     fi
     
-    echo -e "${GREEN}✓ Sistema Arch Linux detectado${NC}"
+    echo -e "${GREEN}✓ Sistema compatible detectado${NC}"
 }
 
 # ============================================================================
@@ -757,15 +780,10 @@ check_dependencies() {
     if [[ ${#missing[@]} -gt 0 ]]; then
         log_warn "Instalando dependencias faltantes: ${missing[*]}"
         
-        # Cachear sudo antes de instalar
-        if ! cache_sudo; then
-            log_error "No se pudo obtener permisos sudo para instalar dependencias"
-            return 1
-        fi
-        
-        if ! run_sudo pacman -S --noconfirm --needed "${missing[@]}"; then
-            log_error "No se pudieron instalar las dependencias"
-            return 1
+        # Usar función multi-distro
+        if ! pkg_install "${missing[@]}"; then
+            log_error "No se pudieron instalar algunas dependencias"
+            log_warn "Continuando..."
         fi
     fi
     log "✓ Dependencias OK"
