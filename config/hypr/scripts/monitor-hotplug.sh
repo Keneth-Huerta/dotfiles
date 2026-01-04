@@ -1,10 +1,10 @@
 #!/bin/bash
 
-#  Monitor Hotplug Handler
+# 🔌 Monitor Hotplug Handler
 # Automatically configures monitors when they are connected/disconnected
 
 LOG_FILE="/tmp/monitor-hotplug.log"
-MONITOR_MANAGER="$HOME/.config/hypr/scripts/monitor-manager.sh"
+MONITOR_MANAGER="/home/valge/.config/hypr/scripts/monitor-manager.sh"
 
 # Function to log messages
 log_message() {
@@ -20,7 +20,7 @@ wait_for_hyprland() {
         sleep 1
         count=$((count + 1))
         if [[ $count -gt $timeout ]]; then
-            log_message " Timeout waiting for Hyprland"
+            log_message "⚠️ Timeout waiting for Hyprland"
             return 1
         fi
     done
@@ -29,24 +29,24 @@ wait_for_hyprland() {
 
 # Main hotplug logic
 handle_monitor_change() {
-    log_message " Monitor change detected"
+    log_message "🔌 Monitor change detected"
     
     # Wait a bit for the system to stabilize
     sleep 2
     
     # Ensure Hyprland is ready
     if ! wait_for_hyprland; then
-        log_message " Hyprland not available"
+        log_message "❌ Hyprland not available"
         exit 1
     fi
     
     # Auto-configure monitors
     if [[ -x "$MONITOR_MANAGER" ]]; then
-        log_message " Running auto-configuration..."
+        log_message "🖥️ Running auto-configuration..."
         "$MONITOR_MANAGER" auto >> "$LOG_FILE" 2>&1
-        log_message " Monitor configuration completed"
+        log_message "✅ Monitor configuration completed"
     else
-        log_message " Monitor manager script not found or not executable"
+        log_message "❌ Monitor manager script not found or not executable"
     fi
 }
 
@@ -54,5 +54,5 @@ handle_monitor_change() {
 if [[ "$1" == "change" ]]; then
     handle_monitor_change
 else
-    log_message " Hotplug event: $1 (ignored)"
+    log_message "🔍 Hotplug event: $1 (ignored)"
 fi

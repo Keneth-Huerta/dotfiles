@@ -24,7 +24,7 @@ freeze_input() {
     hyprctl keyword animations:enabled false
     hyprctl keyword decoration:blur:enabled false
     
-    notify-send " Sistema Congelado" "Input pausado. Usa el segundo script para capturar." --urgency=critical
+    notify-send "🧊 Sistema Congelado" "Input pausado. Usa el segundo script para capturar." --urgency=critical
 }
 
 # Función para descongelar entrada
@@ -43,13 +43,13 @@ unfreeze_input() {
     # Remover archivo de estado
     rm -f "$FREEZE_FILE"
     
-    notify-send " Sistema Activo" "Input restaurado normalmente" --urgency=normal
+    notify-send "🔄 Sistema Activo" "Input restaurado normalmente" --urgency=normal
 }
 
 # Función para capturar mientras está congelado
 capture_frozen() {
     if [ ! -f "$FREEZE_FILE" ]; then
-        notify-send " Error" "Sistema no está congelado. Usa primero el comando freeze." --urgency=critical
+        notify-send "❌ Error" "Sistema no está congelado. Usa primero el comando freeze." --urgency=critical
         exit 1
     fi
     
@@ -70,12 +70,12 @@ capture_frozen() {
             # Recortar región seleccionada
             grim -g "$SELECTION" /tmp/frozen_full.png "$OUTPUT_FILE"
             wl-copy < "$OUTPUT_FILE"
-            notify-send " Captura Exitosa" "Dropdown capturado desde estado congelado" --urgency=low
+            notify-send "📸 Captura Exitosa" "Dropdown capturado desde estado congelado" --urgency=low
         else
             # Si falla slurp, usar captura completa
             cp /tmp/frozen_full.png "$OUTPUT_FILE"
             wl-copy < "$OUTPUT_FILE"
-            notify-send " Captura Completa" "Pantalla completa capturada" --urgency=low
+            notify-send "📸 Captura Completa" "Pantalla completa capturada" --urgency=low
         fi
         
         # Congelar de nuevo
@@ -85,7 +85,7 @@ capture_frozen() {
         # Fallback: captura completa
         grim "$OUTPUT_FILE"
         wl-copy < "$OUTPUT_FILE"
-        notify-send " Captura Completa" "Pantalla completa capturada" --urgency=low
+        notify-send "📸 Captura Completa" "Pantalla completa capturada" --urgency=low
     fi
     
     # Limpiar

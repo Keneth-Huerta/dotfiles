@@ -8,6 +8,7 @@
 
 # Obtener directorio del script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DOTFILES_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 # Cargar utilidades de distribución
 if [ -f "$SCRIPT_DIR/distro-utils.sh" ]; then
@@ -19,6 +20,78 @@ fi
 
 # Variables globales
 INTERACTIVE=true
+
+# ============================================================================
+# FUNCIONES DE ENLACE DE CONFIGURACIONES
+# ============================================================================
+
+# Función para crear symlink con backup
+create_symlink() {
+    local source="$1"
+    local target="$2"
+    
+    # Crear directorio padre si no existe
+    mkdir -p "$(dirname "$target")"
+    
+    # Si el target existe y no es un symlink, hacer backup
+    if [ -e "$target" ] && [ ! -L "$target" ]; then
+        log_warn "Haciendo backup de $target"
+        mv "$target" "${target}.bak"
+    fi
+    
+    # Si ya es un symlink, eliminarlo
+    if [ -L "$target" ]; then
+        rm "$target"
+    fi
+    
+    # Crear symlink
+    ln -s "$source" "$target"
+    log_success "Linked: $target -> $source"
+}
+
+# Función para enlazar configuraciones de Kitty
+link_kitty_config() {
+    if [ -d "$DOTFILES_DIR/config/kitty" ]; then
+        log_info "Enlazando configuración de Kitty..."
+        create_symlink "$DOTFILES_DIR/config/kitty" "$HOME/.config/kitty"
+    fi
+}
+
+# Función para enlazar configuraciones de Zsh
+link_zsh_config() {
+    if [ -d "$DOTFILES_DIR/config/zsh" ]; then
+        log_info "Enlazando configuración de Zsh..."
+        
+        if [ -f "$DOTFILES_DIR/config/zsh/.zshrc" ]; then
+            create_symlink "$DOTFILES_DIR/config/zsh/.zshrc" "$HOME/.zshrc"
+        fi
+        
+        if [ -f "$DOTFILES_DIR/config/zsh/.zshenv" ]; then
+            create_symlink "$DOTFILES_DIR/config/zsh/.zshenv" "$HOME/.zshenv"
+        fi
+        
+        # Enlazar .p10k.zsh si existe
+        if [ -f "$DOTFILES_DIR/config/zsh/.p10k.zsh" ]; then
+            create_symlink "$DOTFILES_DIR/config/zsh/.p10k.zsh" "$HOME/.p10k.zsh"
+        fi
+    fi
+}
+
+# Función para enlazar configuraciones de Neovim
+link_neovim_config() {
+    if [ -d "$DOTFILES_DIR/config/nvim" ]; then
+        log_info "Enlazando configuración de Neovim..."
+        create_symlink "$DOTFILES_DIR/config/nvim" "$HOME/.config/nvim"
+    fi
+}
+
+# Función para enlazar configuraciones de Starship
+link_starship_config() {
+    if [ -f "$DOTFILES_DIR/config/starship/starship.toml" ]; then
+        log_info "Enlazando configuración de Starship..."
+        create_symlink "$DOTFILES_DIR/config/starship/starship.toml" "$HOME/.config/starship.toml"
+    fi
+}
 
 # ============================================================================
 # FUNCIONES DE INSTALACIÓN
@@ -36,6 +109,9 @@ install_terminal_tools() {
     
     pkg_install "${packages[@]}"
     log_success "Herramientas de terminal instaladas"
+    
+    # Enlazar configuraciones automáticamente
+    link_kitty_config
 }
 
 # Función para instalar shells
@@ -55,12 +131,18 @@ install_shells() {
     # Instalar oh-my-zsh
     install_oh_my_zsh
     
+    # Instalar powerlevel10k
+    install_powerlevel10k
+    
     # Instalar oh-my-fish solo si fish está instalado
     if command_exists fish; then
         install_oh_my_fish
     fi
     
     log_success "Shells instalados"
+    
+    # Enlazar configuraciones automáticamente
+    link_zsh_config
 }
 
 # Función para instalar prompts
@@ -78,6 +160,9 @@ install_prompts() {
     fi
     
     log_success "Prompts instalados"
+    
+    # Enlazar configuraciones automáticamente
+    link_starship_config
 }
 
 # Función para instalar editores
@@ -91,21 +176,24 @@ install_editors() {
     
     pkg_install "${packages[@]}"
     
-    # Preguntar por LazyVim solo en modo interactivo
+    # Preguntar por NvChad solo en modo interactivo
     if [ "$INTERACTIVE" = true ]; then
-        echo -e "${YELLOW}¿Deseas instalar LazyVim? (s/n)${NC}"
+        echo -e "${YELLOW}¿Deseas instalar NvChad? (s/n)${NC}"
         read -r response
         if [[ "$response" =~ ^([sS][iI]|[sS])$ ]]; then
-            install_lazyvim
+            install_nvchad
         fi
     fi
     
     log_success "Editores instalados"
+    
+    # Enlazar configuraciones automáticamente
+    link_neovim_config
 }
 
-# Instalar LazyVim
-install_lazyvim() {
-    log_info "Instalando LazyVim..."
+# Instalar NvChad
+install_nvchad() {
+    log_info "Instalando NvChad..."
     
     # Backup de configuración existente
     if [ -d ~/.config/nvim ]; then
@@ -115,12 +203,18 @@ install_lazyvim() {
     if [ -d ~/.local/share/nvim ]; then
         mv ~/.local/share/nvim ~/.local/share/nvim.bak.$(date +%Y%m%d-%H%M%S)
     fi
+    if [ -d ~/.local/state/nvim ]; then
+        mv ~/.local/state/nvim ~/.local/state/nvim.bak.$(date +%Y%m%d-%H%M%S)
+    fi
+    if [ -d ~/.cache/nvim ]; then
+        mv ~/.cache/nvim ~/.cache/nvim.bak.$(date +%Y%m%d-%H%M%S)
+    fi
     
-    # Clonar LazyVim
-    git clone https://github.com/LazyVim/starter ~/.config/nvim
-    rm -rf ~/.config/nvim/.git
+    # Clonar NvChad
+    git clone https://github.com/NvChad/NvChad ~/.config/nvim --depth 1
     
-    log_success "LazyVim instalado"
+    log_success "NvChad instalado"
+    log_info "Para configurar NvChad, ejecuta 'nvim' y espera a que termine la instalación de plugins"
 }
 
 # Función para instalar utilidades CLI
@@ -269,9 +363,9 @@ show_menu() {
     echo ""
     echo "1)  Instalar todo"
     echo "2)  Herramientas de terminal (kitty, alacritty, tmux)"
-    echo "3)  Shells (fish, zsh + oh-my-zsh)"
+    echo "3)  Shells (fish, zsh + oh-my-zsh + powerlevel10k)"
     echo "4)  Prompts (starship, oh-my-posh)"
-    echo "5)  Editores (vim, neovim, LazyVim)"
+    echo "5)  Editores (vim, neovim, NvChad)"
     echo "6)  Utilidades CLI (htop, fzf, ripgrep, bat, etc)"
     echo "7)  Herramientas de desarrollo (node, python, go, rust)"
     echo "8)  Bases de datos (postgresql, redis)"
@@ -337,9 +431,9 @@ main() {
                 echo "Opciones:"
                 echo "  --all         Instalar todo"
                 echo "  --terminal    Instalar herramientas de terminal"
-                echo "  --shells      Instalar shells (fish, zsh)"
+                echo "  --shells      Instalar shells (fish, zsh + powerlevel10k)"
                 echo "  --prompts     Instalar prompts (starship)"
-                echo "  --editors     Instalar editores (vim, neovim)"
+                echo "  --editors     Instalar editores (vim, neovim, NvChad)"
                 echo "  --cli         Instalar utilidades CLI"
                 echo "  --dev         Instalar herramientas de desarrollo"
                 echo "  --databases   Instalar bases de datos"

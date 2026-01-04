@@ -1,6 +1,6 @@
-# Sugerencias de Window Rules - Para Implementar Después
+# 📋 Sugerencias de Window Rules - Para Implementar Después
 
-## ** Aplicaciones específicas:**
+## **📱 Aplicaciones específicas:**
 
 ### Navegadores
 - Firefox/Brave en workspace específico
@@ -27,7 +27,7 @@
 - Terminales específicos con transparencia
 - IDEs con workspace dedicados
 
-## ** Tipos de ventanas:**
+## **🎯 Tipos de ventanas:**
 
 ### Ventanas flotantes
 - Centrado automático para diálogos
@@ -49,7 +49,7 @@
 - Fullscreen real para juegos
 - Reducir latencia
 
-## ** Comportamientos especiales:**
+## **⚡ Comportamientos especiales:**
 
 ### Screen sharing
 - xwaylandvideobridge invisible
@@ -72,7 +72,7 @@
 - Multimedia → workspace 4
 - Gaming → workspace 5
 
-## ** Efectos visuales:**
+## **🎨 Efectos visuales:**
 
 ### Transparencias dinámicas
 - Terminales: 0.9 activo, 0.8 inactivo
@@ -95,7 +95,7 @@
 - Navegadores: blur medio
 - Gaming: sin blur
 
-## ** Casos específicos a implementar:**
+## **🔧 Casos específicos a implementar:**
 
 ### Fixes conocidos
 ```ini
@@ -119,7 +119,7 @@ windowrule = fullscreen, class:^(gamescope)$
 windowrule = noborder, class:^(steam_app_)(.*)
 ```
 
-## ** Notas de implementación:**
+## **📝 Notas de implementación:**
 - Revisar cada regla con `hyprctl clients`
 - Probar orden de precedencia
 - Verificar compatibilidad XWayland vs Wayland

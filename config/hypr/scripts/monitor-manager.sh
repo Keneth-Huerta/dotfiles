@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#  Monitor Manager for Hyprland
+# 🖥️ Monitor Manager for Hyprland
 # Automatic dual monitor setup and workspace configuration
 
 LOG_FILE="/tmp/monitor-manager.log"
@@ -38,14 +38,14 @@ check_dependencies() {
     fi
     
     if [[ ${#missing_deps[@]} -gt 0 ]]; then
-        log_message " Error: Missing dependencies: ${missing_deps[*]}"
-        echo -e "${RED} Missing dependencies: ${missing_deps[*]}${NC}"
+        log_message "❌ Error: Missing dependencies: ${missing_deps[*]}"
+        echo -e "${RED}❌ Missing dependencies: ${missing_deps[*]}${NC}"
         return 1
     fi
     
     if ! is_hyprland_running; then
-        log_message " Error: Hyprland is not running"
-        echo -e "${RED} Hyprland is not running${NC}"
+        log_message "❌ Error: Hyprland is not running"
+        echo -e "${RED}❌ Hyprland is not running${NC}"
         return 1
     fi
     
@@ -87,7 +87,7 @@ get_secondary_monitor() {
 # Function to configure single monitor setup
 configure_single_monitor() {
     local primary=$(get_primary_monitor)
-    log_message " Configuring single monitor setup: $primary"
+    log_message "🖥️ Configuring single monitor setup: $primary"
     
     # Configure primary monitor
     hyprctl keyword monitor "$primary,1920x1080@60,0x0,1"
@@ -116,7 +116,7 @@ workspace = 9, monitor:$primary
 workspace = 10, monitor:$primary
 EOF
     
-    log_message " Single monitor setup completed"
+    log_message "✅ Single monitor setup completed"
 }
 
 # Function to configure dual monitor setup
@@ -125,7 +125,7 @@ configure_dual_monitors() {
     local secondary=$(get_secondary_monitor)
     local position="${1:-left}"  # Default to LEFT instead of right
     
-    log_message " Configuring dual monitor setup: $primary (primary) + $secondary (secondary) - Position: $position"
+    log_message "🖥️🖥️ Configuring dual monitor setup: $primary (primary) + $secondary (secondary) - Position: $position"
     
     # Configure monitors based on position
     if [[ "$position" == "left" ]]; then
@@ -208,16 +208,16 @@ EOF
         hyprctl dispatch workspace 1
     fi
     
-    log_message " Dual monitor setup completed"
+    log_message "✅ Dual monitor setup completed"
 }
 
 # Function to detect and auto-configure monitors
 auto_configure() {
     local monitor_count=$(get_monitors | wc -l)
     
-    log_message " Detecting monitors... Found: $monitor_count"
+    log_message "🔍 Detecting monitors... Found: $monitor_count"
     get_monitors | while read monitor; do
-        log_message "   $monitor"
+        log_message "  📺 $monitor"
     done
     
     if [[ $monitor_count -eq 1 ]]; then
@@ -225,13 +225,13 @@ auto_configure() {
     elif [[ $monitor_count -ge 2 ]]; then
         configure_dual_monitors
     else
-        log_message " No monitors detected!"
+        log_message "❌ No monitors detected!"
         return 1
     fi
     
     # Restart wallpaper if available
     if [[ -f "$CONFIG_DIR/scripts/mpvpaper-manager.sh" ]]; then
-        log_message " Restarting wallpaper..."
+        log_message "🔄 Restarting wallpaper..."
         "$CONFIG_DIR/scripts/mpvpaper-manager.sh" restart >/dev/null 2>&1
     fi
     
@@ -243,7 +243,7 @@ auto_configure() {
 
 # Function to show monitor status
 show_status() {
-    echo -e "${CYAN} Monitor Manager Status${NC}"
+    echo -e "${CYAN}🖥️ Monitor Manager Status${NC}"
     echo -e "${YELLOW}========================${NC}"
     
     local monitor_count=$(get_monitors | wc -l)
@@ -254,9 +254,9 @@ show_status() {
         local workspace=$(hyprctl monitors | grep -A10 "^Monitor $monitor" | grep "active workspace:" | awk '{print $3}')
         
         if [[ "$status" == "yes" ]]; then
-            echo -e "   ${GREEN}$monitor${NC} (focused) - workspace $workspace"
+            echo -e "  📺 ${GREEN}$monitor${NC} (focused) - workspace $workspace"
         else
-            echo -e "   ${YELLOW}$monitor${NC} - workspace $workspace"
+            echo -e "  📺 ${YELLOW}$monitor${NC} - workspace $workspace"
         fi
     done
     
@@ -281,11 +281,11 @@ toggle_mode() {
     local monitor_count=$(get_monitors | wc -l)
     
     if [[ $monitor_count -eq 1 ]]; then
-        echo -e "${YELLOW} Only one monitor detected. Cannot toggle to dual mode.${NC}"
-        echo -e "${CYAN} Connect a second monitor and run 'auto' mode.${NC}"
+        echo -e "${YELLOW}⚠️ Only one monitor detected. Cannot toggle to dual mode.${NC}"
+        echo -e "${CYAN}💡 Connect a second monitor and run 'auto' mode.${NC}"
         return 1
     else
-        echo -e "${BLUE} Toggling monitor configuration...${NC}"
+        echo -e "${BLUE}🔄 Toggling monitor configuration...${NC}"
         auto_configure
     fi
 }
@@ -301,18 +301,18 @@ move_workspace_to_monitor() {
     fi
     
     if ! is_monitor_connected "$monitor"; then
-        echo -e "${RED} Monitor $monitor is not connected${NC}"
+        echo -e "${RED}❌ Monitor $monitor is not connected${NC}"
         return 1
     fi
     
-    log_message " Moving workspace $workspace to monitor $monitor"
+    log_message "🔄 Moving workspace $workspace to monitor $monitor"
     hyprctl keyword workspace "$workspace,monitor:$monitor"
-    echo -e "${GREEN} Workspace $workspace moved to $monitor${NC}"
+    echo -e "${GREEN}✅ Workspace $workspace moved to $monitor${NC}"
 }
 
 # Help function
 show_help() {
-    echo -e "${CYAN} Monitor Manager for Hyprland${NC}"
+    echo -e "${CYAN}🖥️ Monitor Manager for Hyprland${NC}"
     echo -e "${YELLOW}=================================${NC}"
     echo ""
     echo -e "${GREEN}Usage:${NC} $0 {auto|status|toggle|single|dual|dual-left|dual-right|move|help}"
@@ -355,27 +355,27 @@ case "$1" in
         ;;
     dual)
         if [[ $(get_monitors | wc -l) -lt 2 ]]; then
-            echo -e "${RED} Dual monitor mode requires at least 2 connected monitors${NC}"
+            echo -e "${RED}❌ Dual monitor mode requires at least 2 connected monitors${NC}"
             exit 1
         fi
         configure_dual_monitors "left"  # Changed default to left
         ;;
     dual-left)
         if [[ $(get_monitors | wc -l) -lt 2 ]]; then
-            echo -e "${RED} Dual monitor mode requires at least 2 connected monitors${NC}"
+            echo -e "${RED}❌ Dual monitor mode requires at least 2 connected monitors${NC}"
             exit 1
         fi
         configure_dual_monitors "left"
         ;;
     dual-right)
         if [[ $(get_monitors | wc -l) -lt 2 ]]; then
-            echo -e "${RED} Dual monitor mode requires at least 2 connected monitors${NC}"
+            echo -e "${RED}❌ Dual monitor mode requires at least 2 connected monitors${NC}"
             exit 1
         fi
         configure_dual_monitors "right"
         ;;
     move)
-        echo -e "${CYAN} Interactive Workspace Movement${NC}"
+        echo -e "${CYAN}📱 Interactive Workspace Movement${NC}"
         echo -e "${YELLOW}Available monitors:${NC}"
         get_monitors | nl -w2 -s'. '
         echo ""
@@ -387,7 +387,7 @@ case "$1" in
         show_help
         ;;
     *)
-        echo -e "${RED} Invalid option: $1${NC}"
+        echo -e "${RED}❌ Invalid option: $1${NC}"
         echo ""
         show_help
         exit 1

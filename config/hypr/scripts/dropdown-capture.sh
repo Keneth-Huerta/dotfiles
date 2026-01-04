@@ -22,17 +22,17 @@ cleanup() {
 trap cleanup EXIT
 
 # PASO 1: Captura inmediata sin interfaz
-notify-send " Dropdown Capture" "Capturando pantalla..." --urgency=normal
+notify-send "📸 Dropdown Capture" "Capturando pantalla..." --urgency=normal
 grim "$TEMP_DIR/dropdown_frozen.png"
 
 # Verificar captura
 if [ ! -f "$TEMP_DIR/dropdown_frozen.png" ]; then
-    notify-send " Error" "No se pudo capturar la pantalla" --urgency=critical
+    notify-send "❌ Error" "No se pudo capturar la pantalla" --urgency=critical
     exit 1
 fi
 
 # PASO 2: Mostrar imagen en overlay para selección
-notify-send " Dropdown Capture" "Imagen capturada. Selecciona la región..." --urgency=normal
+notify-send "📸 Dropdown Capture" "Imagen capturada. Selecciona la región..." --urgency=normal
 
 # Crear un script temporal para manejar la selección sobre la imagen
 cat > "$TEMP_DIR/select_region.sh" << 'EOF'
@@ -53,7 +53,7 @@ if [ -n "$SELECTION" ]; then
     # Copiar al clipboard
     wl-copy < "$OUTPUT_FILE"
     
-    notify-send " Screenshot" "Dropdown capturado y copiado al clipboard" --urgency=low
+    notify-send "📸 Screenshot" "Dropdown capturado y copiado al clipboard" --urgency=low
     
     # Mostrar preview rápido
     if command -v imv &> /dev/null; then
@@ -62,7 +62,7 @@ if [ -n "$SELECTION" ]; then
         pkill -f "imv.*dropdown_"
     fi
 else
-    notify-send " Screenshot" "Captura cancelada" --urgency=low
+    notify-send "📸 Screenshot" "Captura cancelada" --urgency=low
 fi
 EOF
 

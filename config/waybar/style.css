@@ -15,9 +15,7 @@ window#waybar {
   background: rgba(25, 5, 5, 0.95);
   border-bottom: 3px solid #ff4757;
   color: #ffcccc;
-  /* Enable GPU acceleration */
-  transform: translateZ(0);
-  will-change: auto;
+  /* Simplified: removed unsupported will-change property */
 }
 
 /* Workspaces */
@@ -42,7 +40,6 @@ window#waybar {
 #workspaces button:hover {
   background: rgba(255, 71, 87, 0.5);
   box-shadow: inset 0 -3px #ff4757;
-  transform: translateY(-2px);
 }
 
 #workspaces button.active {
@@ -54,7 +51,6 @@ window#waybar {
 #workspaces button.urgent {
   background: #ff6b6b;
   color: #ffffff;
-  animation: blink 1s linear infinite alternate;
 }
 
 /* Window Title */
@@ -84,7 +80,6 @@ window#waybar {
 
 #clock:hover {
   background: rgba(255, 71, 87, 0.5);
-  transform: scale(1.05);
 }
 
 /* Common module styling */
@@ -108,7 +103,6 @@ window#waybar {
 #cpu:hover,
 #memory:hover,
 #battery:hover {
-  transform: translateY(-2px);
   box-shadow: 0 2px 8px rgba(255, 71, 87, 0.3);
 }
 
@@ -175,7 +169,6 @@ window#waybar {
 #cpu.critical {
   background: rgba(255, 60, 60, 0.4);
   color: #ff6666;
-  animation: pulse 1s ease-in-out infinite;
 }
 
 /* Memory */
@@ -192,7 +185,6 @@ window#waybar {
 #memory.critical {
   background: rgba(255, 60, 60, 0.4);
   color: #ff6666;
-  animation: pulse 1s ease-in-out infinite;
 }
 
 /* Battery */
@@ -214,7 +206,6 @@ window#waybar {
 #battery.critical:not(.charging) {
   background: rgba(231, 76, 60, 0.3);
   color: #e74c3c;
-  animation: blink 0.5s linear infinite alternate;
 }
 
 /* System tray */
@@ -232,34 +223,9 @@ window#waybar {
 #tray > .needs-attention {
   -gtk-icon-effect: highlight;
   background-color: #eb4d4b;
-  animation: attention 1s ease-in-out infinite;
 }
 
-/* Animations */
-@keyframes blink {
-  to {
-    background-color: rgba(255, 71, 87, 0.1);
-    color: #ff4757;
-  }
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.7;
-  }
-}
-
-@keyframes attention {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
-}
+/* Animations removed: GTK CSS often rejects @keyframes */
 
 /* Tooltip styling */
 tooltip {

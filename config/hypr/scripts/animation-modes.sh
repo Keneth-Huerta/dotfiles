@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#  Script para cambiar estilos de animación dinámicamente 
+# 🔴 Script para cambiar estilos de animación dinámicamente 🔴
 
 case "$1" in
     "vistoso")
@@ -10,7 +10,7 @@ case "$1" in
         hyprctl keyword animation "workspaces,1,12,redFlow,slidefade 15%"
         hyprctl keyword animation "workspacesIn,1,15,dramaticBounce,slide"
         hyprctl keyword animation "specialWorkspace,1,15,smoothBounce,slidevert"
-        notify-send " Animaciones" "Modo ULTRA VISTOSO activado" --urgency=low
+        notify-send "🔴 Animaciones" "Modo ULTRA VISTOSO activado" --urgency=low
         ;;
     
     "elegante")
@@ -20,7 +20,7 @@ case "$1" in
         hyprctl keyword animation "workspaces,1,8,easeOutQuint,slidefade 25%"
         hyprctl keyword animation "workspacesIn,1,8,gentleOut,slide"
         hyprctl keyword animation "specialWorkspace,1,10,elastic,slidevert"
-        notify-send " Animaciones" "Modo ELEGANTE activado" --urgency=low
+        notify-send "🔴 Animaciones" "Modo ELEGANTE activado" --urgency=low
         ;;
     
     "rapido")
@@ -30,7 +30,7 @@ case "$1" in
         hyprctl keyword animation "workspaces,1,5,linear,slide"
         hyprctl keyword animation "workspacesIn,1,5,almostLinear,slide"
         hyprctl keyword animation "specialWorkspace,1,6,quick,slidevert"
-        notify-send " Animaciones" "Modo RÁPIDO activado" --urgency=low
+        notify-send "🔴 Animaciones" "Modo RÁPIDO activado" --urgency=low
         ;;
     
     "extremo")
@@ -40,7 +40,7 @@ case "$1" in
         hyprctl keyword animation "workspaces,1,15,dramaticBounce,slidefade 10%"
         hyprctl keyword animation "workspacesIn,1,20,smoothBounce,slide"
         hyprctl keyword animation "specialWorkspace,1,20,elasticOut,slidevert"
-        notify-send " Animaciones" "Modo EXTREMO activado - ¡Prepárate!" --urgency=critical
+        notify-send "🔴 Animaciones" "Modo EXTREMO activado - ¡Prepárate!" --urgency=critical
         ;;
     
     "reset")
@@ -50,11 +50,11 @@ case "$1" in
         hyprctl keyword animation "workspaces,1,10,redFlow,slidefade 20%"
         hyprctl keyword animation "workspacesIn,1,12,dramaticBounce,slide"
         hyprctl keyword animation "specialWorkspace,1,12,smoothBounce,slidevert"
-        notify-send " Animaciones" "Configuración por defecto restaurada" --urgency=low
+        notify-send "🔴 Animaciones" "Configuración por defecto restaurada" --urgency=low
         ;;
     
     *)
-        echo " Uso: $0 {vistoso|elegante|rapido|extremo|reset}"
+        echo "🔴 Uso: $0 {vistoso|elegante|rapido|extremo|reset}"
         echo ""
         echo "  vistoso  - Efectos dramáticos y llamativos"
         echo "  elegante - Animaciones suaves y sofisticadas"

@@ -1,0 +1,115 @@
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/master/doc/json_schema.json",
+  "logo": {
+    "type": "kitty",
+    "source": "/home/valge/Pictures/Wallpapers/arch-rojo.png",
+    "width": 40,
+    "height": 20,
+    "preserveAspectRatio": true,
+    "padding": {
+      "top": 0,
+      "left": 0,
+      "right": 4
+    },
+    "printRemaining": true,
+    "recache": false,
+    "position": "left"
+  },
+  "display": {
+    "stat": false,
+    "pipe": false,
+    "showErrors": false,
+    "disableLinewrap": true,
+    "hideCursor": false,
+    "separator": ": ",
+    "color": {
+  "keys": "#a30000",         // rojo más oscuro
+  "title": "#5a0000",        // rojo muy oscuro para títulos
+  "output": "#7a1f1f",       // rojo oscuro para especificaciones
+  "separator": "bright_red"  // rojo brillante
+    },
+    "brightColor": true
+  },
+  "modules": [
+    {
+      "type": "title",
+      "key": " ",
+      "keyIcon": ""
+    },
+    {
+      "type": "separator",
+      "string": "-"
+    },
+    {
+      "type": "os",
+      "keyIcon": ""
+    },
+    {
+      "type": "host",
+      "keyIcon": "󰌢"
+    },
+    {
+      "type": "kernel",
+      "keyIcon": ""
+    },
+    {
+      "type": "uptime",
+      "keyIcon": ""
+    },
+    {
+      "type": "packages",
+      "keyIcon": "󰏖"
+    },
+    {
+      "type": "shell",
+      "keyIcon": ""
+    },
+    {
+      "type": "display",
+      "keyIcon": "󰍹"
+    },
+    {
+      "type": "de",
+      "keyIcon": ""
+    },
+    {
+      "type": "wm",
+      "keyIcon": ""
+    },
+    {
+      "type": "terminal",
+      "keyIcon": ""
+    },
+    {
+      "type": "cpu",
+      "keyIcon": ""
+    },
+    {
+      "type": "gpu",
+      "keyIcon": "󰾲"
+    },
+    {
+      "type": "memory",
+      "keyIcon": ""
+    },
+    {
+      "type": "disk",
+      "keyIcon": ""
+    },
+    {
+      "type": "battery",
+      "keyIcon": ""
+    },
+    "break",
+    {
+      "type": "colors",
+      "key": " ",
+      "symbol": "block",
+      "paddingLeft": 0,
+      "block": {
+        "width": 3,
+        "range": [0, 15]
+      }
+    }
+  ]
+}

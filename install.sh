@@ -488,11 +488,16 @@ show_menu() {
     echo -e "${MAGENTA}8)${NC} Actualizar sistema"
     echo -e "${MAGENTA}9)${NC} Configuración rápida (solo vim, zsh, starship)"
     echo ""
+    echo -e "${CYAN}Menús Interactivos:${NC}"
+    echo -e "${MAGENTA}20)${NC} ${GREEN}Menú interactivo (whiptail/dialog)${NC}"
+    echo -e "${MAGENTA}21)${NC} ${CYAN}★ Menú Moderno (Python + Rich)${NC} ${YELLOW}[RECOMENDADO]${NC}"
+    echo ""
     echo -e "${CYAN}Gestión:${NC}"
     echo -e "${MAGENTA}11)${NC} Gestionar repositorios"
     echo -e "${MAGENTA}12)${NC} Gestionar claves SSH"
     echo -e "${MAGENTA}13)${NC} Restaurar backup"
     echo -e "${MAGENTA}17)${NC} Auto-detectar repositorios existentes"
+    echo -e "${MAGENTA}18)${NC} ${GREEN}Actualizar configuraciones al repo${NC}"
     echo ""
     echo -e "${CYAN}Diagnóstico:${NC}"
     echo -e "${MAGENTA}14)${NC} Detección de hardware"
@@ -501,6 +506,7 @@ show_menu() {
     echo ""
     echo -e "${CYAN}Avanzado:${NC}"
     echo -e "${MAGENTA}10)${NC} Inicializar dotfiles (copiar configs actuales al repo)"
+    echo -e "${MAGENTA}19)${NC} Ver estado de enlaces simbólicos"
     echo ""
     echo -e "${RED}0)${NC} Salir"
     echo ""
@@ -619,6 +625,163 @@ full_install() {
     fi
 }
 
+# ============================================================================
+# FUNCIÓN PARA MOSTRAR ESTADO DE ENLACES SIMBÓLICOS
+# ============================================================================
+
+show_symlink_status() {
+    clear
+    echo -e "${CYAN}╔════════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${CYAN}║   ESTADO DE ENLACES SIMBÓLICOS (SYMLINKS)                     ║${NC}"
+    echo -e "${CYAN}╚════════════════════════════════════════════════════════════════╝${NC}"
+    echo ""
+    
+    local linked=0
+    local not_linked=0
+    local not_exists=0
+    
+    # Función helper para verificar symlink
+    check_symlink() {
+        local path="$1"
+        local name="$2"
+        
+        if [ -L "$path" ]; then
+            local target=$(readlink -f "$path")
+            if [[ "$target" == "$DOTFILES_DIR"* ]]; then
+                echo -e "${GREEN}✓${NC} $name ${BLUE}→${NC} ${target#$DOTFILES_DIR/}"
+                ((linked++))
+            else
+                echo -e "${YELLOW}⚠${NC} $name ${BLUE}→${NC} $target ${YELLOW}(no apunta al repo)${NC}"
+                ((not_linked++))
+            fi
+        elif [ -e "$path" ]; then
+            echo -e "${RED}✗${NC} $name ${YELLOW}(existe pero NO es symlink)${NC}"
+            ((not_linked++))
+        else
+            echo -e "${YELLOW}⊘${NC} $name ${YELLOW}(no existe)${NC}"
+            ((not_exists++))
+        fi
+    }
+    
+    echo -e "${CYAN}[Terminal y Shell]${NC}"
+    check_symlink "$HOME/.config/kitty" "Kitty"
+    check_symlink "$HOME/.zshrc" ".zshrc"
+    check_symlink "$HOME/.zshenv" ".zshenv"
+    check_symlink "$HOME/.p10k.zsh" ".p10k.zsh"
+    check_symlink "$HOME/.config/fish" "Fish"
+    echo ""
+    
+    echo -e "${CYAN}[Editores]${NC}"
+    check_symlink "$HOME/.config/nvim" "Neovim"
+    echo ""
+    
+    echo -e "${CYAN}[CLI Tools]${NC}"
+    check_symlink "$HOME/.config/starship.toml" "Starship"
+    check_symlink "$HOME/.tmux.conf" "Tmux"
+    check_symlink "$HOME/.gitconfig" "Git"
+    echo ""
+    
+    if [ -d "$HOME/.config/hypr" ]; then
+        echo -e "${CYAN}[Wayland/Hyprland]${NC}"
+        check_symlink "$HOME/.config/hypr" "Hyprland"
+        check_symlink "$HOME/.config/waybar" "Waybar"
+        check_symlink "$HOME/.config/wofi" "Wofi"
+        check_symlink "$HOME/.config/swaylock" "Swaylock"
+        echo ""
+    fi
+    
+    echo -e "${CYAN}╔════════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${CYAN}║   RESUMEN                                                      ║${NC}"
+    echo -e "${CYAN}╚════════════════════════════════════════════════════════════════╝${NC}"
+    echo ""
+    echo -e "  ${GREEN}✓${NC} Enlazados correctamente: ${GREEN}$linked${NC}"
+    echo -e "  ${RED}✗${NC} No enlazados:            ${RED}$not_linked${NC}"
+    echo -e "  ${YELLOW}⊘${NC} No existen:              ${YELLOW}$not_exists${NC}"
+    echo ""
+    
+    if [ $not_linked -gt 0 ]; then
+        echo -e "${YELLOW}💡 Archivos sin enlazar detectados${NC}"
+        echo ""
+        echo -e "${YELLOW}¿Deseas arreglarlos ahora? (s/n)${NC}"
+        read -r fix_response
+        
+        if [[ "$fix_response" =~ ^[sS]$ ]]; then
+            echo ""
+            echo -e "${CYAN}Arreglando enlaces...${NC}"
+            
+            # Función para crear symlink con backup
+            fix_symlink() {
+                local source="$1"
+                local target="$2"
+                local name="$3"
+                
+                if [ -e "$target" ] && [ ! -L "$target" ]; then
+                    # Hacer backup
+                    mv "$target" "${target}.backup-$(date +%Y%m%d-%H%M%S)"
+                    echo -e "${BLUE}  Backup: ${target}.backup${NC}"
+                fi
+                
+                # Eliminar si es symlink incorrecto
+                if [ -L "$target" ]; then
+                    rm "$target"
+                fi
+                
+                # Crear directorio padre si no existe
+                mkdir -p "$(dirname "$target")"
+                
+                # Crear symlink
+                if [ -e "$source" ] || [ -d "$source" ]; then
+                    ln -s "$source" "$target"
+                    echo -e "${GREEN}✓ $name enlazado${NC}"
+                else
+                    echo -e "${YELLOW}⊘ $name: origen no existe en el repo${NC}"
+                fi
+            }
+            
+            # Arreglar .p10k.zsh
+            if [ -e "$HOME/.p10k.zsh" ] && [ ! -L "$HOME/.p10k.zsh" ]; then
+                fix_symlink "$DOTFILES_DIR/config/zsh/.p10k.zsh" "$HOME/.p10k.zsh" ".p10k.zsh"
+            fi
+            
+            # Arreglar Fish
+            if [ -e "$HOME/.config/fish" ] && [ ! -L "$HOME/.config/fish" ]; then
+                fix_symlink "$DOTFILES_DIR/config/fish" "$HOME/.config/fish" "Fish"
+            fi
+            
+            # Arreglar Wofi
+            if [ -e "$HOME/.config/wofi" ] && [ ! -L "$HOME/.config/wofi" ]; then
+                fix_symlink "$DOTFILES_DIR/config/wofi" "$HOME/.config/wofi" "Wofi"
+            fi
+            
+            echo ""
+            echo -e "${GREEN}✓ Enlaces arreglados${NC}"
+            echo ""
+        else
+            echo -e "${YELLOW}💡 Para enlazar configuraciones manualmente, usa:${NC}"
+            echo -e "   Opción 5) Enlazar configuraciones"
+            echo ""
+        fi
+    fi
+    
+    if [ $linked -gt 0 ]; then
+        echo -e "${GREEN}✓ Los archivos enlazados se actualizan automáticamente${NC}"
+        echo -e "${BLUE}  Cualquier cambio que hagas se refleja en el repo${NC}"
+        echo ""
+    fi
+    
+    echo -e "${CYAN}═══════════════════════════════════════════════════════════════${NC}"
+    echo -e "${BLUE}ℹ  ¿Qué es un enlace simbólico (symlink)?${NC}"
+    echo -e "${CYAN}═══════════════════════════════════════════════════════════════${NC}"
+    echo ""
+    echo -e "Un symlink es como un \"atajo\" que apunta a otro archivo."
+    echo -e "Cuando tu ${YELLOW}~/.zshrc${NC} es un symlink a ${BLUE}~/Documents/repos/dotfiles/config/zsh/.zshrc${NC}:"
+    echo ""
+    echo -e "  ${GREEN}✓${NC} Los cambios en ${YELLOW}~/.zshrc${NC} se guardan automáticamente en el repo"
+    echo -e "  ${GREEN}✓${NC} Git puede trackear los cambios"
+    echo -e "  ${GREEN}✓${NC} Puedes sincronizar entre computadoras fácilmente"
+    echo ""
+}
+
 # Main loop
 main() {
     show_banner
@@ -682,6 +845,18 @@ main() {
                 ;;
             17)
                 bash "$DOTFILES_DIR/scripts/auto-detect-repos.sh"
+                ;;
+            18)
+                bash "$DOTFILES_DIR/scripts/update-dotfiles.sh"
+                ;;
+            19)
+                show_symlink_status
+                ;;
+            20)
+                bash "$DOTFILES_DIR/scripts/menu-interactivo.sh"
+                ;;
+            21)
+                bash "$DOTFILES_DIR/scripts/instalador"
                 ;;
             0)
                 echo -e "${GREEN}¡Hasta luego!${NC}"
@@ -1017,6 +1192,42 @@ EOF
 # ============================================================================
 
 main() {
+    # ============================================================================
+    # PASO 0: Mover repositorio a la ubicación correcta (AUTOMÁTICO)
+    # ============================================================================
+    local target_dir="$HOME/Documents/repos/dotfiles"
+    local current_dir="$DOTFILES_DIR"
+    
+    if [ "$current_dir" != "$target_dir" ]; then
+        log_info "El repositorio no está en la ubicación correcta"
+        log_info "Ubicación actual: $current_dir"
+        log_info "Ubicación recomendada: $target_dir"
+        echo ""
+        
+        # Crear directorio de repos si no existe
+        mkdir -p "$HOME/Documents/repos"
+        
+        # Si el destino existe, hacer backup
+        if [ -d "$target_dir" ]; then
+            local backup="$target_dir.backup-$(date +%Y%m%d-%H%M%S)"
+            log_warn "El destino existe, creando backup: $backup"
+            mv "$target_dir" "$backup"
+        fi
+        
+        # Mover el repositorio
+        log_info "Moviendo repositorio a $target_dir..."
+        mv "$current_dir" "$target_dir"
+        
+        log_success "Repositorio movido exitosamente"
+        log_info "Nueva ubicación: $target_dir"
+        echo ""
+        echo -e "${YELLOW}⚠ IMPORTANTE: Ejecuta el script desde la nueva ubicación:${NC}"
+        echo -e "  cd $target_dir"
+        echo -e "  ./install.sh"
+        echo ""
+        exit 0
+    fi
+    
     # Validaciones iniciales
     check_root
     check_arch

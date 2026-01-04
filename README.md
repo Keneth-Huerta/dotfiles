@@ -239,12 +239,52 @@ dotfiles/
 | **Developer** | IDEs + Docker + Tools | ~150 | ~18GB | Desarrollo software |
 | **Pentesting** | BlackArch + Security | ~140 | ~16GB | Seguridad, hacking ético |
 | **Full** | TODO incluido | ~200 | ~20GB | Workstation completa |
+
 Elige tu perfil durante la instalación (Opción 1 del menú).
+
+---
+
+## 🎨 NUEVO: Menú Moderno con Python + Rich
+
+Ahora tienes **dos opciones de interfaz**:
+
+### Opción 21: Menú Moderno (Recomendado) ⭐
+```
+╔══════════════════════════════════════════════════════════════╗
+║              DOTFILES INSTALLER                              ║
+║                  Tu sistema, tu forma                        ║
+╚══════════════════════════════════════════════════════════════╝
+
+┌────┬──────────────────────────┬────────────────────────────┬──────────┐
+│ #  │ Componente               │ Descripción                │ Estado   │
+├────┼──────────────────────────┼────────────────────────────┼──────────┤
+│ 1  │ Terminal Tools           │ kitty, alacritty           │ ●        │
+│ 2  │ Shells                   │ zsh + p10k, fish          │ ●        │
+│ 3  │ Editores                 │ neovim + NvChad            │ ●        │
+└────┴──────────────────────────┴────────────────────────────┴──────────┘
+
+Instalando Terminal Tools   ━━━━━━━━━━━━━━━━━━━━━━━━ 100% ✓
+```
+
+**Características:**
+- ✅ Interfaz moderna con colores y tablas
+- ✅ Progress bars en tiempo real
+- ✅ Selección múltiple intuitiva (1, 2-5, 7)
+- ✅ Menú de gestión integrado
+- ✅ Auto-instalación de dependencias (Python + Rich)
+
+Ver documentación completa: [docs/MENU-MODERNO.md](docs/MENU-MODERNO.md)
+
+### Opción 20: Menú Clásico (whiptail)
+Para sistemas con limitaciones o preferencia por interfaces clásicas.
+
+---
+
 ## Menú Principal
 
 ```
 ╔════════════════════════════════════╗
-║      MENÚ PRINCIPAL - v2.0         ║
+║      MENÚ PRINCIPAL - v2.1         ║
 ╚════════════════════════════════════╝
 
 Instalación:
@@ -262,15 +302,22 @@ Mantenimiento:
   8) Actualizar sistema
   9) Config rápida (vim, zsh)
 
+Menús Interactivos:
+  20) Menú interactivo (whiptail/dialog)
+  21) ★ Menú Moderno (Python + Rich) [RECOMENDADO]
+
 Gestión:
   11) Gestionar repositorios
   12) Gestionar claves SSH
   13) Restaurar backup
+  17) Auto-detectar repositorios
+  18) Actualizar configuraciones al repo
 
 Diagnóstico:
   14) Detección hardware
   15) Health check sistema
   16) Verificar instalación
+  19) Ver estado de enlaces simbólicos
 
 Avanzado:
   10) Inicializar dotfiles

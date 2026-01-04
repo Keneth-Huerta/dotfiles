@@ -712,6 +712,27 @@ install_oh_my_zsh() {
     log_success "Oh My Zsh instalado"
 }
 
+# Instalar Powerlevel10k
+install_powerlevel10k() {
+    local p10k_dir="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k"
+    
+    if [ -d "$p10k_dir" ]; then
+        log_info "Powerlevel10k ya está instalado"
+        return 0
+    fi
+    
+    log_info "Instalando Powerlevel10k..."
+    
+    # Crear directorio custom si no existe
+    mkdir -p "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes"
+    
+    # Clonar Powerlevel10k
+    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$p10k_dir"
+    
+    log_success "Powerlevel10k instalado"
+    log_info "Para configurar, ejecuta: p10k configure"
+}
+
 # Instalar Oh My Fish
 install_oh_my_fish() {
     if [ -d ~/.local/share/omf ]; then
@@ -807,6 +828,7 @@ export -f pkg_is_installed
 export -f pkg_search
 export -f map_package_name
 export -f install_oh_my_zsh
+export -f install_powerlevel10k
 export -f install_oh_my_fish
 export -f install_starship
 export -f install_yay

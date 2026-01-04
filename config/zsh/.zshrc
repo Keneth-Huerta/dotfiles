@@ -12,6 +12,8 @@ export EDITOR="nvim"
 export VISUAL="nvim"
 export PAGER="less"
 export BROWSER="zen-browser"
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
 
 # Configuración de colores rojos para comandos
 export LESS_TERMCAP_mb=$'\e[1;31m'     # begin bold
@@ -206,7 +208,7 @@ export FZF_DEFAULT_OPTS='
 
 # === ALIASES MODERNOS CON ESTILO ROJO ===
 # Reemplazar comandos tradicionales con versiones modernas
-alias cat='bat --style=numbers --color=always --theme="Monokai Extended Red"'
+# alias cat='bat --style=numbers --color=always --theme="Monokai Extended Red"'  # replaced by safe wrapper below
 alias ls='eza --icons --color=always --group-directories-first'
 alias ll='eza -la --icons --color=always --group-directories-first'
 alias la='eza -a --icons --color=always --group-directories-first'  
@@ -238,7 +240,7 @@ alias ip='ip --color=auto'
 # Aliases específicos para Arch Linux
 alias pacman='sudo pacman --color=always'
 alias paru='paru --color=always'
-alias yay='paru --color=always'
+#alias yay='paru --color=always'
 
 # Aliases de utilidad
 alias h='history'
@@ -466,10 +468,10 @@ bindkey '^[c' fzf-cd-widget
 show_zsh_info() {
     echo -e "\e[1;31m"
     echo "╔═══════════════════════════════════════════════════════════════╗"
-    echo "║  🚀 ZSH CONFIGURADO CON ESTILO MODERNO Y COLORES ROJOS 🚀   ║"
+    echo "║  ZSH CONFIGURADO CON ESTILO MODERNO Y COLORES ROJOS           ║"
     echo "║                                                               ║"
     echo "║  Nuevas funciones y aliases disponibles:                      ║"
-    echo "║  • f, sf, find - Buscar archivos con fzf                     ║"
+    echo "║  • f, sf, find - Buscar archivos con fzf                      ║"
     echo "║  • fh - Buscar en historial                                   ║" 
     echo "║  • fkill - Matar procesos interactivamente                    ║"
     echo "║  • mkt - Crear estructura para pentesting                     ║"
@@ -486,3 +488,42 @@ eval $(thefuck --alias)
 
 # VS Code shell integration: load code's zsh integration when running inside VS Code terminal
 [[ "$TERM_PROGRAM" == "vscode" ]] && . "$(code --locate-shell-integration-path zsh)"
+
+# >>> bat-safe-alias start
+# Use bat for pretty output only when writing to a TTY.
+# Prevent ANSI codes and line numbers when redirecting to files or pipes.
+unalias cat 2>/dev/null
+unalias bat 2>/dev/null
+
+# Ensure a valid theme to avoid warnings; fallback to 'default' if custom theme missing
+if command -v bat >/dev/null 2>&1; then
+    if ! command bat --list-themes 2>/dev/null | grep -qx "Monokai Extended Red"; then
+        export BAT_THEME="default"
+    fi
+fi
+
+# Disable pager by default
+export BAT_PAGER=""
+
+cat() {
+    if command -v bat >/dev/null 2>&1; then
+        if [[ -t 1 ]]; then
+            command bat --paging=never --color=auto --style=plain "$@"
+        else
+            command bat --paging=never --color=never --style=plain "$@"
+        fi
+    else
+        command cat "$@"
+    fi
+}
+
+bat() {
+    local color style
+    if [[ -t 1 ]]; then
+        color=auto; style=plain
+    else
+        color=never; style=plain
+    fi
+    command bat --paging=never --color="$color" --style="$style" "$@"
+}
+# <<< bat-safe-alias end

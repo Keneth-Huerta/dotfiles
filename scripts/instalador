@@ -1,0 +1,282 @@
+#!/usr/bin/env bash
+# ============================================================================
+# LAUNCHER INTELIGENTE - Detecta Python y ejecuta menú moderno
+# ============================================================================
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DOTFILES_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+# Colores
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+NC='\033[0m'
+
+# ============================================================================
+# VERIFICAR Y CONFIGURAR PYTHON
+# ============================================================================
+
+check_python() {
+    if command -v python3 &> /dev/null; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+install_python() {
+    echo -e "${CYAN}Instalando Python para menú moderno...${NC}"
+    
+    # Detectar distribución
+    if [ -f /etc/os-release ]; then
+        . /etc/os-release
+        case "$ID" in
+            arch|manjaro|endeavouros)
+                sudo pacman -S --noconfirm python python-pip
+                ;;
+            ubuntu|debian|pop|linuxmint)
+                sudo apt-get update
+                sudo apt-get install -y python3 python3-pip
+                ;;
+            fedora|rhel|centos)
+                sudo dnf install -y python3 python3-pip
+                ;;
+            *)
+                echo -e "${RED}Distribución no reconocida. Instala Python manualmente.${NC}"
+                return 1
+                ;;
+        esac
+    fi
+    
+    return 0
+}
+
+install_rich() {
+    echo -e "${CYAN}Instalando Rich (UI moderna)...${NC}"
+    
+    # Mostrar progreso
+    local temp_log="/tmp/rich-install-$$.log"
+    
+    # Detectar distribución para método correcto
+    if [ -f /etc/os-release ]; then
+        . /etc/os-release
+        
+        # Arch tiene PEP 668, necesitamos usar pacman
+        if [[ "$ID" == "arch" || "$ID" == "manjaro" || "$ID" == "endeavouros" ]]; then
+            echo -e "${BLUE}  → Instalando python-rich con pacman (Arch)${NC}"
+            if sudo pacman -S --noconfirm python-rich > "$temp_log" 2>&1; then
+                echo -e "${GREEN}  ✓ Instalado con pacman${NC}"
+                rm -f "$temp_log"
+                return 0
+            fi
+        fi
+    fi
+    
+    # Método 1: pip con --break-system-packages (Arch/sistemas con PEP 668)
+    echo -e "${BLUE}  → Intentando: pip install --user --break-system-packages rich${NC}"
+    if python3 -m pip install --user --break-system-packages rich > "$temp_log" 2>&1; then
+        echo -e "${GREEN}  ✓ Instalado con pip (break-system-packages)${NC}"
+        rm -f "$temp_log"
+        return 0
+    fi
+    
+    # Método 2: pip con usuario (normal)
+    echo -e "${BLUE}  → Intentando: pip install --user rich${NC}"
+    if python3 -m pip install --user rich > "$temp_log" 2>&1; then
+        echo -e "${GREEN}  ✓ Instalado con pip${NC}"
+        rm -f "$temp_log"
+        return 0
+    fi
+    
+    # Método 3: pip3 directo
+    echo -e "${BLUE}  → Intentando: pip3 install --user rich${NC}"
+    if pip3 install --user rich > "$temp_log" 2>&1; then
+        echo -e "${GREEN}  ✓ Instalado con pip3${NC}"
+        rm -f "$temp_log"
+        return 0
+    fi
+    
+    # Método 4: pipx (si está disponible)
+    if command -v pipx &> /dev/null; then
+        echo -e "${BLUE}  → Intentando: pipx install rich${NC}"
+        if pipx install rich > "$temp_log" 2>&1; then
+            echo -e "${GREEN}  ✓ Instalado con pipx${NC}"
+            rm -f "$temp_log"
+            return 0
+        fi
+    fi
+    
+    # Método 5: pip sin --user (sistema)
+    echo -e "${BLUE}  → Intentando: sudo pip install rich${NC}"
+    if sudo python3 -m pip install rich > "$temp_log" 2>&1; then
+        echo -e "${GREEN}  ✓ Instalado a nivel sistema${NC}"
+        rm -f "$temp_log"
+        return 0
+    fi
+    
+    # Falló todo
+    echo -e "${RED}  ✗ No se pudo instalar Rich${NC}"
+    echo -e "${YELLOW}  Log de error:${NC}"
+    cat "$temp_log" | tail -n 10
+    rm -f "$temp_log"
+    echo ""
+    echo -e "${YELLOW}Soluciones:${NC}"
+    echo -e "${BLUE}  1. Arch/Manjaro: sudo pacman -S python-rich${NC}"
+    echo -e "${BLUE}  2. Otras: pip install --user rich${NC}"
+    echo -e "${BLUE}  3. Con pipx: pipx install rich${NC}"
+    echo ""
+    echo -e "${YELLOW}Usando menú simple en bash...${NC}"
+    return 1
+}
+
+check_rich() {
+    python3 -c "import rich" &> /dev/null
+    return $?
+}
+
+# ============================================================================
+# MENÚ FALLBACK SIMPLE (BASH PURO)
+# ============================================================================
+
+fallback_menu() {
+    clear
+    echo -e "${CYAN}"
+    cat << "EOF"
+╔══════════════════════════════════════════════════════════════╗
+║   ██████╗  ██████╗ ████████╗███████╗██╗██╗     ███████╗███████╗
+║   ██╔══██╗██╔═══██╗╚══██╔══╝██╔════╝██║██║     ██╔════╝██╔════╝
+║   ██║  ██║██║   ██║   ██║   █████╗  ██║██║     █████╗  ███████╗
+║   ██║  ██║██║   ██║   ██║   ██╔══╝  ██║██║     ██╔══╝  ╚════██║
+║   ██████╔╝╚██████╔╝   ██║   ██║     ██║███████╗███████╗███████║
+║   ╚═════╝  ╚═════╝    ╚═╝   ╚═╝     ╚═╝╚══════╝╚══════╝╚══════╝
+║                                                              ║
+║              Menú Simple (Bash)                              ║
+╚══════════════════════════════════════════════════════════════╝
+EOF
+    echo -e "${NC}"
+    echo -e "${YELLOW}Nota: Para menú moderno con colores y tablas, instala Rich:${NC}"
+    echo -e "${BLUE}  pip install --user rich${NC}"
+    echo ""
+    
+    echo -e "${CYAN}Componentes:${NC}"
+    echo -e "  ${GREEN}1${NC}) Terminal Tools (kitty, alacritty)"
+    echo -e "  ${GREEN}2${NC}) Shells (zsh, fish, p10k)"
+    echo -e "  ${GREEN}3${NC}) Editores (neovim, NvChad)"
+    echo -e "  ${GREEN}4${NC}) CLI Utilities (fzf, ripgrep, bat)"
+    echo -e "  ${GREEN}5${NC}) Dev Tools (node, python, docker)"
+    echo -e "  ${GREEN}6${NC}) GUI Environment (Hyprland)"
+    echo -e "  ${GREEN}7${NC}) Databases (postgresql, redis)"
+    echo ""
+    echo -e "${CYAN}Gestión:${NC}"
+    echo -e "  ${YELLOW}8${NC}) Enlazar configuraciones"
+    echo -e "  ${YELLOW}9${NC}) Actualizar configs al repo"
+    echo -e "  ${YELLOW}10${NC}) Ver estado de symlinks"
+    echo ""
+    echo -e "${CYAN}Avanzado:${NC}"
+    echo -e "  ${BLUE}11${NC}) Instalar Rich (menú moderno)"
+    echo ""
+    echo -e "  ${RED}0${NC}) Salir"
+    echo ""
+    
+    read -p "$(echo -e ${CYAN}Selección: ${NC})" choice
+    
+    case $choice in
+        1) bash "$DOTFILES_DIR/scripts/install-cli-tools.sh" --terminal ;;
+        2) bash "$DOTFILES_DIR/scripts/install-cli-tools.sh" --shells ;;
+        3) bash "$DOTFILES_DIR/scripts/install-cli-tools.sh" --editors ;;
+        4) bash "$DOTFILES_DIR/scripts/install-cli-tools.sh" --cli ;;
+        5) bash "$DOTFILES_DIR/scripts/install-cli-tools.sh" --dev ;;
+        6) bash "$DOTFILES_DIR/scripts/install-gui.sh" ;;
+        7) bash "$DOTFILES_DIR/scripts/install-cli-tools.sh" --databases ;;
+        8) bash "$DOTFILES_DIR/scripts/link-configs.sh" ;;
+        9) bash "$DOTFILES_DIR/scripts/update-dotfiles.sh" ;;
+        10) bash "$DOTFILES_DIR/install.sh" --symlink-status ;;
+        11) 
+            echo -e "${CYAN}Instalando Rich...${NC}"
+            if install_rich && check_rich; then
+                echo -e "${GREEN}✓ Rich instalado correctamente${NC}"
+                echo -e "${BLUE}Reiniciando con menú moderno...${NC}"
+                sleep 2
+                exec python3 "$SCRIPT_DIR/menu-moderno.py"
+            else
+                echo -e "${RED}No se pudo instalar Rich${NC}"
+                echo -e "${YELLOW}Intenta manualmente:${NC}"
+                echo -e "${BLUE}  pip install --user rich${NC}"
+                echo -e "${BLUE}  o${NC}"
+                echo -e "${BLUE}  sudo pip install rich${NC}"
+            fi
+            ;;
+        0) echo -e "${GREEN}¡Hasta luego!${NC}"; exit 0 ;;
+        *) echo -e "${RED}Opción inválida${NC}"; sleep 2; fallback_menu ;;
+    esac
+    
+    echo ""
+    read -p "$(echo -e ${YELLOW}Presiona Enter para continuar...${NC})"
+    fallback_menu
+}
+
+# ============================================================================
+# MAIN
+# ============================================================================
+
+main() {
+    clear
+    echo -e "${CYAN}╔════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${CYAN}║   Preparando instalador...                             ║${NC}"
+    echo -e "${CYAN}╚════════════════════════════════════════════════════════╝${NC}"
+    echo ""
+    
+    # Verificar Python
+    if ! check_python; then
+        echo -e "${YELLOW}Python no encontrado${NC}"
+        echo -e "${BLUE}¿Deseas instalar Python para un menú más moderno? (s/n)${NC}"
+        read -r response
+        
+        if [[ "$response" =~ ^[sS]$ ]]; then
+            if install_python; then
+                echo -e "${GREEN}✓ Python instalado${NC}"
+            else
+                echo -e "${YELLOW}Usando menú simple...${NC}"
+                sleep 2
+                fallback_menu
+                exit 0
+            fi
+        else
+            echo -e "${YELLOW}Usando menú simple...${NC}"
+            sleep 2
+            fallback_menu
+            exit 0
+        fi
+    else
+        echo -e "${GREEN}✓ Python encontrado${NC}"
+    fi
+    
+    # Verificar Rich
+    if ! check_rich; then
+        echo -e "${YELLOW}Librería Rich no encontrada${NC}"
+        echo -e "${BLUE}Instalando Rich para interfaz moderna...${NC}"
+        
+        if install_rich; then
+            echo -e "${GREEN}✓ Rich instalado${NC}"
+        else
+            echo -e "${YELLOW}Usando menú simple...${NC}"
+            sleep 2
+            fallback_menu
+            exit 0
+        fi
+    else
+        echo -e "${GREEN}✓ Rich encontrado${NC}"
+    fi
+    
+    echo ""
+    echo -e "${GREEN}✓ Todo listo para el menú moderno${NC}"
+    sleep 1
+    
+    # Ejecutar menú moderno en Python
+    python3 "$SCRIPT_DIR/menu-moderno.py"
+}
+
+# Ejecutar
+main

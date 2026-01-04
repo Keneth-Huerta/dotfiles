@@ -30,7 +30,7 @@ check_dependencies() {
     fi
     
     if [[ ${#missing_deps[@]} -gt 0 ]]; then
-        log_message " Error: Missing dependencies: ${missing_deps[*]}"
+        log_message "❌ Error: Missing dependencies: ${missing_deps[*]}"
         log_message "Install with: yay -S mpvpaper mpv"
         return 1
     fi
@@ -39,7 +39,7 @@ check_dependencies() {
 }
 
 start_mpvpaper() {
-    log_message " Starting red video wallpaper..."
+    log_message "🔴 Starting red video wallpaper..."
     
     # Check dependencies first
     if ! check_dependencies; then
@@ -50,20 +50,20 @@ start_mpvpaper() {
     local video_to_use="$WALLPAPER_FILE"
     if [[ -f "$WALLPAPER_PINGPONG" ]]; then
         video_to_use="$WALLPAPER_PINGPONG"
-        log_message " Using ping-pong video for seamless loop"
+        log_message "🎬 Using ping-pong video for seamless loop"
     else
-        log_message " Using original video (consider creating ping-pong version)"
+        log_message "📹 Using original video (consider creating ping-pong version)"
     fi
     
     # Ensure the video file exists
     if [[ ! -f "$video_to_use" ]]; then
-        log_message " Error: Video file not found at $video_to_use"
+        log_message "❌ Error: Video file not found at $video_to_use"
         return 1
     fi
     
     # Kill any existing mpvpaper processes (but not this script)
     if pgrep -f "^mpvpaper" >/dev/null 2>&1; then
-        log_message " Stopping existing mpvpaper processes..."
+        log_message "🛑 Stopping existing mpvpaper processes..."
         pkill -f "^mpvpaper" 2>/dev/null || true
         sleep 2
         # Force kill if still running
@@ -74,8 +74,8 @@ start_mpvpaper() {
     fi
     
     # Start mpvpaper with proper background handling
-    log_message " Launching mpvpaper with options: $MPVPAPER_OPTS"
-    log_message " Video file: $video_to_use"
+    log_message "🚀 Launching mpvpaper with options: $MPVPAPER_OPTS"
+    log_message "🎯 Video file: $video_to_use"
     
     # Use eval to properly expand the options and setsid to create a new session
     eval "setsid mpvpaper $MPVPAPER_OPTS '*' \"$video_to_use\"" >/dev/null 2>&1 &
@@ -86,20 +86,20 @@ start_mpvpaper() {
     
     # Verify the process is running
     if pgrep -f "^mpvpaper.*$(basename "$video_to_use")" >/dev/null 2>&1; then
-        log_message " Red video wallpaper started successfully"
+        log_message "✅ Red video wallpaper started successfully"
         return 0
     else
-        log_message " First attempt failed, trying alternative method..."
+        log_message "⚠️ First attempt failed, trying alternative method..."
         
         # Alternative method: use nohup with eval for proper option expansion
         eval "nohup mpvpaper $MPVPAPER_OPTS '*' \"$video_to_use\"" >/dev/null 2>&1 &
         sleep 3
         
         if pgrep -f "^mpvpaper.*$(basename "$video_to_use")" >/dev/null 2>&1; then
-            log_message " Red video wallpaper started on retry"
+            log_message "✅ Red video wallpaper started on retry"
             return 0
         else
-            log_message " Failed to start mpvpaper after retry"
+            log_message "❌ Failed to start mpvpaper after retry"
             log_message "Debug: Checking mpvpaper installation and permissions..."
             which mpvpaper >> "$LOG_FILE" 2>&1
             ls -la "$video_to_use" >> "$LOG_FILE" 2>&1
@@ -109,7 +109,7 @@ start_mpvpaper() {
 }
 
 stop_mpvpaper() {
-    log_message " Stopping mpvpaper..."
+    log_message "🛑 Stopping mpvpaper..."
     
     # First try graceful termination
     if pgrep -f "^mpvpaper" >/dev/null 2>&1; then
@@ -127,24 +127,24 @@ stop_mpvpaper() {
     
     # Final check and cleanup
     if pgrep -f "^mpvpaper" >/dev/null 2>&1; then
-        log_message " Some mpvpaper processes may still be running"
+        log_message "⚠️ Some mpvpaper processes may still be running"
         pgrep -f "^mpvpaper" -l >> "$LOG_FILE" 2>&1
         return 1
     else
-        log_message " mpvpaper stopped successfully"
+        log_message "✅ mpvpaper stopped successfully"
         return 0
     fi
 }
 
 status_mpvpaper() {
     if pgrep -f "^mpvpaper" >/dev/null 2>&1; then
-        log_message " mpvpaper is running with red video wallpaper"
+        log_message "🔴 mpvpaper is running with red video wallpaper"
         echo "Process details:"
         pgrep -f "^mpvpaper" -l
         echo "Video file: $WALLPAPER_FILE"
         echo "Log file: $LOG_FILE"
     else
-        log_message " mpvpaper is not running"
+        log_message "⚪ mpvpaper is not running"
         echo "Log file: $LOG_FILE (for troubleshooting)"
     fi
 }
@@ -157,7 +157,7 @@ case "$1" in
         stop_mpvpaper
         ;;
     restart)
-        log_message " Restarting mpvpaper..."
+        log_message "🔄 Restarting mpvpaper..."
         stop_mpvpaper
         sleep 2
         start_mpvpaper
@@ -166,17 +166,17 @@ case "$1" in
         status_mpvpaper
         ;;
     create-pingpong)
-        log_message " Creating ping-pong video..."
+        log_message "🎬 Creating ping-pong video..."
         ~/.config/hypr/scripts/create-pingpong-video.sh
         ;;
     use-pingpong)
         if [[ -f "$WALLPAPER_PINGPONG" ]]; then
-            log_message " Switching to ping-pong video..."
+            log_message "🔄 Switching to ping-pong video..."
             stop_mpvpaper
             sleep 2
             start_mpvpaper
         else
-            log_message " Ping-pong video not found. Create it first with: $0 create-pingpong"
+            log_message "❌ Ping-pong video not found. Create it first with: $0 create-pingpong"
             exit 1
         fi
         ;;

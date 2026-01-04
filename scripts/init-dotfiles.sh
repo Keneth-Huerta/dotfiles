@@ -101,6 +101,11 @@ copy_if_exists() {
 echo -e "${CYAN}Copiando configuraciones desde ~/.config/ ...${NC}"
 echo ""
 
+# Copiar configuración de Powerlevel10k si existe
+if [ -f "$HOME/.p10k.zsh" ]; then
+    copy_if_exists "$HOME/.p10k.zsh" "$DOTFILES_DIR/config/zsh/.p10k.zsh" "Powerlevel10k config"
+fi
+
 # Hyprland y Wayland
 copy_if_exists "$HOME/.config/hypr" "$DOTFILES_DIR/config/hypr" "Hyprland"
 copy_if_exists "$HOME/.config/waybar" "$DOTFILES_DIR/config/waybar" "Waybar"

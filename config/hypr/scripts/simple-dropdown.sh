@@ -20,7 +20,7 @@ if grim "$OUTPUT_FILE.full"; then
     # Método 2: Usar ImageMagick para permitir selección sobre imagen estática
     if command -v convert &> /dev/null; then
         # Mostrar imagen y permitir clic para seleccionar
-        notify-send " Dropdown" "Pantalla capturada. Abre el archivo para ver." --urgency=low
+        notify-send "📸 Dropdown" "Pantalla capturada. Abre el archivo para ver." --urgency=low
         wl-copy < "$OUTPUT_FILE.full"
         
         # Abrir con visor predeterminado para que usuario pueda ver
@@ -39,8 +39,8 @@ if grim "$OUTPUT_FILE.full"; then
         # Fallback simple
         mv "$OUTPUT_FILE.full" "$OUTPUT_FILE"
         wl-copy < "$OUTPUT_FILE"
-        notify-send " Screenshot" "Captura completa realizada" --urgency=low
+        notify-send "📸 Screenshot" "Captura completa realizada" --urgency=low
     fi
 else
-    notify-send " Error" "No se pudo capturar" --urgency=critical
+    notify-send "❌ Error" "No se pudo capturar" --urgency=critical
 fi

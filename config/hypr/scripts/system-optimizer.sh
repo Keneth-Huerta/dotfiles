@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#  System Optimizer for Hyprland
+# 🚀 System Optimizer for Hyprland
 # Optimizes system performance and cleans up resources
 
 LOG_FILE="/tmp/system-optimizer.log"
@@ -17,14 +17,14 @@ log_message() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" | tee -a "$LOG_FILE"
 }
 
-echo -e "${BLUE}${NC}"
-echo -e "${BLUE}    Hyprland System Optimizer     ${NC}"
-echo -e "${BLUE}${NC}"
+echo -e "${BLUE}╔════════════════════════════════════════╗${NC}"
+echo -e "${BLUE}║   🚀 Hyprland System Optimizer 🚀    ║${NC}"
+echo -e "${BLUE}╚════════════════════════════════════════╝${NC}"
 echo ""
 
 # Function to clean cache
 clean_cache() {
-    echo -e "${YELLOW} Cleaning cache...${NC}"
+    echo -e "${YELLOW}🧹 Cleaning cache...${NC}"
     log_message "Starting cache cleanup"
     
     # Clean thumbnail cache
@@ -32,50 +32,50 @@ clean_cache() {
         local before=$(du -sh "$CACHE_DIR/thumbnails" 2>/dev/null | cut -f1)
         find "$CACHE_DIR/thumbnails" -type f -atime +30 -delete 2>/dev/null
         local after=$(du -sh "$CACHE_DIR/thumbnails" 2>/dev/null | cut -f1)
-        echo -e "${GREEN}   Thumbnails: $before → $after${NC}"
+        echo -e "${GREEN}  ✓ Thumbnails: $before → $after${NC}"
         log_message "Cleaned thumbnails cache: $before → $after"
     fi
     
     # Clean Waybar cache
     if [[ -d "$CACHE_DIR/waybar" ]]; then
         rm -rf "$CACHE_DIR/waybar"/*
-        echo -e "${GREEN}   Waybar cache cleared${NC}"
+        echo -e "${GREEN}  ✓ Waybar cache cleared${NC}"
         log_message "Cleared Waybar cache"
     fi
     
     # Clean fontconfig cache
     if command -v fc-cache &> /dev/null; then
         fc-cache -f -v > /dev/null 2>&1
-        echo -e "${GREEN}   Font cache rebuilt${NC}"
+        echo -e "${GREEN}  ✓ Font cache rebuilt${NC}"
         log_message "Rebuilt font cache"
     fi
     
     # Clean old logs
     find /tmp -name "*.log" -type f -mtime +7 -delete 2>/dev/null
-    echo -e "${GREEN}   Old logs cleaned${NC}"
+    echo -e "${GREEN}  ✓ Old logs cleaned${NC}"
     log_message "Cleaned old log files"
 }
 
 # Function to optimize PipeWire
 optimize_pipewire() {
-    echo -e "${YELLOW} Optimizing PipeWire...${NC}"
+    echo -e "${YELLOW}🎵 Optimizing PipeWire...${NC}"
     log_message "Optimizing PipeWire"
     
     # Restart PipeWire services
     systemctl --user restart pipewire pipewire-pulse wireplumber 2>/dev/null
     
     if [[ $? -eq 0 ]]; then
-        echo -e "${GREEN}   PipeWire services restarted${NC}"
+        echo -e "${GREEN}  ✓ PipeWire services restarted${NC}"
         log_message "PipeWire services restarted successfully"
     else
-        echo -e "${RED}   Failed to restart PipeWire${NC}"
+        echo -e "${RED}  ✗ Failed to restart PipeWire${NC}"
         log_message "Failed to restart PipeWire services"
     fi
 }
 
 # Function to check system resources
 check_resources() {
-    echo -e "${YELLOW} System Resources:${NC}"
+    echo -e "${YELLOW}📊 System Resources:${NC}"
     log_message "Checking system resources"
     
     # CPU usage
@@ -95,7 +95,7 @@ check_resources() {
 
 # Function to optimize Hyprland
 optimize_hyprland() {
-    echo -e "${YELLOW} Optimizing Hyprland...${NC}"
+    echo -e "${YELLOW}⚡ Optimizing Hyprland...${NC}"
     log_message "Optimizing Hyprland configuration"
     
     if pgrep -x Hyprland >/dev/null; then
@@ -104,16 +104,16 @@ optimize_hyprland() {
         
         if [[ $cpu_usage -gt 70 ]]; then
             hyprctl keyword decoration:blur:passes 2
-            echo -e "${GREEN}   Reduced blur passes (CPU > 70%)${NC}"
+            echo -e "${GREEN}  ✓ Reduced blur passes (CPU > 70%)${NC}"
             log_message "Reduced blur passes due to high CPU usage"
         fi
         
         # Clean up unused workspaces
         local workspace_count=$(hyprctl workspaces -j | jq '. | length')
-        echo -e "${GREEN}   Active workspaces: $workspace_count${NC}"
+        echo -e "${GREEN}  ✓ Active workspaces: $workspace_count${NC}"
         log_message "Active workspaces: $workspace_count"
     else
-        echo -e "${RED}   Hyprland not running${NC}"
+        echo -e "${RED}  ✗ Hyprland not running${NC}"
         log_message "Hyprland is not running"
     fi
 }
@@ -121,12 +121,12 @@ optimize_hyprland() {
 # Function to show recommendations
 show_recommendations() {
     echo ""
-    echo -e "${BLUE} Performance Recommendations:${NC}"
+    echo -e "${BLUE}💡 Performance Recommendations:${NC}"
     
     # Check if gaming mode would help
     local mem_percent=$(free | awk '/^Mem:/ {printf "%.0f", ($3/$2)*100}')
     if [[ $mem_percent -gt 80 ]]; then
-        echo -e "${YELLOW}   High memory usage ($mem_percent%)${NC}"
+        echo -e "${YELLOW}  ⚠ High memory usage ($mem_percent%)${NC}"
         echo -e "${GREEN}  → Consider: Super+F1 (disable blur) or Super+F3 (disable animations)${NC}"
     fi
     
@@ -179,7 +179,7 @@ main() {
     esac
     
     echo ""
-    echo -e "${GREEN} Optimization completed!${NC}"
+    echo -e "${GREEN}✅ Optimization completed!${NC}"
     log_message "Optimization script completed: $1"
 }
 

@@ -15,11 +15,11 @@ set_rainbow_borders() {
 
 # Function to set elegant borders
 set_elegant_borders() {
-    echo "Activando bordes elegantes rojos..."
+    echo "✨ Activando bordes elegantes rojos..."
     hyprctl keyword general:col.active_border "rgba(ff4444ee) rgba(ff0000ee) 45deg"
     hyprctl keyword general:col.inactive_border "rgba(883333aa)"
     hyprctl keyword general:border_size 2
-    notify-send "Bordes Elegantes Rojos" "Estilo rojo aplicado" -t 2000
+    notify-send "✨ Bordes Elegantes Rojos" "Estilo rojo aplicado" -t 2000
 }
 
 # Function to toggle window blur effects
@@ -113,11 +113,11 @@ apply_seasonal_theme() {
 
 # Function to create particle effect simulation
 create_particle_effect() {
-    echo "Simulando efectos de partículas con ventanas..."
+    echo "✨ Simulando efectos de partículas con ventanas..."
     
     # Create temporary particle windows
     for i in {1..8}; do
-        (sleep 0.1 && kitty --class="particle-$i" -e sh -c "echo '*'; sleep 2") &
+        (sleep 0.1 && kitty --class="particle-$i" -e sh -c "echo '✨'; sleep 2") &
     done
     
     # Apply special rules for particle windows
@@ -127,22 +127,22 @@ create_particle_effect() {
     hyprctl keyword windowrule "noblur,class:^particle-.*$"
     hyprctl keyword windowrule "opacity 0.7,class:^particle-.*$"
     
-    notify-send "Efecto de Partículas" "Simulación visual creada" -t 2000
+    notify-send "✨ Efecto de Partículas" "Simulación visual creada" -t 2000
 }
 
 # Main menu
 show_menu() {
-    echo "Dynamic Visual Effects for Hyprland"
+    echo "🎨 Dynamic Visual Effects for Hyprland"
     echo "======================================"
     echo "1. 🌈 Rainbow borders"
-    echo "2. Elegant borders"
+    echo "2. ✨ Elegant borders"
     echo "3. 🌊 Toggle blur intensity"
     echo "4. ⚡ Fast animations"
     echo "5. 🎭 Normal animations"
     echo "6. 🐌 Slow animations"
     echo "7. 🔄 Cycle window rounding"
     echo "8. 🌍 Apply seasonal theme"
-    echo "9. Particle effect simulation"
+    echo "9. ✨ Particle effect simulation"
     echo "0. Exit"
     echo ""
 }

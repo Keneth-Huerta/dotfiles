@@ -13,13 +13,13 @@ toggle_freeze() {
         hyprctl keyword animations:enabled false
         hyprctl keyword decoration:blur:enabled false
         hyprctl keyword misc:vfr false
-        notify-send " Hyprland" "Pantalla congelada - Presiona Win+Ctrl+F para capturar" --urgency=normal
+        notify-send "🧊 Hyprland" "Pantalla congelada - Presiona Win+Ctrl+F para capturar" --urgency=normal
     else
         # Reanudar animaciones y rendering
         hyprctl keyword animations:enabled true
         hyprctl keyword decoration:blur:enabled true
         hyprctl keyword misc:vfr true
-        notify-send " Hyprland" "Pantalla descongelada" --urgency=normal
+        notify-send "🔄 Hyprland" "Pantalla descongelada" --urgency=normal
     fi
 }
 
@@ -48,9 +48,9 @@ if [ "$1" = "capture" ]; then
     # Tomar captura de región
     if grim -g "$(slurp)" "$OUTPUT_FILE"; then
         wl-copy < "$OUTPUT_FILE"
-        notify-send " Screenshot" "Captura guardada y copiada al clipboard" --urgency=low
+        notify-send "📸 Screenshot" "Captura guardada y copiada al clipboard" --urgency=low
     else
-        notify-send " Error" "No se pudo tomar la captura" --urgency=critical
+        notify-send "❌ Error" "No se pudo tomar la captura" --urgency=critical
     fi
     
     # Descongelar automáticamente después de capturar
