@@ -2,6 +2,13 @@
 
 # Script para ejecutar fastfetch con diferentes configuraciones según el terminal
 
+# Check if fastfetch is installed
+if ! command -v fastfetch >/dev/null 2>&1; then
+    echo "fastfetch is not installed. Please install it using your package manager."
+    # Exit gracefully whether sourced or executed
+    [[ ${BASH_SOURCE[0]} != "${0}" ]] && return 0 || exit 0
+fi
+
 # Detectar el terminal actual
 if [[ "$TERM_PROGRAM" == "vscode" ]]; then
     # En VS Code, usar ASCII

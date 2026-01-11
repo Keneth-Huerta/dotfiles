@@ -733,6 +733,46 @@ install_powerlevel10k() {
     log_info "Para configurar, ejecuta: p10k configure"
 }
 
+# Helper function to install zsh plugins
+install_zsh_plugin() {
+    local plugin_name="$1"
+    local repo_url="$2"
+    local plugin_dir="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/$plugin_name"
+    
+    if [ -d "$plugin_dir" ]; then
+        log_info "$plugin_name ya está instalado"
+        return 0
+    fi
+    
+    log_info "Instalando $plugin_name..."
+    
+    # Crear directorio custom si no existe
+    mkdir -p "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins"
+    
+    # Clonar plugin
+    if git clone --depth=1 "$repo_url" "$plugin_dir"; then
+        log_success "$plugin_name instalado"
+    else
+        log_error "Error al instalar $plugin_name"
+        return 1
+    fi
+}
+
+# Instalar zsh-autosuggestions plugin
+install_zsh_autosuggestions() {
+    install_zsh_plugin "zsh-autosuggestions" "https://github.com/zsh-users/zsh-autosuggestions"
+}
+
+# Instalar zsh-syntax-highlighting plugin
+install_zsh_syntax_highlighting() {
+    install_zsh_plugin "zsh-syntax-highlighting" "https://github.com/zsh-users/zsh-syntax-highlighting.git"
+}
+
+# Instalar zsh-history-substring-search plugin
+install_zsh_history_substring_search() {
+    install_zsh_plugin "zsh-history-substring-search" "https://github.com/zsh-users/zsh-history-substring-search"
+}
+
 # Instalar Oh My Fish
 install_oh_my_fish() {
     if [ -d ~/.local/share/omf ]; then
@@ -829,6 +869,10 @@ export -f pkg_search
 export -f map_package_name
 export -f install_oh_my_zsh
 export -f install_powerlevel10k
+export -f install_zsh_plugin
+export -f install_zsh_autosuggestions
+export -f install_zsh_syntax_highlighting
+export -f install_zsh_history_substring_search
 export -f install_oh_my_fish
 export -f install_starship
 export -f install_yay

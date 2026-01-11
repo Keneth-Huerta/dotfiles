@@ -122,14 +122,17 @@ install_shells() {
         fish
         zsh
         zsh-completions
-        zsh-autosuggestions
-        zsh-syntax-highlighting
     )
     
     pkg_install "${packages[@]}"
     
     # Instalar oh-my-zsh
     install_oh_my_zsh
+    
+    # Instalar plugins de zsh manualmente
+    install_zsh_autosuggestions
+    install_zsh_syntax_highlighting
+    install_zsh_history_substring_search
     
     # Instalar powerlevel10k
     install_powerlevel10k
@@ -256,6 +259,9 @@ install_cli_utilities() {
         
         # Multiplexers
         tmux
+        
+        # Shell utilities
+        thefuck
         
         # Otros
         jq
