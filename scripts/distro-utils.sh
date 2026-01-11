@@ -733,6 +733,66 @@ install_powerlevel10k() {
     log_info "Para configurar, ejecuta: p10k configure"
 }
 
+# Instalar zsh-autosuggestions plugin
+install_zsh_autosuggestions() {
+    local plugin_dir="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autosuggestions"
+    
+    if [ -d "$plugin_dir" ]; then
+        log_info "zsh-autosuggestions ya está instalado"
+        return 0
+    fi
+    
+    log_info "Instalando zsh-autosuggestions..."
+    
+    # Crear directorio custom si no existe
+    mkdir -p "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins"
+    
+    # Clonar zsh-autosuggestions
+    git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions "$plugin_dir"
+    
+    log_success "zsh-autosuggestions instalado"
+}
+
+# Instalar zsh-syntax-highlighting plugin
+install_zsh_syntax_highlighting() {
+    local plugin_dir="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting"
+    
+    if [ -d "$plugin_dir" ]; then
+        log_info "zsh-syntax-highlighting ya está instalado"
+        return 0
+    fi
+    
+    log_info "Instalando zsh-syntax-highlighting..."
+    
+    # Crear directorio custom si no existe
+    mkdir -p "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins"
+    
+    # Clonar zsh-syntax-highlighting
+    git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git "$plugin_dir"
+    
+    log_success "zsh-syntax-highlighting instalado"
+}
+
+# Instalar zsh-history-substring-search plugin
+install_zsh_history_substring_search() {
+    local plugin_dir="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-history-substring-search"
+    
+    if [ -d "$plugin_dir" ]; then
+        log_info "zsh-history-substring-search ya está instalado"
+        return 0
+    fi
+    
+    log_info "Instalando zsh-history-substring-search..."
+    
+    # Crear directorio custom si no existe
+    mkdir -p "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins"
+    
+    # Clonar zsh-history-substring-search
+    git clone --depth=1 https://github.com/zsh-users/zsh-history-substring-search "$plugin_dir"
+    
+    log_success "zsh-history-substring-search instalado"
+}
+
 # Instalar Oh My Fish
 install_oh_my_fish() {
     if [ -d ~/.local/share/omf ]; then
@@ -829,6 +889,9 @@ export -f pkg_search
 export -f map_package_name
 export -f install_oh_my_zsh
 export -f install_powerlevel10k
+export -f install_zsh_autosuggestions
+export -f install_zsh_syntax_highlighting
+export -f install_zsh_history_substring_search
 export -f install_oh_my_fish
 export -f install_starship
 export -f install_yay

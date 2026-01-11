@@ -3,7 +3,9 @@
 # ============================================================================
 
 # Run Fastfetch con estilo
-~/.config/fastfetch/smart-fastfetch.sh
+if command -v fastfetch >/dev/null 2>&1; then
+    ~/.config/fastfetch/smart-fastfetch.sh
+fi
 
 # === VARIABLES DE ENTORNO OPTIMIZADAS ===
 export COLORTERM=truecolor
@@ -431,7 +433,12 @@ fi
 # alias unimatrix='unimatrix -c red'
 
 # === CONFIGURACIÓN DE POWERLEVEL10K ===
-source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
+# Try custom installation first, then system-wide installation
+if [ -f "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k/powerlevel10k.zsh-theme" ]; then
+    source "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k/powerlevel10k.zsh-theme"
+elif [ -f /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme ]; then
+    source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
+fi
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
@@ -484,7 +491,10 @@ show_zsh_info() {
 
 # Para mostrar la información, ejecuta: show_zsh_info
 
-eval $(thefuck --alias)
+# Modernizar el comando thefuck
+if command -v thefuck >/dev/null 2>&1; then
+    eval $(thefuck --alias)
+fi
 
 # VS Code shell integration: load code's zsh integration when running inside VS Code terminal
 [[ "$TERM_PROGRAM" == "vscode" ]] && . "$(code --locate-shell-integration-path zsh)"
