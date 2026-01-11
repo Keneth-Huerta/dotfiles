@@ -733,64 +733,41 @@ install_powerlevel10k() {
     log_info "Para configurar, ejecuta: p10k configure"
 }
 
-# Instalar zsh-autosuggestions plugin
-install_zsh_autosuggestions() {
-    local plugin_dir="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autosuggestions"
+# Helper function to install zsh plugins
+install_zsh_plugin() {
+    local plugin_name="$1"
+    local repo_url="$2"
+    local plugin_dir="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/$plugin_name"
     
     if [ -d "$plugin_dir" ]; then
-        log_info "zsh-autosuggestions ya está instalado"
+        log_info "$plugin_name ya está instalado"
         return 0
     fi
     
-    log_info "Instalando zsh-autosuggestions..."
+    log_info "Instalando $plugin_name..."
     
     # Crear directorio custom si no existe
     mkdir -p "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins"
     
-    # Clonar zsh-autosuggestions
-    git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions "$plugin_dir"
+    # Clonar plugin
+    git clone --depth=1 "$repo_url" "$plugin_dir"
     
-    log_success "zsh-autosuggestions instalado"
+    log_success "$plugin_name instalado"
+}
+
+# Instalar zsh-autosuggestions plugin
+install_zsh_autosuggestions() {
+    install_zsh_plugin "zsh-autosuggestions" "https://github.com/zsh-users/zsh-autosuggestions"
 }
 
 # Instalar zsh-syntax-highlighting plugin
 install_zsh_syntax_highlighting() {
-    local plugin_dir="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting"
-    
-    if [ -d "$plugin_dir" ]; then
-        log_info "zsh-syntax-highlighting ya está instalado"
-        return 0
-    fi
-    
-    log_info "Instalando zsh-syntax-highlighting..."
-    
-    # Crear directorio custom si no existe
-    mkdir -p "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins"
-    
-    # Clonar zsh-syntax-highlighting
-    git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git "$plugin_dir"
-    
-    log_success "zsh-syntax-highlighting instalado"
+    install_zsh_plugin "zsh-syntax-highlighting" "https://github.com/zsh-users/zsh-syntax-highlighting.git"
 }
 
 # Instalar zsh-history-substring-search plugin
 install_zsh_history_substring_search() {
-    local plugin_dir="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-history-substring-search"
-    
-    if [ -d "$plugin_dir" ]; then
-        log_info "zsh-history-substring-search ya está instalado"
-        return 0
-    fi
-    
-    log_info "Instalando zsh-history-substring-search..."
-    
-    # Crear directorio custom si no existe
-    mkdir -p "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins"
-    
-    # Clonar zsh-history-substring-search
-    git clone --depth=1 https://github.com/zsh-users/zsh-history-substring-search "$plugin_dir"
-    
-    log_success "zsh-history-substring-search instalado"
+    install_zsh_plugin "zsh-history-substring-search" "https://github.com/zsh-users/zsh-history-substring-search"
 }
 
 # Instalar Oh My Fish
@@ -889,6 +866,7 @@ export -f pkg_search
 export -f map_package_name
 export -f install_oh_my_zsh
 export -f install_powerlevel10k
+export -f install_zsh_plugin
 export -f install_zsh_autosuggestions
 export -f install_zsh_syntax_highlighting
 export -f install_zsh_history_substring_search

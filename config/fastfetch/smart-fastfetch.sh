@@ -4,7 +4,7 @@
 
 # Check if fastfetch is installed
 if ! command -v fastfetch >/dev/null 2>&1; then
-    echo "fastfetch is not installed. Install it with: sudo pacman -S fastfetch (Arch) or your package manager"
+    echo "fastfetch is not installed. Please install it using your package manager."
     return 0 2>/dev/null || exit 0
 fi
 
