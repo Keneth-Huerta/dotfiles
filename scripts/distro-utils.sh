@@ -750,9 +750,12 @@ install_zsh_plugin() {
     mkdir -p "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins"
     
     # Clonar plugin
-    git clone --depth=1 "$repo_url" "$plugin_dir"
-    
-    log_success "$plugin_name instalado"
+    if git clone --depth=1 "$repo_url" "$plugin_dir"; then
+        log_success "$plugin_name instalado"
+    else
+        log_error "Error al instalar $plugin_name"
+        return 1
+    fi
 }
 
 # Instalar zsh-autosuggestions plugin

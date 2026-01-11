@@ -5,7 +5,8 @@
 # Check if fastfetch is installed
 if ! command -v fastfetch >/dev/null 2>&1; then
     echo "fastfetch is not installed. Please install it using your package manager."
-    return 0 2>/dev/null || exit 0
+    # Exit gracefully whether sourced or executed
+    [[ ${BASH_SOURCE[0]} != "${0}" ]] && return 0 || exit 0
 fi
 
 # Detectar el terminal actual
