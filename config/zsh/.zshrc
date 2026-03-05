@@ -2,6 +2,10 @@
 # CONFIGURACIÓN MODERNA DE ZSH CON ESTILO ROJO PREDOMINANTE
 # ============================================================================
 
+# Silenciar el aviso de p10k instant prompt cuando hay output en la
+# inicialización (p.ej. fastfetch). Opciones: off | quiet | verbose
+typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
+
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -556,6 +560,10 @@ cat() {
 }
 
 bat() {
+    if ! command -v bat &>/dev/null; then
+        command cat "$@"
+        return
+    fi
     local color style
     if [[ -t 1 ]]; then
         color=auto; style=plain
