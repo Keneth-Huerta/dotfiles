@@ -434,11 +434,23 @@ fi
 # alias unimatrix='unimatrix -c red'
 
 # === CONFIGURACIÓN DE POWERLEVEL10K ===
-if [[ -f /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme ]]; then
-    source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
-    # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-    [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-else
+# Buscar p10k en las dos ubicaciones posibles:
+#   - AUR (paru/yay): /usr/share/zsh-theme-powerlevel10k/
+#   - Git clone (sin AUR helper): ~/.oh-my-zsh/custom/themes/powerlevel10k/
+_p10k_paths=(
+    "/usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme"
+    "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k/powerlevel10k.zsh-theme"
+)
+_p10k_loaded=false
+for _p10k_path in "${_p10k_paths[@]}"; do
+    if [[ -f "$_p10k_path" ]]; then
+        source "$_p10k_path"
+        [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+        _p10k_loaded=true
+        break
+    fi
+done
+if [[ "$_p10k_loaded" == false ]]; then
     # Prompt de fallback cuando p10k no está instalado.
     # Instala con: paru -S zsh-theme-powerlevel10k-git
     autoload -U colors && colors
@@ -446,6 +458,7 @@ else
     PROMPT='%F{red}%n%f%F{white}@%f%F{cyan}%m%f %F{yellow}%~%f $(git rev-parse --abbrev-ref HEAD 2>/dev/null | xargs -I{} echo "%F{green}({})%f")
 %F{red}❯%f '
 fi
+unset _p10k_paths _p10k_path _p10k_loaded
 
 # === CONFIGURACIÓN DE PATH OPTIMIZADA ===
 # Agregar directorios al PATH si existen
@@ -552,3 +565,4 @@ bat() {
 # en lugar de la sesión de usuario (qemu:///session)
 export LIBVIRT_DEFAULT_URI='qemu:///system'
 alias nstatus='nmcli device status | grep -v "veth\|br-\|docker\|virbr"'
+alias code='code --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-gpu'

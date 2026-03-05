@@ -262,30 +262,12 @@ install_editors() {
     log_info "Ejecuta 'nvim' para que NvChad y los plugins se instalen automáticamente"
 }
 
-# Instalar NvChad
+# Instalar NvChad — NOTA: config/nvim ya ES NvChad v2.5.
+# Esta función se conserva solo si se quiere reinstalar desde cero.
+# NO se llama automáticamente para no destruir la config del repo.
 install_nvchad() {
-    log_info "Instalando NvChad..."
-    
-    # Backup de configuración existente
-    if [ -d ~/.config/nvim ]; then
-        log_warn "Respaldando configuración existente de nvim..."
-        mv ~/.config/nvim ~/.config/nvim.bak.$(date +%Y%m%d-%H%M%S)
-    fi
-    if [ -d ~/.local/share/nvim ]; then
-        mv ~/.local/share/nvim ~/.local/share/nvim.bak.$(date +%Y%m%d-%H%M%S)
-    fi
-    if [ -d ~/.local/state/nvim ]; then
-        mv ~/.local/state/nvim ~/.local/state/nvim.bak.$(date +%Y%m%d-%H%M%S)
-    fi
-    if [ -d ~/.cache/nvim ]; then
-        mv ~/.cache/nvim ~/.cache/nvim.bak.$(date +%Y%m%d-%H%M%S)
-    fi
-    
-    # Clonar NvChad
-    git clone https://github.com/NvChad/NvChad ~/.config/nvim --depth 1
-    
-    log_success "NvChad instalado"
-    log_info "Para configurar NvChad, ejecuta 'nvim' y espera a que termine la instalación de plugins"
+    log_warn "install_nvchad: la config del repo ya incluye NvChad."
+    log_warn "Ejecuta 'nvim' y lazy.nvim instalará los plugins automáticamente."
 }
 
 # Función para instalar utilidades CLI
