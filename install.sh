@@ -474,41 +474,38 @@ update_system() {
 
 # Menú principal
 show_menu() {
-    echo -e "${CYAN}╔════════════════════════════════════════╗${NC}"
-    echo -e "${CYAN}║         MENÚ PRINCIPAL                 ║${NC}"
-    echo -e "${CYAN}╚════════════════════════════════════════╝${NC}"
+    echo -e "${CYAN}╔════════════════════════════════════════════╗${NC}"
+    echo -e "${CYAN}║       DOTFILES — MENÚ PRINCIPAL              ║${NC}"
+    echo -e "${CYAN}╚════════════════════════════════════════════╝${NC}"
     echo ""
-    echo -e "${MAGENTA}1)${NC} Instalación completa (Todo)"
-    echo -e "${MAGENTA}2)${NC} Instalar paquetes"
-    echo -e "${MAGENTA}3)${NC} Instalar entorno gráfico (Hyprland)"
-    echo -e "${MAGENTA}4)${NC} Instalar herramientas CLI"
-    echo -e "${MAGENTA}5)${NC} Enlazar configuraciones"
-    echo -e "${MAGENTA}6)${NC} Hacer backup de configuraciones actuales"
-    echo -e "${MAGENTA}7)${NC} Exportar lista de paquetes instalados"
-    echo -e "${MAGENTA}8)${NC} Actualizar sistema"
-    echo -e "${MAGENTA}9)${NC} Configuración rápida (solo vim, zsh, starship)"
+    echo -e "  ${CYAN}INSTALACIÓN${NC}"
+    echo -e "  ${MAGENTA}1)${NC}  Instalación completa (Todo)"
+    echo -e "  ${MAGENTA}2)${NC}  Instalar paquetes ${CYAN}(pacman + AUR + flatpak)${NC}"
+    echo -e "  ${MAGENTA}3)${NC}  Entorno gráfico ${CYAN}(Hyprland + Waybar)${NC}"
+    echo -e "  ${MAGENTA}4)${NC}  Herramientas CLI ${CYAN}(nvim, zsh, bat, eza...)${NC}"
+    echo -e "  ${MAGENTA}5)${NC}  Configuración rápida ${CYAN}(vim, zsh, starship)${NC}"
     echo ""
-    echo -e "${CYAN}Menús Interactivos:${NC}"
-    echo -e "${MAGENTA}20)${NC} ${GREEN}Menú interactivo (whiptail/dialog)${NC}"
-    echo -e "${MAGENTA}21)${NC} ${CYAN}★ Menú Moderno (Python + Rich)${NC} ${YELLOW}[RECOMENDADO]${NC}"
+    echo -e "  ${CYAN}CONFIGURACIÓN${NC}"
+    echo -e "  ${MAGENTA}6)${NC}  Enlazar configuraciones ${CYAN}(crear symlinks)${NC}"
+    echo -e "  ${MAGENTA}7)${NC}  Backup de configuraciones actuales"
+    echo -e "  ${MAGENTA}8)${NC}  Actualizar configuraciones en el repo"
+    echo -e "  ${MAGENTA}9)${NC}  Exportar lista de paquetes instalados"
     echo ""
-    echo -e "${CYAN}Gestión:${NC}"
-    echo -e "${MAGENTA}11)${NC} Gestionar repositorios"
-    echo -e "${MAGENTA}12)${NC} Gestionar claves SSH"
-    echo -e "${MAGENTA}13)${NC} Restaurar backup"
-    echo -e "${MAGENTA}17)${NC} Auto-detectar repositorios existentes"
-    echo -e "${MAGENTA}18)${NC} ${GREEN}Actualizar configuraciones al repo${NC}"
+    echo -e "  ${CYAN}GESTIÓN${NC}"
+    echo -e "  ${MAGENTA}10)${NC} Inicializar dotfiles ${CYAN}(copiar configs al repo)${NC}"
+    echo -e "  ${MAGENTA}11)${NC} Gestionar repositorios"
+    echo -e "  ${MAGENTA}12)${NC} Gestionar claves SSH"
+    echo -e "  ${MAGENTA}13)${NC} Restaurar backup"
     echo ""
-    echo -e "${CYAN}Diagnóstico:${NC}"
-    echo -e "${MAGENTA}14)${NC} Detección de hardware"
-    echo -e "${MAGENTA}15)${NC} Verificar salud del sistema"
-    echo -e "${MAGENTA}16)${NC} Verificar instalación"
+    echo -e "  ${CYAN}DIAGNÓSTICO${NC}"
+    echo -e "  ${MAGENTA}14)${NC} Actualizar sistema"
+    echo -e "  ${MAGENTA}15)${NC} Detectar hardware"
+    echo -e "  ${MAGENTA}16)${NC} Verificar salud del sistema"
+    echo -e "  ${MAGENTA}17)${NC} Verificar instalación"
+    echo -e "  ${MAGENTA}18)${NC} Estado de enlaces simbólicos"
+    echo -e "  ${MAGENTA}19)${NC} Auto-detectar repositorios existentes"
     echo ""
-    echo -e "${CYAN}Avanzado:${NC}"
-    echo -e "${MAGENTA}10)${NC} Inicializar dotfiles (copiar configs actuales al repo)"
-    echo -e "${MAGENTA}19)${NC} Ver estado de enlaces simbólicos"
-    echo ""
-    echo -e "${RED}0)${NC} Salir"
+    echo -e "  ${RED}0)${NC}  Salir"
     echo ""
 }
 
@@ -800,19 +797,19 @@ main() {
                 bash "$DOTFILES_DIR/scripts/install-cli-tools.sh"
                 ;;
             5)
-                bash "$DOTFILES_DIR/scripts/link-configs.sh"
+                quick_install
                 ;;
             6)
-                bash "$DOTFILES_DIR/scripts/backup-configs.sh"
+                bash "$DOTFILES_DIR/scripts/link-configs.sh"
                 ;;
             7)
-                bash "$DOTFILES_DIR/scripts/export-packages.sh"
+                bash "$DOTFILES_DIR/scripts/backup-configs.sh"
                 ;;
             8)
-                update_system
+                bash "$DOTFILES_DIR/scripts/update-dotfiles.sh"
                 ;;
             9)
-                quick_install
+                bash "$DOTFILES_DIR/scripts/export-packages.sh"
                 ;;
             10)
                 bash "$DOTFILES_DIR/scripts/init-dotfiles.sh"
@@ -827,30 +824,24 @@ main() {
                 bash "$DOTFILES_DIR/scripts/restore-backup.sh"
                 ;;
             14)
+                update_system
+                ;;
+            15)
                 source "$DOTFILES_DIR/scripts/detect-hardware.sh"
                 detect_hardware
                 read -p "Presiona ENTER para continuar..."
                 ;;
-            15)
+            16)
                 bash "$DOTFILES_DIR/scripts/health-check.sh"
                 ;;
-            16)
+            17)
                 bash "$DOTFILES_DIR/scripts/post-install-verify.sh"
                 ;;
-            17)
-                bash "$DOTFILES_DIR/scripts/auto-detect-repos.sh"
-                ;;
             18)
-                bash "$DOTFILES_DIR/scripts/update-dotfiles.sh"
-                ;;
-            19)
                 show_symlink_status
                 ;;
-            20)
-                bash "$DOTFILES_DIR/scripts/menu-interactivo.sh"
-                ;;
-            21)
-                bash "$DOTFILES_DIR/scripts/instalador"
+            19)
+                bash "$DOTFILES_DIR/scripts/auto-detect-repos.sh"
                 ;;
             0)
                 echo -e "${GREEN}¡Hasta luego!${NC}"

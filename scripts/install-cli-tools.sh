@@ -119,7 +119,6 @@ install_shells() {
     echo -e "${YELLOW}Instalando shells...${NC}"
     
     local packages=(
-        fish
         zsh
         zsh-completions
         zsh-autosuggestions
@@ -133,11 +132,6 @@ install_shells() {
     
     # Instalar powerlevel10k
     install_powerlevel10k
-    
-    # Instalar oh-my-fish solo si fish está instalado
-    if command_exists fish; then
-        install_oh_my_fish
-    fi
     
     log_success "Shells instalados"
     
@@ -283,7 +277,6 @@ install_dev_tools() {
         nodejs
         npm
         python
-        python-pip
         go
         rust
         
@@ -363,7 +356,7 @@ show_menu() {
     echo ""
     echo "1)  Instalar todo"
     echo "2)  Herramientas de terminal (kitty, alacritty, tmux)"
-    echo "3)  Shells (fish, zsh + oh-my-zsh + powerlevel10k)"
+    echo "3)  Shells (zsh + oh-my-zsh + powerlevel10k)"
     echo "4)  Prompts (starship, oh-my-posh)"
     echo "5)  Editores (vim, neovim, NvChad)"
     echo "6)  Utilidades CLI (htop, fzf, ripgrep, bat, etc)"
