@@ -33,6 +33,16 @@ SCRIPT_START_TIME=$(date +%s)
 # ============================================================================
 
 detect_distro() {
+    # Termux (Android) - no tiene /etc/os-release
+    if [ -n "$TERMUX_VERSION" ] || [ -d "/data/data/com.termux" ]; then
+        DISTRO_ID="termux"
+        DISTRO_VERSION="${TERMUX_VERSION:-unknown}"
+        DISTRO_NAME="Termux (Android)"
+        detect_package_manager
+        log_info "Entorno detectado: $DISTRO_NAME"
+        return 0
+    fi
+
     if [ -f /etc/os-release ]; then
         . /etc/os-release
         DISTRO_ID="$ID"
@@ -62,6 +72,12 @@ detect_distro() {
 
 detect_package_manager() {
     case "$DISTRO_ID" in
+        termux)
+            PKG_MANAGER="pkg"
+            PKG_INSTALL_CMD="pkg install -y"
+            PKG_UPDATE_CMD="pkg upgrade -y"
+            PKG_SEARCH_CMD="pkg search"
+            ;;
         arch|manjaro|endeavouros|garuda)
             PKG_MANAGER="pacman"
             PKG_INSTALL_CMD="sudo pacman -S --needed --noconfirm"
@@ -97,7 +113,12 @@ detect_package_manager() {
             echo -e "${YELLOW}Advertencia: Distribución '$DISTRO_ID' no reconocida${NC}"
             echo -e "${YELLOW}Intentando detectar gestor de paquetes...${NC}"
             
-            if command -v pacman &> /dev/null; then
+            if [ -n "$TERMUX_VERSION" ] && command -v pkg &> /dev/null; then
+                PKG_MANAGER="pkg"
+                PKG_INSTALL_CMD="pkg install -y"
+                PKG_UPDATE_CMD="pkg upgrade -y"
+                PKG_SEARCH_CMD="pkg search"
+            elif command -v pacman &> /dev/null; then
                 PKG_MANAGER="pacman"
                 PKG_INSTALL_CMD="sudo pacman -S --needed --noconfirm"
                 PKG_UPDATE_CMD="sudo pacman -Syu --noconfirm"
@@ -207,54 +228,36 @@ show_failed_packages_summary() {
         apt)
             echo -e "  ${GREEN}sudo apt-get install ${FAILED_PACKAGES[*]}${NC}"
             echo -e "  ${GREEN}apt-cache search <nombre-paquete>${NC}"
-    local installed_count=0
-    local failed_count=0
+            ;;
+        dnf)
+            echo -e "  ${GREEN}sudo dnf install ${FAILED_PACKAGES[*]}${NC}"
+            ;;
+        zypper)
+            echo -e "  ${GREEN}sudo zypper install ${FAILED_PACKAGES[*]}${NC}"
+            ;;
+        xbps)
+            echo -e "  ${GREEN}sudo xbps-install ${FAILED_PACKAGES[*]}${NC}"
+            ;;
+        pkg)
+            echo -e "  ${GREEN}pkg install ${FAILED_PACKAGES[*]}${NC}"
+            echo -e "  ${GREEN}pkg search <nombre-paquete>${NC}"
+            ;;
+        *)
+            echo -e "  ${GREEN}${PKG_INSTALL_CMD} ${FAILED_PACKAGES[*]}${NC}"
+            ;;
+    esac
+}
+
+suggest_alternative() {
+    local pkg="$1"
+    local suggestions=()
     
-    # Mapear nombres de paquetes según la distribución
-    for pkg in "${packages[@]}"; do
-        local mapped_pkg=$(map_package_name "$pkg")
-        if [ -n "$mapped_pkg" ] && [ "$mapped_pkg" != "SKIP" ]; then
-            mapped_packages+=("$mapped_pkg")
-        else
-            log_warn "Paquete '$pkg' no disponible en esta distribución"
-        fi
-    done
-    
-    if [ ${#mapped_packages[@]} -eq 0 ]; then
-        log_warn "No hay paquetes para instalar después del mapeo"
-        return 0
-    fi
-    
-    log_info "Instalando paquetes: ${mapped_packages[*]}"
-    echo ""
-    
-    # Intentar instalar cada paquete individualmente para mejor control
-    for pkg in "${mapped_packages[@]}"; do
-        if pkg_is_installed "$pkg"; then
-            log_success "$pkg ya está instalado ✓"
-            ((installed_count++))
-            continue
-        fi
-        
-        # Intentar instalar con búsqueda inteligente
-        if try_install_with_search "$pkg"; then
-            log_success "$pkg instalado ✓"
-            ((installed_count++))
-        else
-            log_error "No se pudo instalar: $pkg"
-            ((failed_count++))
-        fi
-    done
-    
-    echo ""
-    echo -e "${BLUE}Resumen:${NC}"
-    echo -e "  ${GREEN}✓${NC} Instalados/Ya instalados: $installed_count"
-    
-    if [ $failed_count -gt 0 ]; then
-        echo -e "  ${RED}✗${NC} Fallidos: $failed_count"
-    fi
-    
-    return 0;
+    case "$pkg" in
+        fastfetch) suggestions=("neofetch" "screenfetch") ;;
+        exa)       suggestions=("eza" "lsd") ;;
+        eza)       suggestions=("exa" "lsd") ;;
+        bat)       suggestions=("batcat") ;;
+        fd)        suggestions=("fd-find") ;;
     esac
     
     if [ ${#suggestions[@]} -gt 0 ]; then
@@ -293,6 +296,11 @@ try_install_with_search() {
             ;;
         xbps)
             if sudo xbps-install -y "$pkg" 2>/dev/null; then
+                return 0
+            fi
+            ;;
+        pkg)
+            if pkg install -y "$pkg" 2>/dev/null; then
                 return 0
             fi
             ;;
@@ -349,6 +357,12 @@ try_install_with_search() {
                     return 0
                 fi
                 ;;
+            pkg)
+                if pkg install -y "$alt" 2>/dev/null; then
+                    log_success "Instalado alternativa: $alt (en lugar de $original_pkg)"
+                    return 0
+                fi
+                ;;
         esac
     done
     
@@ -365,6 +379,9 @@ try_install_with_search() {
             ;;
         dnf)
             search_results=$(dnf search "$pkg" 2>/dev/null | grep "^[a-z]" | head -5)
+            ;;
+        pkg)
+            search_results=$(pkg search "$pkg" 2>/dev/null | head -5)
             ;;
     esac
     
@@ -403,6 +420,9 @@ pkg_update() {
             ;;
         xbps)
             sudo xbps-install -Su
+            ;;
+        pkg)
+            pkg upgrade -y
             ;;
         *)
             log_error "Gestor de paquetes no soportado: $PKG_MANAGER"
@@ -455,6 +475,9 @@ pkg_install() {
         xbps)
             sudo xbps-install -y "${mapped_packages[@]}"
             ;;
+        pkg)
+            pkg install -y "${mapped_packages[@]}"
+            ;;
         *)
             log_error "Gestor de paquetes no soportado: $PKG_MANAGER"
             return 1
@@ -503,6 +526,9 @@ pkg_is_installed() {
         xbps)
             xbps-query "$package" &> /dev/null
             ;;
+        pkg)
+            dpkg -l "$package" 2>/dev/null | grep -q "^ii"
+            ;;
         *)
             return 1
             ;;
@@ -531,6 +557,9 @@ pkg_search() {
         xbps)
             xbps-query -Rs "$query"
             ;;
+        pkg)
+            pkg search "$query"
+            ;;
         *)
             log_error "Gestor de paquetes no soportado: $PKG_MANAGER"
             return 1
@@ -547,9 +576,9 @@ map_package_name() {
     
     # Si el paquete tiene un mapeo específico, usarlo
     case "$pkg" in
-        # Terminales
+        # Terminales (no disponibles en Termux, sin servidor de display)
         kitty|alacritty)
-            echo "$pkg"  # Mismo nombre en todas las distros
+            [ "$PKG_MANAGER" = "pkg" ] && echo "SKIP" || echo "$pkg"
             ;;
         
         # Shells
@@ -594,14 +623,18 @@ map_package_name() {
             ;;
         exa)
             # exa fue renombrado a eza
-            if [ "$PKG_MANAGER" = "apt" ]; then
+            if [ "$PKG_MANAGER" = "apt" ] || [ "$PKG_MANAGER" = "pkg" ]; then
                 command_exists exa && echo "exa" || echo "SKIP"
             else
                 echo "eza"
             fi
             ;;
         eza)
-            [ "$PKG_MANAGER" = "apt" ] && echo "SKIP" || echo "$pkg"
+            if [ "$PKG_MANAGER" = "apt" ] || [ "$PKG_MANAGER" = "pkg" ]; then
+                echo "SKIP"
+            else
+                echo "$pkg"
+            fi
             ;;
         
         # File managers
@@ -649,7 +682,7 @@ map_package_name() {
         # Build tools
         base-devel)
             case "$PKG_MANAGER" in
-                apt)
+                apt|pkg)
                     echo "build-essential"
                     ;;
                 dnf)
@@ -670,23 +703,32 @@ map_package_name() {
                 python-pip)
                     [ "$PKG_MANAGER" = "apt" ] && echo "python3-pip" || echo "$pkg"
                     ;;
+                go)
+                    [ "$PKG_MANAGER" = "pkg" ] && echo "golang" || echo "$pkg"
+                    ;;
                 *)
                     echo "$pkg"
                     ;;
             esac
             ;;
         
-        # Docker
+        # Docker (no disponible en Termux)
         docker)
-            [ "$PKG_MANAGER" = "apt" ] && echo "docker.io" || echo "$pkg"
+            if [ "$PKG_MANAGER" = "pkg" ]; then
+                echo "SKIP"
+            elif [ "$PKG_MANAGER" = "apt" ]; then
+                echo "docker.io"
+            else
+                echo "$pkg"
+            fi
             ;;
         docker-compose)
-            [ "$PKG_MANAGER" = "apt" ] && echo "docker-compose" || echo "$pkg"
+            [ "$PKG_MANAGER" = "pkg" ] && echo "SKIP" || echo "docker-compose"
             ;;
         
-        # Bases de datos
+        # Bases de datos (no disponibles en Termux)
         postgresql|redis)
-            echo "$pkg"
+            [ "$PKG_MANAGER" = "pkg" ] && echo "SKIP" || echo "$pkg"
             ;;
         
         # Por defecto, usar el mismo nombre

@@ -3,7 +3,7 @@
 # CLI TOOLS INSTALLER - Compatible con múltiples distribuciones
 # ============================================================================
 # Instala herramientas de terminal, shells, editores y utilidades CLI
-# Soporta: Arch, Ubuntu/Debian, Fedora y más
+# Soporta: Arch, Ubuntu/Debian, Fedora, Termux (Android) y más
 # ============================================================================
 
 # Obtener directorio del script
@@ -257,9 +257,11 @@ install_cli_utilities() {
         tldr
     )
     
-    # exa/eza según disponibilidad
+    # exa/eza según disponibilidad y gestor de paquetes
     if [ "$PKG_MANAGER" = "pacman" ]; then
         packages+=(eza)
+    elif [ "$PKG_MANAGER" = "pkg" ]; then
+        packages+=(lsd)  # Alternativa a eza disponible en Termux
     elif command_exists exa; then
         packages+=(exa)
     fi
