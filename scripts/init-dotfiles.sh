@@ -115,7 +115,6 @@ copy_if_exists "$HOME/.config/wofi" "$DOTFILES_DIR/config/wofi" "Wofi"
 
 # Terminal
 copy_if_exists "$HOME/.config/kitty" "$DOTFILES_DIR/config/kitty" "Kitty"
-copy_if_exists "$HOME/.config/fish" "$DOTFILES_DIR/config/fish" "Fish"
 
 # Shell configs
 copy_if_exists "$HOME/.zshrc" "$DOTFILES_DIR/config/zsh/.zshrc" "Zsh config"

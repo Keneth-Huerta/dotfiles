@@ -12,7 +12,6 @@ heroic-games-launcher-bin
 hidamari
 hydra-launcher-bin
 intellij-idea-ultimate-edition
-kddockwidgets-qt6
 libfprint-2-tod1-elan
 libfprint-tod
 mpvpaper
@@ -29,8 +28,6 @@ opencode-bin
 paru-bin
 paru-bin-debug
 pcsx2
-plutosvg
-plutovg
 python-vlc
 scrub
 sklauncher-bin
@@ -40,7 +37,6 @@ swaylock-effects
 tty-clock
 unimatrix-git
 visual-studio-code-bin
-waifu2x-converter-cpp
 waifu2x-converter-qt-git
 whatsapp-for-linux-git
 wlogout

@@ -73,6 +73,10 @@ link_zsh() {
     if [ -f "$DOTFILES_DIR/config/zsh/.zshenv" ]; then
         create_symlink "$DOTFILES_DIR/config/zsh/.zshenv" "$HOME/.zshenv"
     fi
+
+    if [ -f "$DOTFILES_DIR/config/zsh/.p10k.zsh" ]; then
+        create_symlink "$DOTFILES_DIR/config/zsh/.p10k.zsh" "$HOME/.p10k.zsh"
+    fi
 }
 
 # Función para enlazar configuraciones de Neovim

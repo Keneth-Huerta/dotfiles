@@ -668,7 +668,6 @@ show_symlink_status() {
     check_symlink "$HOME/.zshrc" ".zshrc"
     check_symlink "$HOME/.zshenv" ".zshenv"
     check_symlink "$HOME/.p10k.zsh" ".p10k.zsh"
-    check_symlink "$HOME/.config/fish" "Fish"
     echo ""
     
     echo -e "${CYAN}[Editores]${NC}"
@@ -741,11 +740,6 @@ show_symlink_status() {
             # Arreglar .p10k.zsh
             if [ -e "$HOME/.p10k.zsh" ] && [ ! -L "$HOME/.p10k.zsh" ]; then
                 fix_symlink "$DOTFILES_DIR/config/zsh/.p10k.zsh" "$HOME/.p10k.zsh" ".p10k.zsh"
-            fi
-            
-            # Arreglar Fish
-            if [ -e "$HOME/.config/fish" ] && [ ! -L "$HOME/.config/fish" ]; then
-                fix_symlink "$DOTFILES_DIR/config/fish" "$HOME/.config/fish" "Fish"
             fi
             
             # Arreglar Wofi
@@ -1001,7 +995,7 @@ EOF
     echo ""
     echo -e "  ${GREEN}1)${NC} 🖥️  Instalación Completa ${CYAN}(Entorno + Apps + Configs)${NC}"
     echo -e "  ${GREEN}2)${NC} Solo Entorno Gráfico ${CYAN}(Hyprland + Waybar + GUI)${NC}"
-    echo -e "  ${GREEN}3)${NC} ⌨️  Solo Herramientas CLI ${CYAN}(Nvim + Fish + Tools)${NC}"
+    echo -e "  ${GREEN}3)${NC} ⌨️  Solo Herramientas CLI ${CYAN}(Nvim + ZSH + Tools)${NC}"
     echo -e "  ${GREEN}4)${NC} Herramientas de Desarrollo ${CYAN}(Docker + IDEs + Languages)${NC}"
     echo -e "  ${GREEN}5)${NC} 📝 Solo Aplicar Configuraciones ${CYAN}(Sin instalar paquetes)${NC}"
     echo -e "  ${GREEN}6)${NC} Instalación Personalizada ${CYAN}(Escoger componentes)${NC}"
@@ -1098,7 +1092,7 @@ install_custom() {
     components=(
         ["base"]="Paquetes base del sistema"
         ["gui"]="Entorno gráfico (Hyprland + Waybar)"
-        ["cli"]="Herramientas CLI (Nvim, Fish, etc)"
+        ["cli"]="Herramientas CLI (Nvim, ZSH, etc)"
         ["dev"]="Herramientas de desarrollo"
         ["apps"]="Aplicaciones (Brave, Discord, etc)"
         ["configs"]="Aplicar configuraciones"
@@ -1193,39 +1187,27 @@ EOF
 
 main() {
     # ============================================================================
-    # PASO 0: Mover repositorio a la ubicación correcta (AUTOMÁTICO)
+    # PASO 0: Verificar ubicación del repositorio (MANUAL - solo avisa)
     # ============================================================================
     local target_dir="$HOME/Documents/repos/dotfiles"
     local current_dir="$DOTFILES_DIR"
-    
+
     if [ "$current_dir" != "$target_dir" ]; then
-        log_info "El repositorio no está en la ubicación correcta"
-        log_info "Ubicación actual: $current_dir"
-        log_info "Ubicación recomendada: $target_dir"
+        log_warn "El repositorio no está en la ubicación recomendada"
+        log_warn "Ubicación actual:     $current_dir"
+        log_warn "Ubicación recomendada: $target_dir"
         echo ""
-        
-        # Crear directorio de repos si no existe
-        mkdir -p "$HOME/Documents/repos"
-        
-        # Si el destino existe, hacer backup
-        if [ -d "$target_dir" ]; then
-            local backup="$target_dir.backup-$(date +%Y%m%d-%H%M%S)"
-            log_warn "El destino existe, creando backup: $backup"
-            mv "$target_dir" "$backup"
+        echo -e "${YELLOW}Puedes moverlo manualmente con:${NC}"
+        echo -e "  mkdir -p \$HOME/Documents/repos"
+        echo -e "  mv \"$current_dir\" \"$target_dir\""
+        echo -e "  cd \"$target_dir\" && ./install.sh"
+        echo ""
+        read -p "¿Continuar desde la ubicación actual? [s/N]: " _continue_here
+        if [[ ! "$_continue_here" =~ ^[sS]$ ]]; then
+            echo "Instalación cancelada."
+            exit 0
         fi
-        
-        # Mover el repositorio
-        log_info "Moviendo repositorio a $target_dir..."
-        mv "$current_dir" "$target_dir"
-        
-        log_success "Repositorio movido exitosamente"
-        log_info "Nueva ubicación: $target_dir"
         echo ""
-        echo -e "${YELLOW}⚠ IMPORTANTE: Ejecuta el script desde la nueva ubicación:${NC}"
-        echo -e "  cd $target_dir"
-        echo -e "  ./install.sh"
-        echo ""
-        exit 0
     fi
     
     # Validaciones iniciales

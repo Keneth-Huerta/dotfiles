@@ -2,8 +2,12 @@
 # CONFIGURACIÓN MODERNA DE ZSH CON ESTILO ROJO PREDOMINANTE
 # ============================================================================
 
-# Run Fastfetch con estilo
-~/.config/fastfetch/smart-fastfetch.sh
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
 
 # === VARIABLES DE ENTORNO OPTIMIZADAS ===
 export COLORTERM=truecolor
@@ -15,7 +19,7 @@ export BROWSER="zen-browser"
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 
-# Configuración de colores rojos para comandos
+# Configuración de colores de man/less
 export LESS_TERMCAP_mb=$'\e[1;31m'     # begin bold
 export LESS_TERMCAP_md=$'\e[1;31m'     # begin blink
 export LESS_TERMCAP_so=$'\e[01;44;33m' # begin reverse video
@@ -23,13 +27,6 @@ export LESS_TERMCAP_us=$'\e[01;32m'    # begin underline
 export LESS_TERMCAP_me=$'\e[0m'        # reset bold/blink
 export LESS_TERMCAP_se=$'\e[0m'        # reset reverse video
 export LESS_TERMCAP_ue=$'\e[0m'        # reset underline
-
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
 
 # === CONFIGURACIÓN DE OH MY ZSH ===
 # Path to your Oh My Zsh installation.
@@ -39,7 +36,7 @@ export ZSH="$HOME/.oh-my-zsh"
 # load a random theme each time Oh My Zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="robbyrussell"
+ZSH_THEME="powerlevel10k/powerlevel10k"
 
 # === CONFIGURACIÓN DE HISTORIAL AVANZADA ===
 HISTSIZE=10000
@@ -84,9 +81,6 @@ zstyle ':omz:plugins:alias-finder' cheaper yes
 # Uncomment one of the following lines to change the auto-update behavior
 # zstyle ':omz:update' mode disabled  # disable automatic updates
 # zstyle ':omz:update' mode auto      # update automatically without asking
-alias rmk='scrub -p dod $1; shred -zun 10 -v $1'
-## Habilitar soporte truecolor para terminales modernos
-export COLORTERM=truecolor
 # zstyle ':omz:update' mode reminder  # just remind me to update when it's time
 
 # Uncomment the following line to change how often to auto-update (in days).
@@ -455,6 +449,11 @@ export PATH
 # Cargar variables de entorno específicas
 [ -f "$HOME/.local/bin/env" ] && source "$HOME/.local/bin/env"
 
+# === FASTFETCH - al final para no interferir con p10k instant prompt ===
+if [[ -o interactive ]] && [[ "$TERM_PROGRAM" != "vscode" ]] && command -v fastfetch &>/dev/null; then
+    ~/.config/fastfetch/smart-fastfetch.sh 2>/dev/null || fastfetch
+fi
+
 # === KEYBINDINGS MODERNOS ===
 # Navegación mejorada en el historial
 bindkey '^P' history-substring-search-up
@@ -527,3 +526,9 @@ bat() {
     command bat --paging=never --color="$color" --style="$style" "$@"
 }
 # <<< bat-safe-alias end
+
+# Solución permanente para el URI Mismatch con virsh
+# Esto hace que virsh siempre busque en el sistema global (qemu:///system)
+# en lugar de la sesión de usuario (qemu:///session)
+export LIBVIRT_DEFAULT_URI='qemu:///system'
+alias nstatus='nmcli device status | grep -v "veth\|br-\|docker\|virbr"'

@@ -268,10 +268,18 @@ install_yay() {
     fi
     
     log_info "Instalando yay (AUR helper)..."
-    install_yay  # Función de distro-utils.sh
     
-    log_success "yay instalado correctamente"
-}
+    # Verificar dependencias
+    if ! command_exists git; then
+        run_sudo pacman -S --needed --noconfirm git || handle_error "No se pudo instalar git"
+    fi
+    if ! pacman -Qg base-devel &>/dev/null; then
+        run_sudo pacman -S --needed --noconfirm base-devel || handle_error "No se pudo instalar base-devel"
+    fi
+    
+    local tmpdir
+    tmpdir=$(mktemp -d)
+    cd "$tmpdir"
     
     if git clone https://aur.archlinux.org/yay.git; then
         cd yay
@@ -288,6 +296,8 @@ install_yay() {
     fi
     
     rm -rf "$tmpdir"
+    return 1
+}
     return 1
 }
 
@@ -428,12 +438,12 @@ main() {
             install_yay
             ;;
         6)
-            enable_multilib
-            ;;
-        8)
             install_paru
             ;;
         7)
+            enable_multilib
+            ;;
+        8)
             setup_blackarch_repo
             ;;
         0)
