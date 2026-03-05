@@ -161,7 +161,17 @@ install_shells() {
                 echo "$zsh_path" | sudo tee -a /etc/shells >/dev/null
             fi
             if sudo chsh -s "$zsh_path" "$USER"; then
-                log_success "Shell predeterminada cambiada a zsh. Reinicia la sesión para activarla."
+                echo ""
+                echo -e "${GREEN}╔══════════════════════════════════════════════════╗${NC}"
+                echo -e "${GREEN}║   ✓ ZSH establecida como shell predeterminada    ║${NC}"
+                echo -e "${GREEN}╠══════════════════════════════════════════════════╣${NC}"
+                echo -e "${GREEN}║  Para activarla AHORA sin cerrar sesión:         ║${NC}"
+                echo -e "${GREEN}║                                                  ║${NC}"
+                echo -e "${GREEN}║   ${YELLOW}exec zsh${GREEN}                                      ║${NC}"
+                echo -e "${GREEN}║                                                  ║${NC}"
+                echo -e "${GREEN}║  O cierra sesión y vuelve a entrar.              ║${NC}"
+                echo -e "${GREEN}╚══════════════════════════════════════════════════╝${NC}"
+                echo ""
             else
                 log_warn "No se pudo cambiar el shell automáticamente. Ejecuta manualmente: chsh -s $zsh_path"
             fi

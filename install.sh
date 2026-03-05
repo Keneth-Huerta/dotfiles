@@ -614,6 +614,9 @@ full_install() {
     echo -e "${CYAN}Logs guardados en:${NC} $LOG_FILE"
     echo -e "${YELLOW}Se recomienda reiniciar el sistema${NC}"
     echo ""
+    echo -e "${CYAN}Para activar ZSH en esta terminal ahora mismo:${NC}"
+    echo -e "  ${YELLOW}exec zsh${NC}"
+    echo ""
     read -p "¿Deseas reiniciar ahora? (s/n): " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Ss]$ ]]; then
