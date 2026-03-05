@@ -434,11 +434,18 @@ fi
 # alias unimatrix='unimatrix -c red'
 
 # === CONFIGURACIÓN DE POWERLEVEL10K ===
-[[ -f /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme ]] \
-    && source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
-
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+if [[ -f /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme ]]; then
+    source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
+    # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+    [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+else
+    # Prompt de fallback cuando p10k no está instalado.
+    # Instala con: paru -S zsh-theme-powerlevel10k-git
+    autoload -U colors && colors
+    setopt PROMPT_SUBST
+    PROMPT='%F{red}%n%f%F{white}@%f%F{cyan}%m%f %F{yellow}%~%f $(git rev-parse --abbrev-ref HEAD 2>/dev/null | xargs -I{} echo "%F{green}({})%f")
+%F{red}❯%f '
+fi
 
 # === CONFIGURACIÓN DE PATH OPTIMIZADA ===
 # Agregar directorios al PATH si existen
