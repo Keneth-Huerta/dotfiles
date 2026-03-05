@@ -298,8 +298,6 @@ install_yay() {
     rm -rf "$tmpdir"
     return 1
 }
-    return 1
-}
 
 # Función para instalar paru (AUR helper alternativo)
 install_paru() {
@@ -350,6 +348,7 @@ install_aur_packages() {
     local aur_packages=(
         # Terminal y shell
         oh-my-posh-bin
+        zsh-theme-powerlevel10k-git
         
         # Hyprland extras
         hyprpicker-git
@@ -415,6 +414,16 @@ main() {
     echo "8) Configurar repositorio BlackArch (pentesting)"
     echo "0) Volver"
     echo ""
+    # Modo no interactivo
+    if [ "${1:-}" = "--all" ]; then
+        install_official_packages
+        install_yay
+        install_aur_packages
+        install_flatpak_packages
+        echo -e "${GREEN}¡Instalación completada!${NC}"
+        return 0
+    fi
+
     read -p "Selecciona una opción: " option
     
     case $option in
@@ -457,4 +466,4 @@ main() {
     echo -e "${GREEN}¡Instalación completada!${NC}"
 }
 
-main
+main "$@"

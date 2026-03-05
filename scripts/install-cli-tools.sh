@@ -131,7 +131,22 @@ install_shells() {
     install_oh_my_zsh
     
     # Instalar powerlevel10k
-    install_powerlevel10k
+    # En Arch: instalar desde AUR (se carga desde /usr/share/...)
+    # En otras distros: clonar en el directorio de temas de OMZ
+    if [ "$PKG_MANAGER" = "pacman" ]; then
+        if command_exists paru; then
+            paru -S --needed --noconfirm zsh-theme-powerlevel10k-git 2>/dev/null \
+                || log_warn "No se pudo instalar zsh-theme-powerlevel10k-git via AUR"
+        elif command_exists yay; then
+            yay -S --needed --noconfirm zsh-theme-powerlevel10k-git 2>/dev/null \
+                || log_warn "No se pudo instalar zsh-theme-powerlevel10k-git via AUR"
+        else
+            log_warn "No hay AUR helper disponible, instalando powerlevel10k via git..."
+            install_powerlevel10k
+        fi
+    else
+        install_powerlevel10k
+    fi
     
     log_success "Shells instalados"
     
@@ -170,19 +185,12 @@ install_editors() {
     
     pkg_install "${packages[@]}"
     
-    # Preguntar por NvChad solo en modo interactivo
-    if [ "$INTERACTIVE" = true ]; then
-        echo -e "${YELLOW}¿Deseas instalar NvChad? (s/n)${NC}"
-        read -r response
-        if [[ "$response" =~ ^([sS][iI]|[sS])$ ]]; then
-            install_nvchad
-        fi
-    fi
+    # Enlazar la config de neovim del repo (incluye NvChad via lazy.nvim)
+    # NvChad y los plugins se descargan automáticamente al abrir nvim por primera vez
+    link_neovim_config
     
     log_success "Editores instalados"
-    
-    # Enlazar configuraciones automáticamente
-    link_neovim_config
+    log_info "Ejecuta 'nvim' para que NvChad y los plugins se instalen automáticamente"
 }
 
 # Instalar NvChad

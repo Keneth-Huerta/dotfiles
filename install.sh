@@ -581,7 +581,7 @@ full_install() {
     
     # Ejecutar scripts de instalación
     log_info "Iniciando instalación de paquetes..."
-    bash "$DOTFILES_DIR/scripts/install-packages.sh" || true
+    bash "$DOTFILES_DIR/scripts/install-packages.sh" --all || true
     
     log_info "Iniciando instalación de GUI..."
     bash "$DOTFILES_DIR/scripts/install-gui.sh" || true
@@ -837,7 +837,7 @@ main() {
                 bash "$DOTFILES_DIR/scripts/install-gui.sh"
                 ;;
             4)
-                bash "$DOTFILES_DIR/scripts/install-cli-tools.sh"
+                bash "$DOTFILES_DIR/scripts/install-cli-tools.sh" --all
                 ;;
             5)
                 quick_install
