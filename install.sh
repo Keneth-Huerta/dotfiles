@@ -587,13 +587,13 @@ full_install() {
     bash "$DOTFILES_DIR/scripts/install-gui.sh" || true
     
     log_info "Iniciando instalación de herramientas CLI..."
-    bash "$DOTFILES_DIR/scripts/install-cli-tools.sh" || true
+    bash "$DOTFILES_DIR/scripts/install-cli-tools.sh" --all || true
     
     # Pre-config hook
     run_hook "pre-config"
     
     log_info "Creando symlinks de configuración..."
-    bash "$DOTFILES_DIR/scripts/link-configs.sh" || true
+    bash "$DOTFILES_DIR/scripts/link-configs.sh" --all || true
     
     # Post-config hook
     run_hook "post-config"
@@ -773,9 +773,52 @@ show_symlink_status() {
     echo ""
 }
 
+# ============================================================================
+# VERIFICAR Y MOVER REPOSITORIO A LA UBICACIÓN CORRECTA
+# ============================================================================
+
+ensure_correct_location() {
+    local TARGET_DIR="$HOME/Documents/repos/dotfiles"
+
+    # Si ya está en la ubicación correcta, no hacer nada
+    if [ "$DOTFILES_DIR" = "$TARGET_DIR" ]; then
+        return 0
+    fi
+
+    echo -e "${YELLOW}╔══════════════════════════════════════════════════════╗${NC}"
+    echo -e "${YELLOW}║  REUBICANDO REPOSITORIO                              ║${NC}"
+    echo -e "${YELLOW}╚══════════════════════════════════════════════════════╝${NC}"
+    echo ""
+    echo -e "${BLUE}Ubicación actual:  ${NC}$DOTFILES_DIR"
+    echo -e "${BLUE}Ubicación correcta:${NC}$TARGET_DIR"
+    echo ""
+
+    # Crear directorio padre si no existe
+    mkdir -p "$HOME/Documents/repos"
+
+    # Si el destino ya existe, hacer backup
+    if [ -d "$TARGET_DIR" ]; then
+        local backup="${TARGET_DIR}.backup-$(date +%Y%m%d-%H%M%S)"
+        echo -e "${YELLOW}El destino ya existe, creando backup:${NC} $backup"
+        mv "$TARGET_DIR" "$backup"
+    fi
+
+    # Mover el repositorio
+    mv "$DOTFILES_DIR" "$TARGET_DIR"
+
+    echo -e "${GREEN}✓ Repositorio movido a: $TARGET_DIR${NC}"
+    echo ""
+    echo -e "${CYAN}Vuelve a ejecutar el instalador desde la nueva ubicación:${NC}"
+    echo -e "  cd $TARGET_DIR"
+    echo -e "  ./install.sh"
+    echo ""
+    exit 0
+}
+
 # Main loop
 main() {
     show_banner
+    ensure_correct_location
     check_system
     check_internet
     

@@ -209,6 +209,17 @@ link_all() {
 
 # Menú principal
 main() {
+    # Modo no interactivo: enlazar todo directamente
+    if [ "${1:-}" = "--all" ]; then
+        echo -e "${RED}╔════════════════════════════════════════╗${NC}"
+        echo -e "${RED}║   ENLAZANDO CONFIGURACIONES            ║${NC}"
+        echo -e "${RED}╚════════════════════════════════════════╝${NC}"
+        echo ""
+        link_all
+        echo -e "${GREEN}¡Configuraciones enlazadas correctamente!${NC}"
+        return 0
+    fi
+
     echo -e "${RED}╔════════════════════════════════════════╗${NC}"
     echo -e "${RED}║   ENLAZAR CONFIGURACIONES              ║${NC}"
     echo -e "${RED}╚════════════════════════════════════════╝${NC}"
@@ -259,4 +270,4 @@ main() {
     echo -e "${GREEN}¡Configuraciones enlazadas correctamente!${NC}"
 }
 
-main
+main "$@"
