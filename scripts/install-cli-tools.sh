@@ -49,6 +49,33 @@ create_symlink() {
     log_success "Linked: $target -> $source"
 }
 
+# Instala paru si no hay AUR helper disponible en Arch
+ensure_aur_helper() {
+    [ "$PKG_MANAGER" != "pacman" ] && return 0
+    command_exists paru && return 0
+    command_exists yay  && return 0
+
+    log_info "No hay AUR helper. Instalando paru..."
+
+    # Dependencias previas
+    if ! command_exists git; then
+        sudo pacman -S --needed --noconfirm git
+    fi
+    if ! pacman -Qg base-devel &>/dev/null; then
+        sudo pacman -S --needed --noconfirm base-devel
+    fi
+
+    local tmpdir
+    tmpdir=$(mktemp -d)
+    git clone https://aur.archlinux.org/paru.git "$tmpdir/paru" \
+        && cd "$tmpdir/paru" \
+        && makepkg -si --noconfirm \
+        && cd - >/dev/null \
+        && rm -rf "$tmpdir" \
+        && log_success "paru instalado" \
+        || log_warn "No se pudo instalar paru. Los paquetes AUR deben instalarse manualmente."
+}
+
 # Función para enlazar configuraciones de Kitty
 link_kitty_config() {
     if [ -d "$DOTFILES_DIR/config/kitty" ]; then
@@ -123,6 +150,7 @@ install_shells() {
         zsh-completions
         zsh-autosuggestions
         zsh-syntax-highlighting
+        zsh-history-substring-search
     )
     
     pkg_install "${packages[@]}"
@@ -130,18 +158,29 @@ install_shells() {
     # Instalar oh-my-zsh
     install_oh_my_zsh
     
-    # Instalar powerlevel10k
+    # Instalar powerlevel10k + fuente MesloLGS (requerida para los iconos)
     # En Arch: instalar desde AUR (se carga desde /usr/share/...)
     # En otras distros: clonar en el directorio de temas de OMZ
     if [ "$PKG_MANAGER" = "pacman" ]; then
+        # Asegurarse de tener un AUR helper antes de usarlo
+        ensure_aur_helper
+
+        local aur_helper=""
         if command_exists paru; then
-            paru -S --needed --noconfirm zsh-theme-powerlevel10k-git 2>/dev/null \
-                || log_warn "No se pudo instalar zsh-theme-powerlevel10k-git via AUR"
+            aur_helper="paru"
         elif command_exists yay; then
-            yay -S --needed --noconfirm zsh-theme-powerlevel10k-git 2>/dev/null \
-                || log_warn "No se pudo instalar zsh-theme-powerlevel10k-git via AUR"
+            aur_helper="yay"
+        fi
+
+        if [ -n "$aur_helper" ]; then
+            log_info "Instalando powerlevel10k y fuente MesloLGS NF..."
+            $aur_helper -S --needed --noconfirm \
+                zsh-theme-powerlevel10k-git \
+                ttf-meslo-nerd-font-powerlevel10k \
+                2>/dev/null || log_warn "No se pudieron instalar algunos paquetes AUR"
         else
             log_warn "No hay AUR helper disponible, instalando powerlevel10k via git..."
+            log_warn "La fuente MesloLGS NF debe instalarse manualmente para ver los iconos correctamente"
             install_powerlevel10k
         fi
     else
