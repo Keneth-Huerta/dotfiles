@@ -807,18 +807,18 @@ ensure_correct_location() {
     mv "$DOTFILES_DIR" "$TARGET_DIR"
 
     echo -e "${GREEN}✓ Repositorio movido a: $TARGET_DIR${NC}"
+    echo -e "${CYAN}Reiniciando instalador desde la nueva ubicación...${NC}"
     echo ""
-    echo -e "${CYAN}Vuelve a ejecutar el instalador desde la nueva ubicación:${NC}"
-    echo -e "  cd $TARGET_DIR"
-    echo -e "  ./install.sh"
-    echo ""
-    exit 0
+    sleep 1
+
+    # Re-ejecutar el instalador desde la nueva ubicación
+    exec bash "$TARGET_DIR/install.sh" "$@"
 }
 
 # Main loop
 main() {
     show_banner
-    ensure_correct_location
+    ensure_correct_location "$@"
     check_system
     check_internet
     
