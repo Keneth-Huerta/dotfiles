@@ -135,11 +135,6 @@ plugins=(
     colored-man-pages
     alias-finder
     
-    # Enhanced navigation and search
-    zsh-autosuggestions 
-    zsh-syntax-highlighting 
-    zsh-history-substring-search
-    
     # Development tools
     docker-compose
     kubectl
@@ -155,12 +150,24 @@ plugins=(
     copypath
 )
 
+# En Arch estos plugins son paquetes del sistema, no plugins de OMZ.
+# Se cargan manualmente después de oh-my-zsh.sh (ver más abajo).
+
 # Configuración específica de plugins
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#666666,bg=none"
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 ZSH_AUTOSUGGEST_USE_ASYNC=true
 
 source $ZSH/oh-my-zsh.sh
+
+# === PLUGINS DE SISTEMA (Arch: /usr/share/zsh/plugins/) ===
+# Cargar condicionalmente si están instalados
+[[ -f /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]] \
+    && source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+[[ -f /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]] \
+    && source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+[[ -f /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh ]] \
+    && source /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
 
 # === CONFIGURACIÓN DE COLORES PARA SYNTAX HIGHLIGHTING ===
 # Configuración después de cargar oh-my-zsh para mejor legibilidad
@@ -427,7 +434,8 @@ fi
 # alias unimatrix='unimatrix -c red'
 
 # === CONFIGURACIÓN DE POWERLEVEL10K ===
-source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
+[[ -f /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme ]] \
+    && source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
@@ -458,8 +466,11 @@ fi
 
 # === KEYBINDINGS MODERNOS ===
 # Navegación mejorada en el historial
-bindkey '^P' history-substring-search-up
-bindkey '^N' history-substring-search-down
+# history-substring-search keybindings (solo si el plugin está cargado)
+if typeset -f history-substring-search-up &>/dev/null; then
+    bindkey '^P' history-substring-search-up
+    bindkey '^N' history-substring-search-down
+fi
 bindkey '^R' fzf-history-widget
 bindkey '^T' fzf-file-widget
 bindkey '^[c' fzf-cd-widget
@@ -485,7 +496,7 @@ show_zsh_info() {
 
 # Para mostrar la información, ejecuta: show_zsh_info
 
-eval $(thefuck --alias)
+command -v thefuck &>/dev/null && eval $(thefuck --alias)
 
 # VS Code shell integration: load code's zsh integration when running inside VS Code terminal
 [[ "$TERM_PROGRAM" == "vscode" ]] && . "$(code --locate-shell-integration-path zsh)"
