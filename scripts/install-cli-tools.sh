@@ -149,7 +149,27 @@ install_shells() {
     fi
     
     log_success "Shells instalados"
-    
+
+    # Establecer zsh como shell predeterminada
+    if command_exists zsh && [ "${DISTRO:-}" != "termux" ]; then
+        local zsh_path
+        zsh_path=$(command -v zsh)
+        if [ "$SHELL" != "$zsh_path" ]; then
+            log_info "Estableciendo zsh como shell predeterminada ($zsh_path)..."
+            # Asegurarse de que zsh está en /etc/shells
+            if ! grep -qx "$zsh_path" /etc/shells 2>/dev/null; then
+                echo "$zsh_path" | sudo tee -a /etc/shells >/dev/null
+            fi
+            if sudo chsh -s "$zsh_path" "$USER"; then
+                log_success "Shell predeterminada cambiada a zsh. Reinicia la sesión para activarla."
+            else
+                log_warn "No se pudo cambiar el shell automáticamente. Ejecuta manualmente: chsh -s $zsh_path"
+            fi
+        else
+            log_info "zsh ya es la shell predeterminada"
+        fi
+    fi
+
     # Enlazar configuraciones automáticamente
     link_zsh_config
 }
