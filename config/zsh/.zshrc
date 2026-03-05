@@ -36,7 +36,9 @@ export ZSH="$HOME/.oh-my-zsh"
 # load a random theme each time Oh My Zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="powerlevel10k/powerlevel10k"
+# En Arch, p10k se instala en /usr/share, no en el dir de oh-my-zsh.
+# Se carga directamente más abajo (source powerlevel10k.zsh-theme).
+ZSH_THEME=""
 
 # === CONFIGURACIÓN DE HISTORIAL AVANZADA ===
 HISTSIZE=10000
