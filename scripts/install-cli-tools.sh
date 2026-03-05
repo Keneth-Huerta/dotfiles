@@ -281,7 +281,6 @@ install_cli_utilities() {
         
         # Información del sistema
         fastfetch
-        neofetch
         
         # Búsqueda y navegación
         fzf

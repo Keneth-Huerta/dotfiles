@@ -458,33 +458,36 @@ pkg_install() {
     fi
     
     log_info "Instalando: ${mapped_packages[*]}"
-    
-    case "$PKG_MANAGER" in
-        pacman)
-            sudo pacman -S --needed --noconfirm "${mapped_packages[@]}"
-            ;;
-        apt)
-            sudo apt-get install -y "${mapped_packages[@]}"
-            ;;
-        dnf)
-            sudo dnf install -y "${mapped_packages[@]}"
-            ;;
-        zypper)
-            sudo zypper install -y "${mapped_packages[@]}"
-            ;;
-        xbps)
-            sudo xbps-install -y "${mapped_packages[@]}"
-            ;;
-        pkg)
-            pkg install -y "${mapped_packages[@]}"
-            ;;
-        *)
-            log_error "Gestor de paquetes no soportado: $PKG_MANAGER"
-            return 1
-            ;;
-    esac
-    
-    return $?
+
+    # Intentar instalar todo el lote de una vez (más rápido).
+    # Si falla (p.ej. un paquete no existe), instalar uno por uno
+    # para que los demás sí se instalen.
+    _do_install() {
+        case "$PKG_MANAGER" in
+            pacman)  sudo pacman -S --needed --noconfirm "$@" ;;
+            apt)     sudo apt-get install -y "$@" ;;
+            dnf)     sudo dnf install -y "$@" ;;
+            zypper)  sudo zypper install -y "$@" ;;
+            xbps)    sudo xbps-install -y "$@" ;;
+            pkg)     pkg install -y "$@" ;;
+            *)       log_error "Gestor de paquetes no soportado: $PKG_MANAGER"; return 1 ;;
+        esac
+    }
+
+    if ! _do_install "${mapped_packages[@]}"; then
+        log_warn "Instalación en lote falló. Instalando paquete por paquete..."
+        local failed=()
+        for pkg in "${mapped_packages[@]}"; do
+            if ! _do_install "$pkg" 2>/dev/null; then
+                log_warn "No se pudo instalar: $pkg"
+                failed+=("$pkg")
+            fi
+        done
+        [ ${#failed[@]} -gt 0 ] && log_warn "Paquetes no instalados: ${failed[*]}"
+    fi
+
+    unset -f _do_install
+    return 0
 }
 
 # Instalar desde AUR (solo Arch)

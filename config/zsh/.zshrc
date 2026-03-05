@@ -212,10 +212,16 @@ export FZF_DEFAULT_OPTS='
 # === ALIASES MODERNOS CON ESTILO ROJO ===
 # Reemplazar comandos tradicionales con versiones modernas
 # alias cat='bat --style=numbers --color=always --theme="Monokai Extended Red"'  # replaced by safe wrapper below
-alias ls='eza --icons --color=always --group-directories-first'
-alias ll='eza -la --icons --color=always --group-directories-first'
-alias la='eza -a --icons --color=always --group-directories-first'  
-alias tree='eza --tree --icons --color=always'
+if command -v eza &>/dev/null; then
+    alias ls='eza --icons --color=always --group-directories-first'
+    alias ll='eza -la --icons --color=always --group-directories-first'
+    alias la='eza -a --icons --color=always --group-directories-first'
+    alias tree='eza --tree --icons --color=always'
+else
+    alias ls='ls --color=auto'
+    alias ll='ls -la --color=auto'
+    alias la='ls -a --color=auto'
+fi
 alias mc='ranger'
 
 # Navegación inteligente
