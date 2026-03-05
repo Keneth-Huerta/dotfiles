@@ -837,7 +837,7 @@ main() {
                 bash "$DOTFILES_DIR/scripts/install-gui.sh"
                 ;;
             4)
-                bash "$DOTFILES_DIR/scripts/install-cli-tools.sh" --all
+                bash "$DOTFILES_DIR/scripts/install-cli-tools.sh"
                 ;;
             5)
                 quick_install
