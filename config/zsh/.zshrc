@@ -6,6 +6,12 @@
 # inicialización (p.ej. fastfetch). Opciones: off | quiet | verbose
 typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
 
+# === FASTFETCH - ANTES del preamble de p10k (fix recomendado) ===
+# Ejecutar aquí evita que el output interfiera con el instant prompt.
+if [[ -o interactive ]] && [[ "$TERM_PROGRAM" != "vscode" ]] && command -v fastfetch &>/dev/null; then
+    ~/.config/fastfetch/smart-fastfetch.sh 2>/dev/null || fastfetch
+fi
+
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -490,9 +496,7 @@ export PATH
 [ -f "$HOME/.local/bin/env" ] && source "$HOME/.local/bin/env"
 
 # === FASTFETCH - al final para no interferir con p10k instant prompt ===
-if [[ -o interactive ]] && [[ "$TERM_PROGRAM" != "vscode" ]] && command -v fastfetch &>/dev/null; then
-    ~/.config/fastfetch/smart-fastfetch.sh 2>/dev/null || fastfetch
-fi
+# (Movido al inicio del archivo, antes del preamble de p10k)
 
 # === KEYBINDINGS MODERNOS ===
 # Navegación mejorada en el historial
@@ -529,7 +533,11 @@ show_zsh_info() {
 command -v thefuck &>/dev/null && eval $(thefuck --alias)
 
 # VS Code shell integration: load code's zsh integration when running inside VS Code terminal
-[[ "$TERM_PROGRAM" == "vscode" ]] && . "$(code --locate-shell-integration-path zsh)"
+if [[ "$TERM_PROGRAM" == "vscode" ]]; then
+    _vscode_shell=$(code --locate-shell-integration-path zsh 2>/dev/null)
+    [[ -n "$_vscode_shell" ]] && . "$_vscode_shell"
+    unset _vscode_shell
+fi
 
 # >>> bat-safe-alias start
 # Use bat for pretty output only when writing to a TTY.
