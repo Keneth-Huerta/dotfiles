@@ -154,7 +154,30 @@ install_shells() {
     )
     
     pkg_install "${packages[@]}"
-    
+
+    # En distros no-Arch, los paquetes no siempre quedan en rutas estándar
+    # o directamente no existen en apt (ej: zsh-history-substring-search).
+    # Clonar en OMZ custom plugins como fallback confiable.
+    if [ "$PKG_MANAGER" != "pacman" ] && [ "$PKG_MANAGER" != "pkg" ]; then
+        local omz_plugins="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins"
+        mkdir -p "$omz_plugins"
+        for plugin_info in \
+            "zsh-autosuggestions|https://github.com/zsh-users/zsh-autosuggestions" \
+            "zsh-syntax-highlighting|https://github.com/zsh-users/zsh-syntax-highlighting" \
+            "zsh-history-substring-search|https://github.com/zsh-users/zsh-history-substring-search"
+        do
+            local plugin_name="${plugin_info%%|*}"
+            local plugin_url="${plugin_info##*|}"
+            if [ ! -d "$omz_plugins/$plugin_name" ]; then
+                log_info "Clonando $plugin_name..."
+                git clone --depth=1 "$plugin_url" "$omz_plugins/$plugin_name" 2>/dev/null \
+                    || log_warn "No se pudo clonar $plugin_name"
+            else
+                log_info "$plugin_name ya existe en OMZ custom plugins"
+            fi
+        done
+    fi
+
     # Instalar oh-my-zsh
     install_oh_my_zsh
     

@@ -170,14 +170,28 @@ ZSH_AUTOSUGGEST_USE_ASYNC=true
 
 source $ZSH/oh-my-zsh.sh
 
-# === PLUGINS DE SISTEMA (Arch: /usr/share/zsh/plugins/) ===
-# Cargar condicionalmente si están instalados
-[[ -f /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]] \
-    && source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
-[[ -f /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]] \
-    && source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-[[ -f /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh ]] \
-    && source /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
+# === PLUGINS ZSH (autosuggestions, syntax-highlighting, history-substring-search) ===
+# Busca en todas las rutas posibles según la distro:
+#   Arch:          /usr/share/zsh/plugins/<plugin>/
+#   Ubuntu/Debian: /usr/share/<plugin>/
+#   Fallback:      ~/.oh-my-zsh/custom/plugins/<plugin>/  (git clone)
+_load_zsh_plugin() {
+    local name="$1" file="$2"
+    local -a search_paths=(
+        "/usr/share/zsh/plugins/${name}/${file}"          # Arch
+        "/usr/share/${name}/${file}"                       # Ubuntu/Debian
+        "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/${name}/${file}"  # OMZ custom
+    )
+    for p in "${search_paths[@]}"; do
+        [[ -f "$p" ]] && { source "$p"; return 0; }
+    done
+    return 1
+}
+
+_load_zsh_plugin zsh-autosuggestions        zsh-autosuggestions.zsh
+_load_zsh_plugin zsh-syntax-highlighting    zsh-syntax-highlighting.zsh
+_load_zsh_plugin zsh-history-substring-search zsh-history-substring-search.zsh
+unset -f _load_zsh_plugin
 
 # === CONFIGURACIÓN DE COLORES PARA SYNTAX HIGHLIGHTING ===
 # Configuración después de cargar oh-my-zsh para mejor legibilidad
