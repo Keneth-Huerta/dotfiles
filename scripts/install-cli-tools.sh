@@ -155,10 +155,15 @@ install_shells() {
     
     pkg_install "${packages[@]}"
 
-    # En distros no-Arch, los paquetes no siempre quedan en rutas estándar
-    # o directamente no existen en apt (ej: zsh-history-substring-search).
-    # Clonar en OMZ custom plugins como fallback confiable.
-    if [ "$PKG_MANAGER" != "pacman" ] && [ "$PKG_MANAGER" != "pkg" ]; then
+    # Instalar oh-my-zsh PRIMERO (crea ~/.oh-my-zsh/custom/plugins/)
+    install_oh_my_zsh
+
+    # Clonar plugins en OMZ custom plugins para distros donde no están
+    # en paquetes del sistema o quedan en rutas no estándar:
+    #   - Ubuntu/Debian (apt): zsh-history-substring-search no existe en apt
+    #   - Termux (pkg):        zsh-history-substring-search no existe en pkg
+    #   - Arch (pacman):       se instalan en /usr/share/; NO clonar
+    if [ "$PKG_MANAGER" != "pacman" ]; then
         local omz_plugins="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins"
         mkdir -p "$omz_plugins"
         for plugin_info in \
@@ -177,9 +182,6 @@ install_shells() {
             fi
         done
     fi
-
-    # Instalar oh-my-zsh
-    install_oh_my_zsh
     
     # Instalar powerlevel10k + fuente MesloLGS (requerida para los iconos)
     # En Arch: instalar desde AUR (se carga desde /usr/share/...)

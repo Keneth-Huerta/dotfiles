@@ -589,13 +589,24 @@ map_package_name() {
             echo "$pkg"
             ;;
         zsh-completions)
-            [ "$PKG_MANAGER" = "apt" ] && echo "zsh-common" || echo "$pkg"
+            # No existe en Termux, en apt se llama zsh-common
+            if [ "$PKG_MANAGER" = "pkg" ]; then
+                echo "SKIP"
+            elif [ "$PKG_MANAGER" = "apt" ]; then
+                echo "zsh-common"
+            else
+                echo "$pkg"
+            fi
             ;;
         zsh-autosuggestions)
             echo "$pkg"
             ;;
         zsh-syntax-highlighting)
             echo "$pkg"
+            ;;
+        zsh-history-substring-search)
+            # No existe como paquete en Termux ni en apt → se instala via git clone
+            [ "$PKG_MANAGER" = "pkg" ] || [ "$PKG_MANAGER" = "apt" ] && echo "SKIP" || echo "$pkg"
             ;;
         
         # Editores
@@ -611,12 +622,9 @@ map_package_name() {
             echo "$pkg"
             ;;
         fastfetch)
-            # fastfetch no está en repos oficiales de Ubuntu/Debian
-            if [ "$PKG_MANAGER" = "apt" ]; then
-                echo "neofetch"  # Alternativa
-            else
-                echo "$pkg"
-            fi
+            # fastfetch no está en repos oficiales de Ubuntu/Debian (y neofetch fue eliminado)
+            # Se instala via snap/flatpak o se omite
+            [ "$PKG_MANAGER" = "apt" ] && echo "SKIP" || echo "$pkg"
             ;;
         neofetch)
             echo "$pkg"
