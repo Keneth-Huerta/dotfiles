@@ -3,7 +3,9 @@
 # DOTFILES INSTALLER - Script Principal
 # ============================================================================
 # Sistema de instalación modular para múltiples distribuciones Linux
-# Uso: ./install.sh [--full|--gui|--cli|--dev|--configs-only|--custom]
+# (Arch, Ubuntu/Debian, Fedora, openSUSE, Void, Termux)
+# Uso interactivo: ./install.sh
+# Uso con flags:   ./install.sh [--full|--gui|--cli|--configs-only|--custom|--dry-run|--help]
 # ============================================================================
 
 # No usar set -e aquí para permitir mejor manejo de errores
@@ -48,6 +50,12 @@ SUDO_TIMESTAMP=0
 
 # Verificar si el usuario tiene permisos sudo
 check_sudo_access() {
+    # En Termux (pkg) no existe sudo: no hace falta elevación de privilegios
+    if [ "$PKG_MANAGER" = "pkg" ]; then
+        SUDO_CACHED=true
+        return 0
+    fi
+
     if ! sudo -n true 2>/dev/null; then
         # Usuario no tiene sudo cacheado, verificar si puede usarlo
         if ! groups | grep -q '\(wheel\|sudo\)'; then
@@ -68,6 +76,13 @@ check_sudo_access() {
 
 # Cachear contraseña sudo al inicio
 cache_sudo() {
+    # En Termux (pkg) no existe sudo: no hace falta elevación de privilegios
+    if [ "$PKG_MANAGER" = "pkg" ]; then
+        SUDO_CACHED=true
+        SUDO_TIMESTAMP=$(date +%s)
+        return 0
+    fi
+
     if [[ "$SUDO_CACHED" == true ]]; then
         # Verificar si el caché sigue válido (por defecto 5 minutos)
         local current_time=$(date +%s)
@@ -195,22 +210,6 @@ run_command() {
     else
         log_info "Ejecutando: $cmd"
         eval "$cmd"
-    fi
-}
-
-# Instalar paquete (respeta DRY_RUN)
-install_package() {
-    local pkg="$1"
-    if [ "$DRY_RUN" = true ]; then
-        echo -e "${CYAN}[DRY-RUN]${NC} Instalaría: $pkg"
-        return 0
-    else
-        if ! pacman -Q "$pkg" &> /dev/null; then
-            log_info "Instalando $pkg..."
-            run_sudo pacman -S --noconfirm "$pkg"
-        else
-            log_info "$pkg ya está instalado"
-        fi
     fi
 }
 
@@ -361,16 +360,21 @@ run_hook() {
 # Verificar conexión a internet
 check_internet() {
     log_info "Verificando conexión a internet..."
-    
+
+    # Termux puede no tener ping; usar curl como respaldo
     local test_hosts=("archlinux.org" "google.com" "1.1.1.1")
-    
+
     for host in "${test_hosts[@]}"; do
         if ping -c 1 -W 2 "$host" &> /dev/null; then
             log_success "Conexión a internet disponible"
             return 0
         fi
+        if command_exists curl && curl -fsS -m 5 -o /dev/null "https://$host/" 2>/dev/null; then
+            log_success "Conexión a internet disponible (via curl)"
+            return 0
+        fi
     done
-    
+
     log_error "No hay conexión a internet"
     log_warn "Configura la red antes de continuar"
     log_info "Puedes usar: nmtui, nmcli o wifi-menu para configurar la red"
@@ -453,14 +457,9 @@ check_conflicts() {
 # Actualizar sistema
 update_system() {
     log_info "Actualizando el sistema..."
-    
-    # Cachear sudo
-    if ! cache_sudo; then
-        log_error "No se pudo obtener permisos sudo"
-        return 1
-    fi
-    
-    if run_sudo pacman -Syu --noconfirm 2>&1 | tee -a "$LOG_FILE"; then
+
+    # Multi-distro: pkg_update elige el gestor (pacman/apt/dnf/zypper/xbps/pkg)
+    if pkg_update 2>&1 | tee -a "$LOG_FILE"; then
         log_success "Sistema actualizado"
         return 0
     else
@@ -513,14 +512,8 @@ show_menu() {
 quick_install() {
     echo -e "${YELLOW}Instalación rápida de herramientas esenciales...${NC}"
     
-    # Cachear sudo
-    if ! cache_sudo; then
-        log_error "No se pudo obtener permisos sudo"
-        return 1
-    fi
-    
-    # Herramientas básicas
-    run_sudo pacman -S --needed --noconfirm \
+    # Herramientas básicas (multi-distro: pkg_install elige el gestor)
+    pkg_install \
         vim neovim \
         zsh zsh-completions zsh-autosuggestions zsh-syntax-highlighting \
         starship \
@@ -818,13 +811,68 @@ ensure_correct_location() {
     exec bash "$TARGET_DIR/install.sh" "$@"
 }
 
+# Ayuda de línea de comandos
+show_cli_help() {
+    echo "Uso: $0 [OPCIÓN]"
+    echo ""
+    echo "Opciones:"
+    echo "  --full           Instalación completa (elegir perfil)"
+    echo "  --gui            Solo entorno gráfico (Hyprland + Waybar, solo Arch)"
+    echo "  --cli            Solo herramientas CLI"
+    echo "  --configs-only   Solo enlazar configuraciones (symlinks)"
+    echo "  --custom         Instalación personalizada (elegir perfil)"
+    echo "  --dry-run        Simular instalación (no instala nada)"
+    echo "  --help           Mostrar esta ayuda"
+    echo ""
+    echo "Sin opción, se abre el menú interactivo."
+}
+
 # Main loop
 main() {
     show_banner
     ensure_correct_location "$@"
     check_system
     check_internet
-    
+
+    # Flags de línea de comandos
+    if [ $# -gt 0 ]; then
+        case "$1" in
+            --full)
+                full_install
+                ;;
+            --gui)
+                if [ "$PKG_MANAGER" != "pacman" ]; then
+                    log_warn "El entorno gráfico solo está disponible en Arch Linux"
+                else
+                    bash "$DOTFILES_DIR/scripts/install-gui.sh"
+                fi
+                ;;
+            --cli)
+                bash "$DOTFILES_DIR/scripts/install-cli-tools.sh" --all
+                ;;
+            --configs-only)
+                bash "$DOTFILES_DIR/scripts/link-configs.sh" --all
+                ;;
+            --custom)
+                select_profile_interactive
+                [ -n "$SELECTED_PROFILE" ] && full_install
+                ;;
+            --dry-run)
+                DRY_RUN=true
+                ;;
+            --help)
+                show_cli_help
+                return 0
+                ;;
+            *)
+                log_warn "Opción desconocida: $1"
+                show_cli_help
+                return 1
+                ;;
+        esac
+        return 0
+    fi
+
     while true; do
         show_menu
         read -p "Selecciona una opción: " choice
@@ -905,413 +953,4 @@ main() {
     done
 }
 
-main
-BOLD='\033[1m'
-
-# ============================================================================
-# FUNCIONES AUXILIARES
-# ============================================================================
-
-log() {
-    echo -e "${GREEN}[$(date +'%Y-%m-%d %H:%M:%S')]${NC} $*" | tee -a "$LOG_FILE"
-}
-
-log_error() {
-    echo -e "${RED}[ERROR]${NC} $*" | tee -a "$LOG_FILE"
-}
-
-log_warn() {
-    echo -e "${YELLOW}[WARN]${NC} $*" | tee -a "$LOG_FILE"
-}
-
-log_info() {
-    echo -e "${BLUE}[INFO]${NC} $*" | tee -a "$LOG_FILE"
-}
-
-header() {
-    echo ""
-    echo -e "${BOLD}${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "${BOLD}${MAGENTA}  $*${NC}"
-    echo -e "${BOLD}${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo ""
-}
-
-check_root() {
-    if [[ $EUID -eq 0 ]]; then
-        log_error "⚠️  NO EJECUTES ESTE SCRIPT COMO ROOT"
-        log_error "Usa tu usuario normal. El script pedirá sudo cuando sea necesario."
-        echo ""
-        echo -e "${YELLOW}Ejemplo correcto:${NC}"
-        echo "  ./install.sh"
-        echo ""
-        echo -e "${RED}Incorrecto:${NC}"
-        echo "  sudo ./install.sh  ← ¡NO HAGAS ESTO!"
-        exit 1
-    fi
-    
-    # Verificar acceso sudo
-    if ! check_sudo_access; then
-        log_error "No tienes permisos sudo configurados"
-        exit 1
-    fi
-}
-
-check_arch() {
-    if [[ ! -f /etc/arch-release ]]; then
-        log_error "Este script está diseñado para Arch Linux"
-        exit 1
-    fi
-}
-
-check_internet() {
-    log_info "Verificando conexión a internet..."
-    if ! ping -c 1 archlinux.org &> /dev/null; then
-        log_error "No hay conexión a internet. Conéctate y vuelve a intentar."
-        exit 1
-    fi
-    log "✓ Conexión a internet OK"
-}
-
-check_dependencies() {
-    log_info "Verificando dependencias básicas..."
-    local deps=("git" "curl" "wget")
-    local missing=()
-    
-    for dep in "${deps[@]}"; do
-        if ! command -v "$dep" &> /dev/null; then
-            missing+=("$dep")
-        fi
-    done
-    
-    if [[ ${#missing[@]} -gt 0 ]]; then
-        log_warn "Instalando dependencias faltantes: ${missing[*]}"
-        
-        # Usar función multi-distro
-        if ! pkg_install "${missing[@]}"; then
-            log_error "No se pudieron instalar algunas dependencias"
-            log_warn "Continuando..."
-        fi
-    fi
-    log "✓ Dependencias OK"
-}
-
-create_backup() {
-    log_info "Creando backup de configuraciones existentes..."
-    mkdir -p "$BACKUP_DIR"
-    
-    # Backup de configs importantes
-    local configs=(".config/hypr" ".config/waybar" ".config/kitty" ".config/nvim")
-    
-    for config in "${configs[@]}"; do
-        if [[ -e "$HOME/$config" ]]; then
-            log_info "  Respaldando $config"
-            mkdir -p "$BACKUP_DIR/$(dirname "$config")"
-            cp -r "$HOME/$config" "$BACKUP_DIR/$(dirname "$config")/" 2>/dev/null || true
-        fi
-    done
-    
-    log "✓ Backup creado en: $BACKUP_DIR"
-}
-
-# ============================================================================
-# MENÚ INTERACTIVO
-# ============================================================================
-
-show_menu() {
-    clear
-    cat << "EOF"
-╔══════════════════════════════════════════════════════════════╗
-║                                                              ║
-║          INSTALADOR DE DOTFILES - ARCH LINUX          ║
-║                                                              ║
-╚══════════════════════════════════════════════════════════════╝
-EOF
-
-    echo ""
-    echo -e "${BOLD}Selecciona el tipo de instalación:${NC}"
-    echo ""
-    echo -e "  ${GREEN}1)${NC} 🖥️  Instalación Completa ${CYAN}(Entorno + Apps + Configs)${NC}"
-    echo -e "  ${GREEN}2)${NC} Solo Entorno Gráfico ${CYAN}(Hyprland + Waybar + GUI)${NC}"
-    echo -e "  ${GREEN}3)${NC} ⌨️  Solo Herramientas CLI ${CYAN}(Nvim + ZSH + Tools)${NC}"
-    echo -e "  ${GREEN}4)${NC} Herramientas de Desarrollo ${CYAN}(Docker + IDEs + Languages)${NC}"
-    echo -e "  ${GREEN}5)${NC} 📝 Solo Aplicar Configuraciones ${CYAN}(Sin instalar paquetes)${NC}"
-    echo -e "  ${GREEN}6)${NC} Instalación Personalizada ${CYAN}(Escoger componentes)${NC}"
-    echo -e "  ${GREEN}7)${NC} Mostrar lo que se instalará ${CYAN}(Dry run)${NC}"
-    echo -e "  ${GREEN}8)${NC} ❌ Salir"
-    echo ""
-    echo -ne "${BOLD}Opción [1-8]: ${NC}"
-}
-
-# ============================================================================
-# INSTALACIÓN POR COMPONENTES
-# ============================================================================
-
-install_full() {
-    header "INSTALACIÓN COMPLETA"
-    
-    log "Instalando sistema completo..."
-    
-    source "$SCRIPTS_DIR/utils.sh"
-    source "$SCRIPTS_DIR/packages.sh"
-    
-    install_base_packages
-    install_aur_helper
-    install_gui_packages
-    install_cli_packages
-    install_dev_packages
-    
-    source "$SCRIPTS_DIR/configs.sh"
-    apply_all_configs
-    
-    source "$SCRIPTS_DIR/gui.sh"
-    setup_gui_environment
-    
-    log "✓ Instalación completa finalizada"
-    show_finish_message
-}
-
-install_gui() {
-    header "INSTALACIÓN ENTORNO GRÁFICO"
-    
-    source "$SCRIPTS_DIR/utils.sh"
-    source "$SCRIPTS_DIR/packages.sh"
-    source "$SCRIPTS_DIR/gui.sh"
-    
-    install_gui_packages
-    apply_gui_configs
-    setup_gui_environment
-    
-    log "✓ Entorno gráfico instalado"
-}
-
-install_cli() {
-    header "INSTALACIÓN HERRAMIENTAS CLI"
-    
-    source "$SCRIPTS_DIR/utils.sh"
-    source "$SCRIPTS_DIR/packages.sh"
-    source "$SCRIPTS_DIR/configs.sh"
-    
-    install_cli_packages
-    apply_cli_configs
-    
-    log "✓ Herramientas CLI instaladas"
-}
-
-install_dev() {
-    header "INSTALACIÓN HERRAMIENTAS DE DESARROLLO"
-    
-    source "$SCRIPTS_DIR/utils.sh"
-    source "$SCRIPTS_DIR/packages.sh"
-    
-    install_dev_packages
-    
-    log "✓ Herramientas de desarrollo instaladas"
-}
-
-install_configs_only() {
-    header "APLICANDO SOLO CONFIGURACIONES"
-    
-    source "$SCRIPTS_DIR/configs.sh"
-    apply_all_configs
-    
-    log "✓ Configuraciones aplicadas"
-}
-
-install_custom() {
-    header "INSTALACIÓN PERSONALIZADA"
-    
-    echo ""
-    echo -e "${BOLD}Selecciona los componentes a instalar:${NC}"
-    echo ""
-    
-    # Menú de checkboxes simulado
-    declare -A components
-    components=(
-        ["base"]="Paquetes base del sistema"
-        ["gui"]="Entorno gráfico (Hyprland + Waybar)"
-        ["cli"]="Herramientas CLI (Nvim, ZSH, etc)"
-        ["dev"]="Herramientas de desarrollo"
-        ["apps"]="Aplicaciones (Brave, Discord, etc)"
-        ["configs"]="Aplicar configuraciones"
-    )
-    
-    local selected=()
-    
-    for key in base gui cli dev apps configs; do
-        echo -ne "${YELLOW}¿Instalar ${components[$key]}? [S/n]: ${NC}"
-        read -r response
-        if [[ ! "$response" =~ ^[Nn]$ ]]; then
-            selected+=("$key")
-        fi
-    done
-    
-    # Instalar componentes seleccionados
-    source "$SCRIPTS_DIR/utils.sh"
-    source "$SCRIPTS_DIR/packages.sh"
-    source "$SCRIPTS_DIR/configs.sh"
-    
-    for component in "${selected[@]}"; do
-        case "$component" in
-            base) install_base_packages ;;
-            gui) install_gui_packages; setup_gui_environment ;;
-            cli) install_cli_packages ;;
-            dev) install_dev_packages ;;
-            apps) install_app_packages ;;
-            configs) apply_all_configs ;;
-        esac
-    done
-    
-    log "✓ Instalación personalizada completada"
-}
-
-dry_run() {
-    header "MODO DRY RUN - Mostrando paquetes a instalar"
-    
-    echo ""
-    echo -e "${BOLD}${CYAN}=== PAQUETES BASE ===${NC}"
-    [[ -f "$PACKAGES_DIR/base.txt" ]] && cat "$PACKAGES_DIR/base.txt"
-    
-    echo ""
-    echo -e "${BOLD}${CYAN}=== PAQUETES GUI ===${NC}"
-    [[ -f "$PACKAGES_DIR/gui.txt" ]] && cat "$PACKAGES_DIR/gui.txt"
-    
-    echo ""
-    echo -e "${BOLD}${CYAN}=== HERRAMIENTAS CLI ===${NC}"
-    [[ -f "$PACKAGES_DIR/cli.txt" ]] && cat "$PACKAGES_DIR/cli.txt"
-    
-    echo ""
-    echo -e "${BOLD}${CYAN}=== DESARROLLO ===${NC}"
-    [[ -f "$PACKAGES_DIR/dev.txt" ]] && cat "$PACKAGES_DIR/dev.txt"
-    
-    echo ""
-    echo -e "${BOLD}${CYAN}=== AUR PACKAGES ===${NC}"
-    [[ -f "$PACKAGES_DIR/aur.txt" ]] && cat "$PACKAGES_DIR/aur.txt"
-    
-    echo ""
-}
-
-show_finish_message() {
-    clear
-    cat << "EOF"
-
-╔══════════════════════════════════════════════════════════════╗
-║                                                              ║
-║              INSTALACIÓN COMPLETADA                    ║
-║                                                              ║
-╚══════════════════════════════════════════════════════════════╝
-
-EOF
-
-    echo -e "${GREEN}¡Todo listo!${NC} Tu sistema ha sido configurado correctamente."
-    echo ""
-    echo -e "${YELLOW}Próximos pasos:${NC}"
-    echo ""
-    echo "  1. Reinicia tu sesión: logout y vuelve a entrar"
-    echo "  2. Si instalaste Hyprland, selecciónalo en el login manager"
-    echo "  3. Revisa los logs: tail -f $LOG_FILE"
-    echo "  4. Backup guardado en: $BACKUP_DIR"
-    echo ""
-    echo -e "${CYAN}Tips:${NC}"
-    echo "  - Configuraciones en ~/.config/"
-    echo "  - Para actualizar: cd ~/dotfiles && git pull && ./install.sh --configs-only"
-    echo "  - Reporta issues en GitHub si encuentras problemas"
-    echo ""
-}
-
-# ============================================================================
-# MAIN
-# ============================================================================
-
-main() {
-    # ============================================================================
-    # PASO 0: Verificar ubicación del repositorio (MANUAL - solo avisa)
-    # ============================================================================
-    local target_dir="$HOME/Documents/repos/dotfiles"
-    local current_dir="$DOTFILES_DIR"
-
-    if [ "$current_dir" != "$target_dir" ]; then
-        log_warn "El repositorio no está en la ubicación recomendada"
-        log_warn "Ubicación actual:     $current_dir"
-        log_warn "Ubicación recomendada: $target_dir"
-        echo ""
-        echo -e "${YELLOW}Puedes moverlo manualmente con:${NC}"
-        echo -e "  mkdir -p \$HOME/Documents/repos"
-        echo -e "  mv \"$current_dir\" \"$target_dir\""
-        echo -e "  cd \"$target_dir\" && ./install.sh"
-        echo ""
-        read -p "¿Continuar desde la ubicación actual? [s/N]: " _continue_here
-        if [[ ! "$_continue_here" =~ ^[sS]$ ]]; then
-            echo "Instalación cancelada."
-            exit 0
-        fi
-        echo ""
-    fi
-    
-    # Validaciones iniciales
-    check_root
-    check_arch
-    check_internet
-    check_dependencies
-    
-    # Crear backup
-    create_backup
-    
-    # Iniciar log
-    log "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    log "Inicio de instalación de dotfiles"
-    log "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    
-    # Procesar argumentos o mostrar menú
-    if [[ $# -eq 0 ]]; then
-        # Modo interactivo
-        while true; do
-            show_menu
-            read -r choice
-            
-            case $choice in
-                1) install_full; break ;;
-                2) install_gui; break ;;
-                3) install_cli; break ;;
-                4) install_dev; break ;;
-                5) install_configs_only; break ;;
-                6) install_custom; break ;;
-                7) dry_run; echo ""; read -p "Presiona Enter para continuar..."; continue ;;
-                8) echo "Saliendo..."; exit 0 ;;
-                *) echo -e "${RED}Opción inválida${NC}"; sleep 2; continue ;;
-            esac
-        done
-    else
-        # Modo línea de comandos
-        case "$1" in
-            --full) install_full ;;
-            --gui) install_gui ;;
-            --cli) install_cli ;;
-            --dev) install_dev ;;
-            --configs-only) install_configs_only ;;
-            --custom) install_custom ;;
-            --dry-run) dry_run ;;
-            --help)
-                echo "Uso: $0 [OPCIÓN]"
-                echo ""
-                echo "Opciones:"
-                echo "  --full          Instalación completa"
-                echo "  --gui           Solo entorno gráfico"
-                echo "  --cli           Solo herramientas CLI"
-                echo "  --dev           Solo herramientas de desarrollo"
-                echo "  --configs-only  Solo aplicar configuraciones"
-                echo "  --custom        Instalación personalizada"
-                echo "  --dry-run       Mostrar paquetes sin instalar"
-                echo "  --help          Mostrar esta ayuda"
-                exit 0
-                ;;
-            *)
-                log_error "Opción desconocida: $1"
-                echo "Usa --help para ver opciones disponibles"
-                exit 1
-                ;;
-        esac
-    fi
-}
-
-# Ejecutar script
 main "$@"
