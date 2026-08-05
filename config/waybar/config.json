@@ -5,68 +5,63 @@
   "exclusive": true,
   "passthrough": false,
   "gtk-layer-shell": true,
-  "height": 50,
+  "height": 42,
   "spacing": 4,
-  "margin-top": 5,
-  "margin-bottom": 5,
-  "margin-left": 10,
-  "margin-right": 10,
+  "margin-top": 4,
+  "margin-bottom": 0,
+  "margin-left": 8,
+  "margin-right": 8,
+  
   "modules-left": ["hyprland/workspaces", "hyprland/window"],
-  "modules-center": ["clock"],
-  "modules-right": ["pulseaudio", "backlight", "network", "cpu", "memory", "battery", "tray"],
+  "modules-center": ["clock", "custom/notification"],
+  "modules-right": ["tray", "pulseaudio", "backlight", "network", "cpu", "memory", "temperature", "battery", "custom/power"],
   
   "hyprland/workspaces": {
     "disable-scroll": true,
-    "all-outputs": true,
+    "all-outputs": false,
     "on-click": "activate",
-    "format": "{icon}",
-    "format-icons": {
-      "1": "1",
-      "2": "2", 
-      "3": "3",
-      "4": "4",
-      "5": "5",
-      "6": "6",
-      "7": "7",
-      "8": "8",
-      "9": "9",
-      "10": "10",
-      "urgent": "!",
-      "focused": "●",
-      "default": "○"
-    }
+    "format": "{name}"
   },
   
   "hyprland/window": {
     "format": "{title}",
-    "max-length": 50,
-    "separate-outputs": true
+    "max-length": 40,
+    "separate-outputs": true,
+    "tooltip": false
   },
   
   "clock": {
     "format": "󰥔 {:%H:%M}",
     "format-alt": "󰃭 {:%d/%m/%Y}",
-    "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+    "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+    "interval": 5
+  },
+  
+  "custom/notification": {
+    "format": "󰂚",
+    "tooltip": false,
+    "on-click": "dunstctl history-pop",
+    "on-click-right": "dunstctl close-all",
+    "interval": 5
+  },
+  
+  "tray": {
+    "icon-size": 18,
+    "spacing": 8,
+    "show-passive-items": true
   },
   
   "pulseaudio": {
     "format": "{icon} {volume}%",
     "format-muted": "󰸈 {volume}%",
     "format-icons": {
-      "headphone": "󰋋",
-      "hands-free": "󱡏",
-      "headset": "󰋎",
-      "phone": "󰄜",
-      "portable": "󰦧",
-      "car": "󰄋",
       "default": ["󰕿", "󰖀", "󰕾"]
     },
-    "on-click": "pactl set-sink-mute @DEFAULT_SINK@ toggle",
+    "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
     "on-click-right": "pavucontrol",
-    "on-scroll-up": "pactl set-sink-volume @DEFAULT_SINK@ +5%",
-    "on-scroll-down": "pactl set-sink-volume @DEFAULT_SINK@ -5%",
-    "scroll-step": 5,
-    "smooth-scrolling-threshold": 1
+    "on-scroll-up": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+",
+    "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-",
+    "scroll-step": 5
   },
   
   "backlight": {
@@ -75,31 +70,50 @@
     "format-icons": ["󰃞", "󰃟", "󰃠"],
     "on-scroll-up": "brightnessctl set +5%",
     "on-scroll-down": "brightnessctl set 5%-",
-    "min-length": 6,
-    "scroll-step": 5
+    "min-length": 6
   },
   
   "network": {
     "format-wifi": "󰤨 {signalStrength}%",
-    "format-ethernet": "󰈀 Connected",
+    "format-ethernet": "󰈀",
     "tooltip-format": "󰈀 {ifname}\nIP: {ipaddr}/{cidr}\nGateway: {gwaddr}",
     "format-linked": "󰈀 {ifname} (No IP)",
-    "format-disconnected": "󰤭 Disconnected",
+    "format-disconnected": "󰤭",
     "format-alt": "{essid}",
-    "on-click": "nm-applet --indicator",
-    "on-click-right": "nm-connection-editor"
+    "on-click": "nm-connection-editor",
+    "interval": 5
   },
   
   "cpu": {
     "format": "󰻠 {usage}%",
     "tooltip": false,
-    "on-click": "kitty -e btop"
+    "on-click": "kitty -e btop",
+    "interval": 2,
+    "states": {
+      "warning": 70,
+      "critical": 90
+    }
   },
   
   "memory": {
     "format": "󰍛 {}%",
     "tooltip-format": "RAM: {used:0.1f}G/{total:0.1f}G ({percentage}%)",
-    "on-click": "kitty -e btop"
+    "on-click": "kitty -e btop",
+    "interval": 5,
+    "states": {
+      "warning": 70,
+      "critical": 90
+    }
+  },
+  
+  "temperature": {
+    "thermal-zone": 0,
+    "format": "󰔏 {temperatureC}°C",
+    "format-critical": "󰔏 {temperatureC}°C",
+    "tooltip": true,
+    "interval": 5,
+    "critical-threshold": 80,
+    "on-click": "kitty -e watch -n 1 sensors"
   },
   
   "battery": {
@@ -113,13 +127,13 @@
     "format-charging": "󰂄 {capacity}%",
     "format-plugged": "󰚥 {capacity}%",
     "format-alt": "{time}",
-    "format-icons": ["󰂎", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"]
+    "format-icons": ["󰂎", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"],
+    "interval": 10
   },
   
-  "tray": {
-    "icon-size": 21,
-    "spacing": 10,
-    "show-passive-items": true,
-    "reverse-direction": false
+  "custom/power": {
+    "format": "󰐥",
+    "tooltip": false,
+    "on-click": "wlogout"
   }
 }

@@ -54,6 +54,34 @@ clean_cache() {
     find /tmp -name "*.log" -type f -mtime +7 -delete 2>/dev/null
     echo -e "${GREEN}  ✓ Old logs cleaned${NC}"
     log_message "Cleaned old log files"
+    
+    # Clean browser caches
+    local browser_dirs=(
+        "$CACHE_DIR/mozilla/firefox"
+        "$CACHE_DIR/google-chrome"
+        "$CACHE_DIR/chromium"
+        "$CACHE_DIR/BraveSoftware"
+        "$CACHE_DIR/yay"
+        "$CACHE_DIR/paru"
+    )
+    for dir in "${browser_dirs[@]}"; do
+        if [[ -d "$dir" ]]; then
+            local bsize=$(du -sb "$dir" 2>/dev/null | cut -f1)
+            rm -rf "$dir"/* 2>/dev/null || true
+            if [[ $bsize -gt 0 ]]; then
+                echo -e "${GREEN}  ✓ $(basename "$dir") cache cleaned${NC}"
+            fi
+        fi
+    done
+    
+    # Clean core dumps
+    if [[ -d /var/lib/systemd/coredump ]]; then
+        local core_size=$(du -sb /var/lib/systemd/coredump 2>/dev/null | cut -f1)
+        if [[ $core_size -gt 0 ]]; then
+            sudo rm -f /var/lib/systemd/coredump/* 2>/dev/null || true
+            echo -e "${GREEN}  ✓ Core dumps cleaned${NC}"
+        fi
+    fi
 }
 
 # Function to optimize PipeWire
@@ -118,6 +146,28 @@ optimize_hyprland() {
     fi
 }
 
+# Function to clean memory
+optimize_memory() {
+    echo -e "${YELLOW}🧠 Optimizando memoria...${NC}"
+    log_message "Optimizing memory"
+    
+    # Drop caches (requires sudo)
+    echo -e "${BLUE}  → Liberando cachés del kernel...${NC}"
+    sudo sh -c 'echo 3 > /proc/sys/vm/drop_caches' 2>/dev/null || {
+        echo -e "${YELLOW}  ⚠ No se pudieron limpiar cachés del kernel (sudo requerido)${NC}"
+    }
+    
+    # Compact memory if available
+    if [[ -f /proc/sys/vm/compact_memory ]]; then
+        sudo sh -c 'echo 1 > /proc/sys/vm/compact_memory' 2>/dev/null || true
+    fi
+    
+    # Show before/after
+    local mem_after=$(free -h | awk '/^Mem:/ {printf "Used: %s / Total: %s (%.1f%%)", $3, $2, ($3/$2)*100}')
+    echo -e "${GREEN}  ✓ Memoria: $mem_after${NC}"
+    log_message "Memory optimized: $mem_after"
+}
+
 # Function to show recommendations
 show_recommendations() {
     echo ""
@@ -150,6 +200,9 @@ main() {
         "hyprland")
             optimize_hyprland
             ;;
+        "memory")
+            optimize_memory
+            ;;
         "resources")
             check_resources
             ;;
@@ -160,17 +213,20 @@ main() {
             echo ""
             optimize_hyprland
             echo ""
+            optimize_memory
+            echo ""
             check_resources
             echo ""
             show_recommendations
             ;;
         *)
-            echo -e "${GREEN}Usage:${NC} $0 {cache|pipewire|hyprland|resources|all}"
+            echo -e "${GREEN}Usage:${NC} $0 {cache|pipewire|hyprland|memory|resources|all}"
             echo ""
             echo -e "${BLUE}Options:${NC}"
             echo -e "  ${GREEN}cache${NC}      - Clean system cache"
             echo -e "  ${GREEN}pipewire${NC}   - Optimize PipeWire audio"
             echo -e "  ${GREEN}hyprland${NC}   - Optimize Hyprland settings"
+            echo -e "  ${GREEN}memory${NC}     - Free memory and compact RAM"
             echo -e "  ${GREEN}resources${NC}  - Check system resources"
             echo -e "  ${GREEN}all${NC}        - Run all optimizations"
             echo ""

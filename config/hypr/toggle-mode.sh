@@ -1,124 +1,121 @@
 #!/bin/bash
 # #######################################################################################
-# HYPRLAND PERFORMANCE MODE TOGGLE SCRIPT
-# Script para alternar entre diferentes modos de rendimiento
+# HYPRLAND PERFORMANCE MODE TOGGLE SCRIPT (Mejorado)
+# Script unificado para alternar entre modos de rendimiento
+# No duplica gaming-mode.sh - este es para presets rápidos
 # #######################################################################################
 
-# Colores para output
+# Colores
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+CYAN='\033[0;36m'
+NC='\033[0m'
 
-# Función para mostrar ayuda
+MODE_FILE="$HOME/.config/hypr/.current_mode"
+
 show_help() {
-    echo -e "${BLUE}Hyprland Performance Mode Toggle${NC}"
+    echo -e "${CYAN}Hyprland Performance Mode Toggle${NC}"
     echo -e "${YELLOW}Uso: $0 [MODO]${NC}"
     echo ""
-    echo "Modos disponibles:"
-    echo -e "  ${GREEN}normal${NC}     - Modo normal con todas las características"
-    echo -e "  ${GREEN}gaming${NC}     - Modo gaming (sin blur, animaciones reducidas)"
-    echo -e "  ${GREEN}battery${NC}    - Modo ahorro de batería"
-    echo -e "  ${GREEN}performance${NC} - Modo alto rendimiento"
-    echo -e "  ${GREEN}status${NC}     - Mostrar modo actual"
+    echo -e "  ${GREEN}normal${NC}      - Modo normal con todas las características"
+    echo -e "  ${GREEN}gaming${NC}      - Modo gaming (máximo rendimiento)"
+    echo -e "  ${GREEN}battery${NC}     - Modo ahorro de batería"
+    echo -e "  ${GREEN}focus${NC}       - Modo concentración (sin distracciones)"
+    echo -e "  ${GREEN}status${NC}      - Mostrar modo actual"
     echo ""
+    echo -e "${BLUE}Nota:${NC} Para modo gaming completo con CPU, usa: gaming-mode.sh"
 }
 
-# Función para aplicar modo normal
+save_mode() {
+    echo "$1" > "$MODE_FILE"
+}
+
 apply_normal_mode() {
     echo -e "${GREEN}Aplicando modo normal...${NC}"
     hyprctl keyword decoration:blur:enabled true
     hyprctl keyword animations:enabled true
-    hyprctl keyword decoration:drop_shadow true
+    hyprctl keyword decoration:shadow:enabled true
     hyprctl keyword general:gaps_in 5
     hyprctl keyword general:gaps_out 20
-    echo "normal" > ~/.config/hypr/.current_mode
-    notify-send "Hyprland" "Modo normal activado" -i preferences-system
+    hyprctl keyword decoration:active_opacity 0.95
+    hyprctl keyword decoration:inactive_opacity 0.88
+    save_mode "normal"
+    notify-send "🎨 Modo Normal" "Todas las características activadas" -i preferences-system
 }
 
-# Función para aplicar modo gaming
 apply_gaming_mode() {
     echo -e "${RED}Aplicando modo gaming...${NC}"
     hyprctl keyword decoration:blur:enabled false
     hyprctl keyword animations:enabled false
-    hyprctl keyword decoration:drop_shadow false
+    hyprctl keyword decoration:shadow:enabled false
     hyprctl keyword general:gaps_in 0
     hyprctl keyword general:gaps_out 5
-    echo "gaming" > ~/.config/hypr/.current_mode
-    notify-send "Hyprland" "Modo gaming activado - Máximo rendimiento" -i applications-games
+    hyprctl keyword general:border_size 1
+    hyprctl keyword decoration:active_opacity 1.0
+    hyprctl keyword decoration:inactive_opacity 1.0
+    save_mode "gaming"
+    notify-send "🎮 Modo Gaming" "Máximo rendimiento activado" -i applications-games
 }
 
-# Función para aplicar modo batería
 apply_battery_mode() {
     echo -e "${YELLOW}Aplicando modo ahorro de batería...${NC}"
     hyprctl keyword decoration:blur:enabled false
     hyprctl keyword animations:enabled false
-    hyprctl keyword decoration:drop_shadow false
+    hyprctl keyword decoration:shadow:enabled false
     hyprctl keyword general:gaps_in 2
     hyprctl keyword general:gaps_out 5
-    echo "battery" > ~/.config/hypr/.current_mode
-    notify-send "Hyprland" "Modo ahorro de batería activado" -i battery-low
+    hyprctl keyword general:border_size 1
+    hyprctl keyword decoration:active_opacity 1.0
+    hyprctl keyword decoration:inactive_opacity 0.95
+    save_mode "battery"
+    notify-send "🔋 Modo Batería" "Ahorro de energía activado" -i battery-low
 }
 
-# Función para aplicar modo performance
-apply_performance_mode() {
-    echo -e "${BLUE}Aplicando modo alto rendimiento...${NC}"
-    hyprctl keyword decoration:blur:enabled true
-    hyprctl keyword decoration:blur:passes 1
+apply_focus_mode() {
+    echo -e "${CYAN}Aplicando modo concentración...${NC}"
+    hyprctl keyword decoration:blur:enabled false
     hyprctl keyword animations:enabled true
-    hyprctl keyword general:gaps_in 3
-    hyprctl keyword general:gaps_out 10
-    echo "performance" > ~/.config/hypr/.current_mode
-    notify-send "Hyprland" "Modo alto rendimiento activado" -i preferences-system-performance
+    hyprctl keyword decoration:shadow:enabled false
+    hyprctl keyword general:gaps_in 0
+    hyprctl keyword general:gaps_out 0
+    hyprctl keyword decoration:active_opacity 1.0
+    hyprctl keyword decoration:inactive_opacity 0.80
+    save_mode "focus"
+    notify-send "🎯 Modo Concentración" "Sin distracciones visuales" -i document-edit
 }
 
-# Función para mostrar estado actual
 show_status() {
-    if [[ -f ~/.config/hypr/.current_mode ]]; then
-        current_mode=$(cat ~/.config/hypr/.current_mode)
-        echo -e "${GREEN}Modo actual: ${YELLOW}$current_mode${NC}"
-    else
-        echo -e "${YELLOW}Modo actual: desconocido${NC}"
-    fi
+    local current="desconocido"
+    [[ -f "$MODE_FILE" ]] && current=$(cat "$MODE_FILE")
     
-    # Mostrar configuraciones actuales
+    echo -e "${CYAN}📊 Estado Actual${NC}"
+    echo -e "${YELLOW}================${NC}"
+    echo -e "Modo: ${GREEN}$current${NC}"
     echo ""
-    echo "Configuraciones actuales:"
-    echo -e "  Blur: $(hyprctl getoption decoration:blur:enabled | grep -o 'int: [0-1]' | cut -d' ' -f2)"
-    echo -e "  Animaciones: $(hyprctl getoption animations:enabled | grep -o 'int: [0-1]' | cut -d' ' -f2)"
-    echo -e "  Sombras: $(hyprctl getoption decoration:drop_shadow | grep -o 'int: [0-1]' | cut -d' ' -f2)"
+    
+    local blur=$(hyprctl getoption decoration:blur:enabled -j 2>/dev/null | jq -r '.int // "N/A"')
+    local anim=$(hyprctl getoption animations:enabled -j 2>/dev/null | jq -r '.int // "N/A"')
+    local shadow=$(hyprctl getoption decoration:shadow:enabled -j 2>/dev/null | jq -r '.int // "N/A"')
+    local gaps_in=$(hyprctl getoption general:gaps_in -j 2>/dev/null | jq -r '.int // "N/A"')
+    local gaps_out=$(hyprctl getoption general:gaps_out -j 2>/dev/null | jq -r '.int // "N/A"')
+    
+    echo -e "  Blur:     $([[ $blur == \"1\" ]] && echo -e "${GREEN}ON${NC}" || echo -e "${RED}OFF${NC}")"
+    echo -e "  Animaciones: $([[ $anim == \"1\" ]] && echo -e "${GREEN}ON${NC}" || echo -e "${RED}OFF${NC}")"
+    echo -e "  Sombras:  $([[ $shadow == \"1\" ]] && echo -e "${GREEN}ON${NC}" || echo -e "${RED}OFF${NC}")"
+    echo -e "  Gaps in:  ${BLUE}$gaps_in${NC}"
+    echo -e "  Gaps out: ${BLUE}$gaps_out${NC}"
 }
 
-# Verificar argumentos
-if [[ $# -eq 0 ]]; then
-    show_help
-    exit 1
-fi
-
-# Crear directorio si no existe
-mkdir -p ~/.config/hypr
-
-# Procesar argumentos
+# Main
 case "$1" in
-    "normal")
-        apply_normal_mode
-        ;;
-    "gaming")
-        apply_gaming_mode
-        ;;
-    "battery")
-        apply_battery_mode
-        ;;
-    "performance")
-        apply_performance_mode
-        ;;
-    "status")
-        show_status
-        ;;
-    "-h"|"--help"|"help")
-        show_help
-        ;;
+    "normal")   apply_normal_mode ;;
+    "gaming")   apply_gaming_mode ;;
+    "battery")  apply_battery_mode ;;
+    "focus")    apply_focus_mode ;;
+    "status")   show_status ;;
+    "-h"|"--help"|"help"|"") show_help ;;
     *)
         echo -e "${RED}Error: Modo '$1' no reconocido${NC}"
         show_help

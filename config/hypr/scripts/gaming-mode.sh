@@ -43,7 +43,7 @@ enable_gaming_mode() {
     
     # 3. Disable shadows
     log_message "🌑 Desactivando sombras..."
-    hyprctl keyword decoration:drop_shadow false
+    hyprctl keyword decoration:shadow:enabled false
     
     # 4. Set VRR (Variable Refresh Rate)
     log_message "📺 Habilitando VRR..."
@@ -69,8 +69,8 @@ enable_gaming_mode() {
         sudo cpupower frequency-set -g performance 2>/dev/null || log_message "⚠️ No se pudo cambiar CPU governor (sudo requerido)"
     fi
     
-    # 9. Disable compositor effects for fullscreen
-    log_message "🎬 Desactivando compositor en fullscreen..."
+    # 9. Disable dimming for gaming (full performance)
+    log_message "🎬 Desactivando dim de inactivas..."
     hyprctl keyword decoration:dim_inactive false
     
     # 10. Notify user
@@ -106,7 +106,7 @@ disable_gaming_mode() {
     
     # 3. Enable shadows
     log_message "🌓 Habilitando sombras..."
-    hyprctl keyword decoration:drop_shadow true
+    hyprctl keyword decoration:shadow:enabled true
     
     # 4. Set VRR to adaptive
     log_message "📺 VRR adaptativo..."
@@ -126,14 +126,14 @@ disable_gaming_mode() {
     pkill -CONT dunst 2>/dev/null
     pkill -CONT mako 2>/dev/null
     
-    # 8. Set CPU governor back to powersave/schedutil
+    # 8. Set CPU governor back to powersave
     if command -v cpupower &> /dev/null; then
         log_message "🔋 Restaurando CPU governor..."
-        sudo cpupower frequency-set -g schedutil 2>/dev/null || log_message "⚠️ No se pudo restaurar CPU governor"
+        sudo cpupower frequency-set -g powersave 2>/dev/null || log_message "⚠️ No se pudo restaurar CPU governor"
     fi
     
     # 9. Re-enable compositor effects
-    log_message "🎨 Habilitando efectos del compositor..."
+    log_message "🎨 Habilitando dim de inactivas..."
     hyprctl keyword decoration:dim_inactive true
     
     # 10. Notify user
@@ -161,7 +161,7 @@ show_status() {
     
     local animations=$(hyprctl getoption animations:enabled -j | jq -r '.int')
     local blur=$(hyprctl getoption decoration:blur:enabled -j | jq -r '.int')
-    local shadows=$(hyprctl getoption decoration:drop_shadow -j | jq -r '.int')
+    local shadows=$(hyprctl getoption decoration:shadow:enabled -j | jq -r '.int')
     local vrr=$(hyprctl getoption misc:vrr -j | jq -r '.int')
     local vfr=$(hyprctl getoption misc:vfr -j | jq -r '.int')
     

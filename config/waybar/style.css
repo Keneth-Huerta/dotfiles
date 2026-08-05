@@ -1,51 +1,44 @@
-/* Waybar Style - Clean, Functional and Optimized */
+/* Waybar Style - Optimizado para rendimiento */
 * {
-  font-family: "JetBrains Mono Nerd Font", "Hack Nerd Font", "JetBrains Mono", monospace;
+  font-family: "JetBrains Mono Nerd Font", "JetBrains Mono", monospace;
   font-size: 13px;
   font-weight: 500;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   margin: 0;
   padding: 0;
-  /* Performance optimization */
   text-shadow: none;
 }
 
 window#waybar {
-  background: rgba(25, 5, 5, 0.95);
-  border-bottom: 3px solid #ff4757;
+  background: rgba(15, 5, 5, 0.92);
+  border-bottom: 2px solid rgba(255, 71, 87, 0.6);
   color: #ffcccc;
-  /* Simplified: removed unsupported will-change property */
 }
 
-/* Workspaces */
+/* Workspaces - Sin transition para evitar lag */
 #workspaces {
   background: transparent;
-  margin: 5px;
-  padding: 0px 5px;
-  border-radius: 10px;
+  margin: 4px;
+  padding: 0px 4px;
 }
 
 #workspaces button {
-  padding: 5px 10px;
-  margin: 3px;
-  border-radius: 10px;
-  border: none;
+  padding: 4px 8px;
+  margin: 2px;
+  border-radius: 6px;
   color: #ffcccc;
-  background: rgba(255, 71, 87, 0.3);
-  min-width: 30px;
-  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  background: rgba(255, 71, 87, 0.25);
+  min-width: 24px;
 }
 
 #workspaces button:hover {
-  background: rgba(255, 71, 87, 0.5);
-  box-shadow: inset 0 -3px #ff4757;
+  background: rgba(255, 71, 87, 0.45);
 }
 
 #workspaces button.active {
   background: #ff4757;
   color: #ffffff;
-  box-shadow: 0 2px 8px rgba(255, 71, 87, 0.4);
 }
 
 #workspaces button.urgent {
@@ -55,147 +48,127 @@ window#waybar {
 
 /* Window Title */
 #window {
-  background: rgba(255, 71, 87, 0.2);
-  padding: 5px 15px;
-  margin: 5px;
-  border-radius: 10px;
+  background: rgba(255, 71, 87, 0.15);
+  padding: 4px 12px;
+  margin: 4px;
   color: #ffcccc;
-  transition: background 0.2s ease;
-}
-
-#window:hover {
-  background: rgba(255, 71, 87, 0.3);
 }
 
 /* Clock */
 #clock {
-  background: rgba(255, 71, 87, 0.4);
+  background: rgba(255, 71, 87, 0.35);
   color: #ffffff;
-  padding: 5px 15px;
-  margin: 5px;
-  border-radius: 10px;
+  padding: 4px 12px;
+  margin: 4px;
   font-weight: bold;
-  transition: all 0.2s ease;
 }
 
 #clock:hover {
-  background: rgba(255, 71, 87, 0.5);
+  background: rgba(255, 71, 87, 0.45);
 }
 
-/* Common module styling */
+/* Notification */
+#custom-notification {
+  background: rgba(255, 71, 87, 0.2);
+  color: #ffcccc;
+  padding: 4px 10px;
+  margin: 4px;
+}
+
+/* Common module styling - Sin transition para rendimiento */
 #pulseaudio,
 #backlight,
 #network,
-#bluetooth,
 #cpu,
 #memory,
-#battery {
-  padding: 5px 10px;
-  margin: 5px;
-  border-radius: 10px;
-  transition: all 0.2s ease;
-}
-
-#pulseaudio:hover,
-#backlight:hover,
-#network:hover,
-#bluetooth:hover,
-#cpu:hover,
-#memory:hover,
-#battery:hover {
-  box-shadow: 0 2px 8px rgba(255, 71, 87, 0.3);
+#temperature,
+#battery,
+#custom-power {
+  padding: 4px 8px;
+  margin: 4px;
+  border-radius: 6px;
 }
 
 /* Audio */
 #pulseaudio {
-  background: rgba(255, 71, 87, 0.3);
+  background: rgba(255, 71, 87, 0.25);
   color: #ffcccc;
 }
 
 #pulseaudio.muted {
-  background: rgba(255, 107, 107, 0.4);
+  background: rgba(255, 107, 107, 0.35);
   color: #ff6b6b;
 }
 
 /* Backlight */
 #backlight {
-  background: rgba(255, 71, 87, 0.3);
+  background: rgba(255, 71, 87, 0.25);
   color: #ffcccc;
 }
 
 /* Network */
 #network {
-  background: rgba(255, 71, 87, 0.3);
+  background: rgba(255, 71, 87, 0.25);
   color: #ffcccc;
 }
 
 #network.disconnected {
-  background: rgba(139, 30, 30, 0.3);
+  background: rgba(139, 30, 30, 0.25);
   color: #ff6b6b;
-}
-
-/* Bluetooth */
-#bluetooth {
-  background: rgba(255, 71, 87, 0.3);
-  color: #ffcccc;
-}
-
-#bluetooth.disabled {
-  background: rgba(139, 30, 30, 0.3);
-  color: #ff6b6b;
-}
-
-#bluetooth.off {
-  background: rgba(90, 25, 25, 0.3);
-  color: #cc6666;
-}
-
-#bluetooth.connected {
-  background: rgba(255, 120, 120, 0.4);
-  color: #ffffff;
 }
 
 /* CPU */
 #cpu {
-  background: rgba(220, 60, 70, 0.3);
+  background: rgba(220, 60, 70, 0.25);
   color: #ffcccc;
 }
 
 #cpu.warning {
-  background: rgba(255, 140, 60, 0.4);
+  background: rgba(255, 140, 60, 0.35);
   color: #ffaa66;
 }
 
 #cpu.critical {
-  background: rgba(255, 60, 60, 0.4);
+  background: rgba(255, 60, 60, 0.35);
   color: #ff6666;
 }
 
 /* Memory */
 #memory {
-  background: rgba(180, 50, 60, 0.3);
+  background: rgba(180, 50, 60, 0.25);
   color: #ffcccc;
 }
 
 #memory.warning {
-  background: rgba(255, 140, 60, 0.4);
+  background: rgba(255, 140, 60, 0.35);
   color: #ffaa66;
 }
 
 #memory.critical {
+  background: rgba(255, 60, 60, 0.35);
+  color: #ff6666;
+}
+
+/* Temperature */
+#temperature {
+  background: rgba(255, 120, 80, 0.25);
+  color: #ffcccc;
+}
+
+#temperature.critical {
   background: rgba(255, 60, 60, 0.4);
   color: #ff6666;
 }
 
 /* Battery */
 #battery {
-  background: rgba(255, 71, 87, 0.3);
+  background: rgba(255, 71, 87, 0.25);
   color: #ffcccc;
 }
 
 #battery.charging {
-  background: rgba(255, 120, 120, 0.3);
-  color: #ffcccc;
+  background: rgba(100, 255, 100, 0.25);
+  color: #ccffcc;
 }
 
 #battery.warning:not(.charging) {
@@ -208,12 +181,22 @@ window#waybar {
   color: #e74c3c;
 }
 
+/* Power Button */
+#custom-power {
+  background: rgba(255, 71, 87, 0.4);
+  color: #ffffff;
+  padding: 4px 10px;
+}
+
+#custom-power:hover {
+  background: rgba(255, 71, 87, 0.6);
+}
+
 /* System tray */
 #tray {
-  background: rgba(255, 71, 87, 0.2);
-  padding: 5px 10px;
-  margin: 5px;
-  border-radius: 10px;
+  background: rgba(255, 71, 87, 0.15);
+  padding: 4px 8px;
+  margin: 4px;
 }
 
 #tray > .passive {
@@ -225,18 +208,15 @@ window#waybar {
   background-color: #eb4d4b;
 }
 
-/* Animations removed: GTK CSS often rejects @keyframes */
-
 /* Tooltip styling */
 tooltip {
-  background: rgba(25, 5, 5, 0.95);
+  background: rgba(15, 5, 5, 0.95);
   border: 2px solid #ff4757;
-  border-radius: 8px;
+  border-radius: 6px;
   color: #ffcccc;
-  padding: 8px 12px;
+  padding: 6px 10px;
 }
 
 tooltip label {
   color: #ffcccc;
 }
-

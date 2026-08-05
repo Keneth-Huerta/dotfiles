@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# 🔴 Hyprland Reload Script with Red Theme 🔴
+# 🔴 Hyprland Reload Script with Red Theme (Mejorado)
 # Reloads Hyprland and restarts background services
+# AHORA valida la config ANTES de recargar
 
 LOG_FILE="/tmp/hyprland-reload.log"
 MAX_RETRIES=3
 
-# Function to log messages
 log_message() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" | tee -a "$LOG_FILE"
 }
@@ -15,6 +15,16 @@ log_message() {
 if ! pgrep -x Hyprland >/dev/null; then
     log_message "❌ Error: Hyprland is not running"
     notify-send "❌ Reload Failed" "Hyprland is not running" --urgency=critical
+    exit 1
+fi
+
+# ─── VALIDAR CONFIG ANTES DE RECARGAR ───
+log_message "🔍 Validando configuración antes de recargar..."
+if ~/.config/hypr/scripts/validate-config.sh >/dev/null 2>&1; then
+    log_message "✅ Configuración válida"
+else
+    log_message "❌ Configuración inválida - Abortando reload"
+    notify-send "❌ Reload Abortado" "La configuración tiene errores. Revisa con: Win+Alt+V" --urgency=critical
     exit 1
 fi
 

@@ -602,3 +602,11 @@ bat() {
 export LIBVIRT_DEFAULT_URI='qemu:///system'
 alias nstatus='nmcli device status | grep -v "veth\|br-\|docker\|virbr"'
 alias code='code --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-gpu'
+
+# === LATTICE ispLEVER Classic ===
+alias isplever='WINEPREFIX=~/.wine-isplever wine "C:\ispLEVER_Classic\bin\nt\projnav.exe"'
+
+
+# Added by Antigravity CLI installer
+export PATH="/home/valge/.local/bin:$PATH"
+export PATH="$HOME/.npm-global/bin:$PATH"

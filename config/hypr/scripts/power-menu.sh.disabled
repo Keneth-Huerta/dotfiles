@@ -1,0 +1,47 @@
+#!/bin/bash
+# Power Menu tipo Windows con Yad
+# Estilo rojo elegante, botones grandes, ventana flotante
+
+CSS="
+* {
+  font-family: 'JetBrains Mono Nerd Font', monospace;
+  font-size: 11px;
+}
+button {
+  padding: 12px 20px;
+  margin: 4px;
+  border-radius: 8px;
+  background: rgba(255, 71, 87, 0.2);
+  color: #ffcccc;
+  font-weight: bold;
+  min-width: 140px;
+  border: 1px solid rgba(255, 71, 87, 0.3);
+}
+button:hover {
+  background: rgba(255, 71, 87, 0.5);
+  border: 1px solid rgba(255, 71, 87, 0.8);
+}
+button:active {
+  background: rgba(200, 50, 50, 0.6);
+}
+"
+
+yad --title="Power Menu" \
+  --mouse \
+  --width=320 \
+  --height=260 \
+  --window-icon=system-shutdown \
+  --css="$CSS" \
+  --form \
+  --align-buttons \
+  --columns=1 \
+  --field="⏻  Apagar:BTN" "bash -c 'systemctl poweroff'" \
+  --field="🔄  Reiniciar:BTN" "bash -c 'systemctl reboot'" \
+  --field="💤  Suspender:BTN" "bash -c 'systemctl suspend'" \
+  --field="🔒  Bloquear:BTN" "bash -c 'hyprlock'" \
+  --field="🚪  Cerrar sesión:BTN" "bash -c 'loginctl terminate-user \$USER'" \
+  --button=gtk-cancel:1 \
+  --no-markup \
+  2>/dev/null
+
+exit 0
