@@ -61,7 +61,6 @@ echo "Verificando archivos principales..."
 check_file "$DOTFILES_DIR/install.sh" "Script principal de instalación"
 check_file "$DOTFILES_DIR/config.sh" "Archivo de configuración"
 check_file "$DOTFILES_DIR/README.md" "Documentación principal"
-check_file "$DOTFILES_DIR/QUICK_START.md" "Guía rápida"
 check_file "$DOTFILES_DIR/.gitignore" "Archivo gitignore"
 
 echo ""
