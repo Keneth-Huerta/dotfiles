@@ -1,3 +1,9 @@
+# ============================================================
+# DOCUMENTACION INTERNA (protocolo) — NUNCA publicar a GitHub
+# ============================================================
+internal/
+AGENTS.md
+
 # Backups
 *.bak
 *.backup
@@ -131,3 +137,9 @@ config/*history*
 # Configuraciones personales que podrían tener rutas absolutas
 config/**/*.local
 config/**/local-*
+
+# Backups de configs de hypr (ruido, no versionar)
+config/hypr/backups/
+
+# CV personal (no debe ir al repo público)
+config/hypr/scripts/cv-alvaro.tex
