@@ -341,8 +341,17 @@ install_paru() {
     return 1
 }
 
-# Función para instalar paquetes AUR
+# Función para instalar paquetes AUR (solo Arch)
 install_aur_packages() {
+    if [ "$PKG_MANAGER" != "pacman" ]; then
+        log_warn "Paquetes AUR solo disponibles en Arch Linux. Omitiendo."
+        return 0
+    fi
+    if [ -z "$AUR_HELPER" ]; then
+        log_warn "No hay AUR helper (yay/paru). Instala uno con la opción 5/6."
+        return 0
+    fi
+
     echo -e "${YELLOW}Instalando paquetes AUR...${NC}"
     
     local aur_packages=(
@@ -371,11 +380,16 @@ install_aur_packages() {
         telegram-desktop
     )
     
-    yay -S --needed --noconfirm "${aur_packages[@]}"
+    $AUR_HELPER -S --needed --noconfirm "${aur_packages[@]}"
 }
 
-# Función para instalar flatpak y aplicaciones
+# Función para instalar flatpak y aplicaciones (solo Arch)
 install_flatpak_packages() {
+    if [ "$PKG_MANAGER" != "pacman" ]; then
+        log_warn "flatpak no está soportado por este instalador en esta distro. Omitiendo."
+        return 0
+    fi
+
     echo -e "${YELLOW}Instalando flatpak...${NC}"
     run_sudo pacman -S --needed --noconfirm flatpak
     

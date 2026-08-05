@@ -155,6 +155,21 @@ install_shells() {
     
     pkg_install "${packages[@]}"
 
+    # git y curl son necesarios para instalar OMZ/plugins/p10k vía git/curl.
+    # En el flujo --all, install_shells corre ANTES que install_cli_utilities,
+    # así que hay que garantizarlos aquí.
+    if ! command_exists git || ! command_exists curl; then
+        log_info "Garantizando git y curl..."
+        pkg_install git curl
+    fi
+
+    # Verificar que zsh quedó instalado
+    if ! command_exists zsh; then
+        log_error "zsh no quedó instalado. Revisa el gestor de paquetes ($PKG_MANAGER)."
+        log_info "Si es Termux, ejecuta primero: pkg update"
+        return 1
+    fi
+
     # Instalar oh-my-zsh PRIMERO (crea ~/.oh-my-zsh/custom/plugins/)
     install_oh_my_zsh
 
@@ -215,7 +230,8 @@ install_shells() {
     log_success "Shells instalados"
 
     # Establecer zsh como shell predeterminada
-    if command_exists zsh && [ "${DISTRO:-}" != "termux" ]; then
+    # Nota: en Termux se salta (DISTRO_ID=termux); cambiar shell requiere chsh de Termux, no sudo
+    if command_exists zsh && [ "$DISTRO_ID" != "termux" ]; then
         local zsh_path
         zsh_path=$(command -v zsh)
         if [ "$SHELL" != "$zsh_path" ]; then
@@ -460,6 +476,10 @@ main() {
         log_error "No se pudo detectar la distribución"
         exit 1
     fi
+
+    # En Termux (y apt) hay que refrescar el índice antes de instalar,
+    # si no, `pkg install` falla en una instalación fresca.
+    pkg_refresh
     
     # Modo no interactivo con argumentos
     if [ $# -gt 0 ]; then

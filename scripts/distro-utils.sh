@@ -433,6 +433,23 @@ pkg_update() {
     log_success "Sistema actualizado"
 }
 
+# Actualizar el índice de paquetes (necesario en Termux y apt antes de instalar)
+pkg_refresh() {
+    case "$PKG_MANAGER" in
+        pkg)
+            log_info "Actualizando índice de paquetes (pkg update)..."
+            pkg update -y
+            ;;
+        apt)
+            log_info "Actualizando índice de paquetes (apt-get update)..."
+            sudo apt-get update -y
+            ;;
+        *)
+            return 0
+            ;;
+    esac
+}
+
 # Instalar paquetes
 # Uso: pkg_install package1 package2 package3...
 pkg_install() {
@@ -693,8 +710,12 @@ map_package_name() {
         # Build tools
         base-devel)
             case "$PKG_MANAGER" in
-                apt|pkg)
+                apt)
                     echo "build-essential"
+                    ;;
+                pkg)
+                    # Termux no tiene build-essential; trae clang/make/etc.
+                    echo "SKIP"
                     ;;
                 dnf)
                     echo "Development Tools"
@@ -759,10 +780,25 @@ install_oh_my_zsh() {
         log_info "Oh My Zsh ya está instalado"
         return 0
     fi
-    
+
+    if ! command_exists curl; then
+        log_error "curl no está instalado. No se puede descargar Oh My Zsh."
+        return 1
+    fi
+
     log_info "Instalando Oh My Zsh..."
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-    log_success "Oh My Zsh instalado"
+    local installer
+    installer="$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" || {
+        log_error "Falló la descarga del instalador de Oh My Zsh (curl)"
+        return 1
+    }
+    if sh -c "$installer" "" --unattended; then
+        log_success "Oh My Zsh instalado"
+        return 0
+    else
+        log_error "Falló la instalación de Oh My Zsh"
+        return 1
+    fi
 }
 
 # Instalar Powerlevel10k
@@ -773,6 +809,11 @@ install_powerlevel10k() {
         log_info "Powerlevel10k ya está instalado"
         return 0
     fi
+
+    if ! command_exists git; then
+        log_error "git no está instalado. No se puede clonar Powerlevel10k."
+        return 1
+    fi
     
     log_info "Instalando Powerlevel10k..."
     
@@ -780,10 +821,14 @@ install_powerlevel10k() {
     mkdir -p "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes"
     
     # Clonar Powerlevel10k
-    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$p10k_dir"
-    
-    log_success "Powerlevel10k instalado"
-    log_info "Para configurar, ejecuta: p10k configure"
+    if git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$p10k_dir" 2>/dev/null; then
+        log_success "Powerlevel10k instalado"
+        log_info "Para configurar, ejecuta: p10k configure"
+        return 0
+    else
+        log_error "Falló el clonado de Powerlevel10k"
+        return 1
+    fi
 }
 
 # Instalar Oh My Fish
@@ -792,10 +837,23 @@ install_oh_my_fish() {
         log_info "Oh My Fish ya está instalado"
         return 0
     fi
-    
+    if ! command_exists fish; then
+        log_error "fish no está instalado. No se puede instalar Oh My Fish."
+        return 1
+    fi
+    if ! command_exists curl; then
+        log_error "curl no está instalado. No se puede instalar Oh My Fish."
+        return 1
+    fi
+
     log_info "Instalando Oh My Fish..."
-    curl https://raw.githubusercontent.com/oh-my-fish/oh-my-fish/master/bin/install | fish
-    log_success "Oh My Fish instalado"
+    if curl https://raw.githubusercontent.com/oh-my-fish/oh-my-fish/master/bin/install | fish; then
+        log_success "Oh My Fish instalado"
+        return 0
+    else
+        log_error "Falló la instalación de Oh My Fish"
+        return 1
+    fi
 }
 
 # Instalar Starship
@@ -810,7 +868,13 @@ install_starship() {
     # Intentar instalar desde repositorio primero
     if ! pkg_install starship 2>/dev/null; then
         # Si falla, usar el instalador oficial
-        curl -sS https://starship.rs/install.sh | sh -s -- -y
+        if command_exists curl && curl -sS https://starship.rs/install.sh | sh -s -- -y; then
+            log_success "Starship instalado"
+            return 0
+        else
+            log_error "Falló la instalación de Starship"
+            return 1
+        fi
     fi
     
     log_success "Starship instalado"
@@ -875,6 +939,7 @@ export -f show_failed_packages_summary
 export -f suggest_alternative
 export -f try_install_with_search
 export -f pkg_update
+export -f pkg_refresh
 export -f pkg_install
 export -f aur_install
 export -f pkg_is_installed
