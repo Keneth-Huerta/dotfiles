@@ -444,9 +444,11 @@ alias dcdown='docker-compose down'
 
 # === CONFIGURACIÓN DE INTEGRACIÓN Y HERRAMIENTAS ===
 # NVM configuration optimizada
+# stderr de nvm silenciado: su aviso de .npmrc (globalconfig/prefix) rompe el
+# instant prompt de p10k por imprimir tras el preamble.
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" 2>/dev/null  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" 2>/dev/null  # This loads nvm bash_completion
 
 # Cargar zoxide si está disponible
 if command -v zoxide >/dev/null 2>&1; then
