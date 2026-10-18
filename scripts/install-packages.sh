@@ -6,7 +6,8 @@
 # Soporta: Arch, Ubuntu/Debian, Fedora y más
 # ============================================================================
 
-set -e  # Salir en caso de error
+# Sin set -e: un paquete que falle no debe abortar la instalación completa.
+# pkg_install ya reintenta paquete por paquete y registra los fallos.
 
 # Obtener directorio del script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -301,6 +302,11 @@ install_yay() {
 
 # Función para instalar paru (AUR helper alternativo)
 install_paru() {
+    if [ "$PKG_MANAGER" != "pacman" ]; then
+        log_warn "paru (AUR helper) solo está disponible en Arch Linux"
+        return 0
+    fi
+
     if command_exists paru; then
         echo -e "${GREEN}paru ya está instalado${NC}"
         return 0
