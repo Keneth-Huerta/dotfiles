@@ -23,6 +23,9 @@ PKG_UPDATE_CMD=""
 PKG_SEARCH_CMD=""
 AUR_HELPER=""
 
+# Modo simulación: heredado del instalador principal (install.sh) o del entorno.
+DRY_RUN="${DRY_RUN:-false}"
+
 # Log de paquetes fallidos
 FAILED_PACKAGES=()
 FAILED_LOG_FILE="$HOME/.dotfiles-failed-packages.log"
@@ -402,7 +405,12 @@ try_install_with_search() {
 # Actualizar sistema
 pkg_update() {
     log_info "Actualizando sistema..."
-    
+
+    if [ "$DRY_RUN" = true ]; then
+        log_info "[DRY-RUN] actualizaría el sistema con $PKG_MANAGER"
+        return 0
+    fi
+
     case "$PKG_MANAGER" in
         apt)
             sudo apt-get update
@@ -480,6 +488,10 @@ pkg_install() {
     # Si falla (p.ej. un paquete no existe), instalar uno por uno
     # para que los demás sí se instalen.
     _do_install() {
+        if [ "$DRY_RUN" = true ]; then
+            log_info "[DRY-RUN] $PKG_MANAGER instalaría: $*"
+            return 0
+        fi
         case "$PKG_MANAGER" in
             pacman)  sudo pacman -S --needed --noconfirm "$@" ;;
             apt)     sudo apt-get install -y "$@" ;;
