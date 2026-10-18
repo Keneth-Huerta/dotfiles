@@ -34,8 +34,9 @@ fi
 # Directorio de dotfiles
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Modo dry-run
-DRY_RUN=false
+# Modo dry-run (respeta DRY_RUN=true del entorno; se exporta a los sub-scripts)
+DRY_RUN="${DRY_RUN:-false}"
+export DRY_RUN
 
 # Perfil seleccionado
 SELECTED_PROFILE=""
@@ -836,6 +837,7 @@ main() {
 
     # Flags de línea de comandos
     if [ $# -gt 0 ]; then
+        local handled=true
         case "$1" in
             --full)
                 full_install
@@ -859,6 +861,9 @@ main() {
                 ;;
             --dry-run)
                 DRY_RUN=true
+                export DRY_RUN
+                log_info "Modo DRY-RUN activado: se simulará sin instalar ni modificar nada."
+                handled=false
                 ;;
             --help)
                 show_cli_help
@@ -867,10 +872,14 @@ main() {
             *)
                 log_warn "Opción desconocida: $1"
                 show_cli_help
-                return 1
+                handled=false
                 ;;
         esac
-        return 0
+        # Los flags de acción terminan aquí; --dry-run y los desconocidos
+        # continúan al menú interactivo en vez de abortar.
+        [ "$handled" = true ] && return 0
+        echo ""
+        log_info "Continuando con el menú interactivo..."
     fi
 
     while true; do
