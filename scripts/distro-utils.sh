@@ -707,6 +707,10 @@ map_package_name() {
         jq|tree|tldr)
             echo "$pkg"
             ;;
+        # Navegador y gestor de red: no existen en Termux
+        firefox|networkmanager)
+            [ "$PKG_MANAGER" = "pkg" ] && echo "SKIP" || echo "$pkg"
+            ;;
         ncdu)
             echo "$pkg"
             ;;
