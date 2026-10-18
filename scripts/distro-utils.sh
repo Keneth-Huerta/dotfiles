@@ -878,22 +878,28 @@ install_starship() {
         log_info "Starship ya está instalado"
         return 0
     fi
-    
+
     log_info "Instalando Starship..."
-    
-    # Intentar instalar desde repositorio primero
-    if ! pkg_install starship 2>/dev/null; then
-        # Si falla, usar el instalador oficial
-        if command_exists curl && curl -sS https://starship.rs/install.sh | sh -s -- -y; then
-            log_success "Starship instalado"
+
+    # 1) Repositorio de la distro. pkg_install siempre devuelve 0, así que la
+    #    única comprobación fiable es preguntar si el binario quedó disponible.
+    pkg_install starship || true
+    if command_exists starship; then
+        log_success "Starship instalado desde repositorios"
+        return 0
+    fi
+
+    # 2) Instalador oficial como respaldo (no se silencian los errores).
+    log_warn "starship no está en los repositorios; usando instalador oficial..."
+    if command_exists curl && curl -sS https://starship.rs/install.sh | sh -s -- -y; then
+        if command_exists starship; then
+            log_success "Starship instalado (instalador oficial)"
             return 0
-        else
-            log_error "Falló la instalación de Starship"
-            return 1
         fi
     fi
-    
-    log_success "Starship instalado"
+
+    log_error "No se pudo instalar Starship. Instálalo manualmente: https://starship.rs"
+    return 1
 }
 
 # Instalar AUR helper (yay)
