@@ -609,6 +609,8 @@ alias code='code --enable-features=UseOzonePlatform --ozone-platform=wayland --e
 alias isplever='WINEPREFIX=~/.wine-isplever wine "C:\ispLEVER_Classic\bin\nt\projnav.exe"'
 
 
-# Added by Antigravity CLI installer
-export PATH="/home/valge/.local/bin:$PATH"
+# === PATH DE UTILIDADES LOCALES ===
+# npm global, bun y binarios de usuario (multi-distro: sin rutas de una sola máquina)
 export PATH="$HOME/.npm-global/bin:$PATH"
+export PATH="$HOME/.cache/.bun/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
