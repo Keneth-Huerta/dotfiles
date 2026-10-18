@@ -894,7 +894,11 @@ main() {
                 bash "$DOTFILES_DIR/scripts/install-packages.sh"
                 ;;
             3)
-                bash "$DOTFILES_DIR/scripts/install-gui.sh"
+                if [ "$PKG_MANAGER" != "pacman" ]; then
+                    log_warn "El entorno gráfico (Hyprland + Waybar) solo está disponible en Arch Linux"
+                else
+                    bash "$DOTFILES_DIR/scripts/install-gui.sh"
+                fi
                 ;;
             4)
                 bash "$DOTFILES_DIR/scripts/install-cli-tools.sh"
