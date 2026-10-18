@@ -20,6 +20,11 @@ log_info() {
     echo -e "${BLUE}[INFO]${NC} $1"
 }
 
+# Función para log de advertencia (se usa más abajo)
+log_warn() {
+    echo -e "${YELLOW}[WARN]${NC} $1"
+}
+
 # Función para verificar si un comando existe
 command_exists() {
     command -v "$1" &> /dev/null
@@ -257,6 +262,14 @@ configure_system_services() {
 
 # Menú principal
 main() {
+    # Este instalador es exclusivo de Arch Linux (pacman + systemctl + Hyprland).
+    # En otras distros (p. ej. Termux) se omite sin error en vez de reventar.
+    if ! command_exists pacman; then
+        log_warn "El entorno gráfico (Hyprland + Waybar) solo se instala en Arch Linux."
+        log_info "No se encontró 'pacman'; se omite sin cambios en el sistema."
+        return 0
+    fi
+
     echo -e "${RED}╔════════════════════════════════════════╗${NC}"
     echo -e "${RED}║   INSTALACIÓN DE ENTORNO GRÁFICO      ║${NC}"
     echo -e "${RED}╚════════════════════════════════════════╝${NC}"
