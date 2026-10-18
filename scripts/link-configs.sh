@@ -9,6 +9,13 @@ NC='\033[0m'
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
+# Detección de entorno: en Termux (Android) no hay escritorio Wayland,
+# así que las configs de GUI se omiten y solo se enlazan las de CLI.
+IS_TERMUX=false
+if [ -n "${TERMUX_VERSION:-}" ] || [ -d /data/data/com.termux ]; then
+    IS_TERMUX=true
+fi
+
 # Función para crear symlink con backup
 create_symlink() {
     local source="$1"
@@ -118,9 +125,15 @@ link_starship() {
 # Función para enlazar configuraciones de Git
 link_git() {
     echo -e "${BLUE}Enlazando configuraciones de Git...${NC}"
-    
+
+    # .gitconfig es dato personal y está en .gitignore: solo se enlaza si el
+    # usuario lo tiene de verdad en el repo. Nunca se pisa un ~/.gitconfig real.
     if [ -f "$DOTFILES_DIR/config/git/.gitconfig" ]; then
         create_symlink "$DOTFILES_DIR/config/git/.gitconfig" "$HOME/.gitconfig"
+    elif [ -e "$HOME/.gitconfig" ] && [ ! -L "$HOME/.gitconfig" ]; then
+        echo -e "${YELLOW}⊘ ~/.gitconfig es local (no versionado); se conserva sin enlazar${NC}"
+    else
+        echo -e "${BLUE}⊘ config/git/.gitconfig no existe en el repo; se omite${NC}"
     fi
 }
 
@@ -189,22 +202,29 @@ link_ranger() {
 
 # Función para enlazar todas las configuraciones
 link_all() {
-    link_hyprland
-    link_waybar
-    link_kitty
+    # Configuraciones CLI / agnósticas a la distro
     link_zsh
     link_neovim
-    link_rofi
-    link_dunst
     link_starship
     link_git
     link_tmux
     link_btop
     link_fastfetch
-    link_wlogout
-    link_swaylock
-    link_mpv
     link_ranger
+
+    # Configuraciones de escritorio Wayland: no aplican en Termux/Android
+    if [ "$IS_TERMUX" = true ]; then
+        echo -e "${YELLOW}⊘ Entorno de escritorio (Hyprland/Waybar/Kitty/Rofi/Dunst/Wlogout/Swaylock/MPV) omitido en Termux${NC}"
+    else
+        link_hyprland
+        link_waybar
+        link_kitty
+        link_rofi
+        link_dunst
+        link_wlogout
+        link_swaylock
+        link_mpv
+    fi
 }
 
 # Menú principal
