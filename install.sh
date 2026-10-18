@@ -165,25 +165,25 @@ trap cleanup_sudo EXIT INT TERM
 # Funciones de utilidad
 log_info() {
     local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
-    echo -e "${BLUE}[INFO]${NC} $1" | tee -a "$LOG_FILE"
+    echo -e "${BLUE}[INFO]${NC} $1"
     echo "[$timestamp] [INFO] $1" >> "$LOG_FILE"
 }
 
 log_success() {
     local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
-    echo -e "${GREEN}[OK]${NC} $1" | tee -a "$LOG_FILE"
+    echo -e "${GREEN}[OK]${NC} $1"
     echo "[$timestamp] [SUCCESS] $1" >> "$LOG_FILE"
 }
 
 log_warn() {
     local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
-    echo -e "${YELLOW}[WARN]${NC} $1" | tee -a "$LOG_FILE"
+    echo -e "${YELLOW}[WARN]${NC} $1"
     echo "[$timestamp] [WARN] $1" >> "$LOG_FILE"
 }
 
 log_error() {
     local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
-    echo -e "${RED}[ERROR]${NC} $1" | tee -a "$LOG_FILE"
+    echo -e "${RED}[ERROR]${NC} $1"
     echo "[$timestamp] [ERROR] $1" >> "$LOG_FILE"
 }
 
